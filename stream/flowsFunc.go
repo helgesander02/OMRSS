@@ -58,10 +58,8 @@ func Random_Devices() (int, []int) {
         }
     }
     
-    //select 0,1
     numDestinations, _ := rand.Int(rand.Reader, big.NewInt(2)) 
-    //big.NewInt(n-1) n=2 select 1,2 n=3 select 2,3
-    max := big.NewInt(9) // 0~9 - source
+    max := big.NewInt(9) // 10 (0~9) - source = 9
     num, _ := rand.Int(rand.Reader, max.Sub(max, big.NewInt(3)))
     n := num.Add(num, big.NewInt(3)).Int64()
     numDestinations = numDestinations.Add(numDestinations, big.NewInt(n-1)) 
