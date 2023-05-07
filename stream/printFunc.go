@@ -4,10 +4,6 @@ import (
 	"fmt"
 )
 
-func (flows *Flows) Print_() {
-	fmt.Printf("")
-}
-
 func (flows *Flows) Print_Stream() {
 	TSNFlows := flows.TSNFlows
 	AVBFlows := flows.AVBFlows

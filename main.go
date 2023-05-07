@@ -12,8 +12,8 @@ import (
 func main() {    
     // Define Parameters
     test_case :=  flag.Int("test_case", 50, "Conducting 50 experiments")
-    tsn := flag.Int("tsn", 70, "TSN flow")
-    avb := flag.Int("avb", 30, "ANB flow")
+    tsn := flag.Int("tsn", 70, "Number of TSN flows")
+    avb := flag.Int("avb", 30, "Number of AVB flows")
     HyperPeriod := flag.Int("HyperPeriod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
     topology_print := flag.Bool("topology_print", false, "Display all topology information.")
     flows_print := flag.Bool("flows_print", false, "Display all Flows information.")
@@ -50,7 +50,11 @@ func main() {
         }
 
         // 3. Steiner Tree
+        fmt.Println("\nSteiner Tree")
+        fmt.Println("----------------------------------------")
         steninertree.SteninerTree()
+
+        
         fmt.Println("****************************************")
     }
 }

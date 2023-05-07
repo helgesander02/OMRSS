@@ -5,6 +5,7 @@ type Edge struct {
 }
 
 type Graph struct {
-    edges []Edge
-    n, m  int
+    n     int      
+    Edges []*Edge
+	terminal []int 
 }

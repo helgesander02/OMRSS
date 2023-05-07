@@ -11,7 +11,6 @@ func Generate_Flows(tsn int, avb int, HyperPeriod int) *Flows {
 		flows.Generate_AVBFlow(avb, HyperPeriod)
 		fmt.Printf("Round%d Complete generating flows.\n", round+1)
 	}	
-	fmt.Println("\n")
 	return flows
 }
 

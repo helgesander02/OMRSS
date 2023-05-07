@@ -28,9 +28,7 @@ func AddS2S(topology *Topology, fromNodeID int, toNodeID int, cost float64) {
     if connection1.IsValid(topology.Switch) {
         topology.Switch[fromNodeID].Connections = append(topology.Switch[fromNodeID].Connections, connection1)
 		topology.Switch[toNodeID].Connections = append(topology.Switch[toNodeID].Connections, connection2)
-    } else {
-        fmt.Println("Error Node not found")
-    }
+    } 
 }
 
 func AddT2S(topology *Topology, source int, cost float64) {

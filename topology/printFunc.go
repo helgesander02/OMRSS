@@ -4,10 +4,6 @@ import (
     "fmt"
 )
 
-func (topology *Topology) Print_() {
-    fmt.Printf("")
-}
-
 func (topology *Topology) Print_Topology() {
     for _, node := range topology.Talker {
         fmt.Printf("%s \n", node.Name)
