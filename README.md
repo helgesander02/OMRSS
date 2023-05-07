@@ -5,7 +5,7 @@ Simulate TSN and AVB data streams to find the best path in the topology.
 Clone this repo by `git clone https://github.com/helgesander02/MST-ACOvsOther`
 
 ## Running
-Quickstart: 'go run main.go'
+Quickstart: `go run main.go`
 More options:
 | Option | Description |
 | -------- | ---- | 
