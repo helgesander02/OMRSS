@@ -1,4 +1,4 @@
-package steninertree
+package SMT
 
 import (
     "fmt"

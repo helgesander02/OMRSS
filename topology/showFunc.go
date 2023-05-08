@@ -4,7 +4,7 @@ import (
     "fmt"
 )
 
-func (topology *Topology) Print_Topology() {
+func (topology *Topology) Show_Topology() {
     for _, node := range topology.Talker {
         fmt.Printf("%s \n", node.Name)
         for _,conn := range node.Connections {

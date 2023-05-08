@@ -1,7 +1,8 @@
-package steninertree
+package SMT
 
 type Edge struct {
-    u, v, w int
+    u, v int
+    w    float64
 }
 
 type Graph struct {

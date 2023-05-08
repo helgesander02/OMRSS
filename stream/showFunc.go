@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (flows *Flows) Print_Stream() {
+func (flows *Flows) Show_Stream() {
 	TSNFlows := flows.TSNFlows
 	AVBFlows := flows.AVBFlows
 	number := 1
@@ -30,7 +30,7 @@ func (flows *Flows) Print_Stream() {
 	}
 }
 
-func (flows *Flows) Print_Flow() {
+func (flows *Flows) Show_Flow() {
 	TSNFlows := flows.TSNFlows
 	AVBFlows := flows.AVBFlows
 	number := 1
@@ -55,7 +55,7 @@ func (flows *Flows) Print_Flow() {
 
 }
 
-func (flows *Flows) Print_Flows() {	
+func (flows *Flows) Show_Flows() {	
 	// Display all flows.
 	fmt.Printf("Total Flows:%d ( TSN Flows:%d  AVB Flows:%d )\n", 
 	len(flows.TSNFlows)+len(flows.AVBFlows), len(flows.TSNFlows), len(flows.AVBFlows))	

@@ -6,7 +6,7 @@ import (
 
     "src/topology"
     "src/stream" 
-    "src/steninertree"   
+    "src/SMT"   
 )
 
 func main() {    
@@ -15,8 +15,8 @@ func main() {
     tsn := flag.Int("tsn", 70, "Number of TSN flows")
     avb := flag.Int("avb", 30, "Number of AVB flows")
     HyperPeriod := flag.Int("HyperPeriod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
-    topology_print := flag.Bool("topology_print", false, "Display all topology information.")
-    flows_print := flag.Bool("flows_print", false, "Display all Flows information.")
+    show_topology := flag.Bool("show_topology", false, "Display all topology information.")
+    show_flows := flag.Bool("show_flows", false, "Display all Flows information.")
     flag.Parse()
 
     fmt.Println("The experimental parameters are as follows.")
@@ -36,25 +36,26 @@ func main() {
         Topology := topology.Generate_Network() 
         fmt.Println("Topology generation completed.")
 
-        if *topology_print { Topology.Print_Topology() }
+        if *show_topology { Topology.Show_Topology() }
 
         // 2. Generate Flows "src/stream"
         fmt.Println("\nGenerate Flows")
         fmt.Println("----------------------------------------")
         Flows := stream.Generate_Flows(*tsn, *avb, *HyperPeriod)
 
-        if *flows_print { 
-            Flows.Print_Flows()
-            Flows.Print_Flow()
-            Flows.Print_Stream()
+        if *show_flows { 
+            Flows.Show_Flows()
+            Flows.Show_Flow()
+            Flows.Show_Stream()
         }
 
         // 3. Steiner Tree
         fmt.Println("\nSteiner Tree")
         fmt.Println("----------------------------------------")
-        steninertree.SteninerTree()
 
-        
+        SMT.SteninerTree()
+
+
         fmt.Println("****************************************")
     }
 }

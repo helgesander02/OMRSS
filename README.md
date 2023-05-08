@@ -13,11 +13,13 @@ More options:
 | --tsn | Number of TSN flows |
 | --avb | Number of AVB flows |
 | --HyperPeriod | Greatest Common Divisor of Simulated Time LCM |
-| --topology_print | Display all topology information |
-| --flows_print | Display all Flows information |
+| --show_topology | Display all topology information |
+| --show_flows | Display all Flows information |
 
 
 ## Reference
-[Bang Ye Wu, Kun-Mao Chao, "Steiner Minimal Trees"](https://www.csie.ntu.edu.tw/~kmchao/tree10spr/Steiner.pdf)<br />
 [geeksforgeeks, "Steiner Tree Problem"](https://www.geeksforgeeks.org/steiner-tree/)<br />
-[Sharon Peng, "Kruskal’s Algorithm"](https://mycollegenotebook.medium.com/kruskal-algorithm-deb0d64ce271)<br />
+[知乎, "viterbi"](https://www.zhihu.com/question/20136144)<br />
+[Cisco, "OSPF"](https://www.cisco.com/c/zh_tw/support/docs/ip/open-shortest-path-first-ospf/7039-1.html)
+[geeksforgeeks, "Dijkstra"](https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/)
+
