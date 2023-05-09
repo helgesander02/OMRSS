@@ -6,6 +6,6 @@ import (
 )
 
 func SteninerTree() {
-	fmt.Println("123")
+	fmt.Println("SteninerTree")
 }
 

@@ -1,12 +1,12 @@
 package SMT
 
-type Edge struct {
-    u, v int
-    w    float64
+type Node struct {
+    ID string
+    Visited bool
+    Cost float64
+    Path string
 }
 
-type Graph struct {
-    n     int      
-    Edges []*Edge
-	terminal []int 
+type NodeTable struct {
+    Nodes []*Node
 }
