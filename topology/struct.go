@@ -8,7 +8,7 @@ type Node struct {
 
 type Connection struct {
     FromNodeID    int         // strat
-    ToNodeID      int         // end
+    ToNodeID      int         // next
     Cost          float64     // (125,000,000 bytes/s) 1Gbps => (750,000 bytes/6ms) 750,000 bytes under 6ms for each link
 }
  

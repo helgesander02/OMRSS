@@ -52,8 +52,9 @@ func main() {
         // 3. Steiner Tree
         fmt.Println("\nSteiner Tree")
         fmt.Println("----------------------------------------")
+        
 
-        SMT.SteninerTree()
+        SMT.SteninerTree(Topology, Flows)
 
 
         fmt.Println("****************************************")

@@ -24,18 +24,11 @@ func Generate_Network() *Topology {
     }
 
     // Switch Connection
-    AddS2S(topology, 0, 1, cost) // ConnectionFunc AddS2S
-    AddS2S(topology, 0, 2, cost)
-    AddS2S(topology, 0, 3, cost)
-    AddS2S(topology, 1, 3, cost)
-    AddS2S(topology, 2, 3, cost)
-
-    //Talker Connection
-    //AddT2S(topology, source, cost) // ConnectionFunc AddT2S
-
-    //Listener Connection
-    //AddS2L(topology, destinations, cost) // ConnectionFunc AddS2L
-    
+    topology.AddS2S(0, 1) // ConnectionFunc AddS2S
+    topology.AddS2S(0, 2)
+    topology.AddS2S(0, 3)
+    topology.AddS2S(1, 3)
+    topology.AddS2S(2, 3)    
     
     return topology
 }

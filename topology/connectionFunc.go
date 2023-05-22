@@ -13,7 +13,9 @@ func (c *Connection) IsValid(nodes []*Node) bool {
     return false
 }
 
-func AddS2S(topology *Topology, fromNodeID int, toNodeID int, cost float64) {
+func (topology *Topology) AddS2S(fromNodeID int, toNodeID int) {
+    const cost float64 = 750000 // 750,000 bytes/6ms
+
 	connection1 := &Connection{
         FromNodeID: fromNodeID,
         ToNodeID:   toNodeID,
@@ -31,7 +33,8 @@ func AddS2S(topology *Topology, fromNodeID int, toNodeID int, cost float64) {
     } 
 }
 
-func AddT2S(topology *Topology, source int, cost float64) {
+func (topology *Topology) AddT2S(source int) {
+    const cost float64 = 750000 // 750,000 bytes/6ms
     var toNodeID int
 
     if source>4 {
@@ -54,8 +57,10 @@ func AddT2S(topology *Topology, source int, cost float64) {
 
 }
 
-func AddS2L(topology *Topology, destinations []int, cost float64) {    
+func (topology *Topology) AddS2L(destinations []int) {   
+    const cost float64 = 750000 // 750,000 bytes/6ms 
     var fromNodeID int
+
     for i := 0; i < len(destinations); i++ {
         if destinations[i]>4 {
             fromNodeID = 3
@@ -76,3 +81,4 @@ func AddS2L(topology *Topology, destinations []int, cost float64) {
         topology.Listener = append(topology.Listener, topology.Nodes[destinations[i]])
     } 
 }
+

@@ -1,12 +1,19 @@
 package SMT
 
-type Node struct {
-    ID string
-    Visited bool
-    Cost float64
-    Path string
+type Graphs struct {
+    Graphs []*Graph 
 }
 
-type NodeTable struct {
-    Nodes []*Node
+type Graph struct {
+    ID int
+    Visited bool
+    Cost int
+    Path int
+    Edges []*Edge
+}
+
+type Edge struct {
+    Strat    int         
+    End      int         
+    Cost     int     
 }
