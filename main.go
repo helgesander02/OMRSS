@@ -17,6 +17,7 @@ func main() {
     HyperPeriod := flag.Int("HyperPeriod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
     show_topology := flag.Bool("show_topology", false, "Display all topology information.")
     show_flows := flag.Bool("show_flows", false, "Display all Flows information.")
+    show_trees := flag.Bool("show_trees", false, "Display all Trees information.")
     flag.Parse()
 
     fmt.Println("The experimental parameters are as follows.")
@@ -52,10 +53,11 @@ func main() {
         // 3. Steiner Tree
         fmt.Println("\nSteiner Tree")
         fmt.Println("----------------------------------------")
-        
+        Trees := SMT.SteninerTree(Topology, Flows)
 
-        SMT.SteninerTree(Topology, Flows)
-
+        if *show_trees {
+            Trees.Show_Trees()
+        }
 
         fmt.Println("****************************************")
     }

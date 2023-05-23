@@ -15,3 +15,26 @@ func (graphs *Graphs) Show_Graph() {
 		//}
     } 
 }
+
+func (trees *Trees) Show_Trees() {
+    tsn := 1
+    for _,tree := range trees.TSNTrees{  
+        fmt.Printf("TSN Tree %d \n", tsn)
+        tree.Show_Tree()
+        tsn++
+    }
+    avb := 1
+    for _,tree := range trees.AVBTrees{
+        fmt.Printf("AVB Tree %d \n", avb)
+        tree.Show_Tree()
+        avb++
+    }
+}
+
+func (tree *Tree) Show_Tree() {
+    for _, node := range tree.Nodes{
+        for _, c := range node.Connections {
+            fmt.Printf("%d --> %d \n", c.FromNodeID, c.ToNodeID)
+        }      
+    }
+}
