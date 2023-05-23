@@ -17,6 +17,7 @@ More options:
 | --HyperPeriod | Greatest Common Divisor of Simulated Time LCM |
 | --show_topology | Display all topology information |
 | --show_flows | Display all Flows information |
+| --show_trees | Display all Trees information |
 
 
 ## Reference
