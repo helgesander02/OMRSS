@@ -16,6 +16,8 @@ func (flows *Flows) Show_Stream() {
 			 	stream.Name, stream.ArrivalTime, stream.DataSize, stream.Deadline, stream.FinishTime)
 		} 		
 		number+=1
+
+		break
 	}
 
 	number = 1
@@ -27,6 +29,8 @@ func (flows *Flows) Show_Stream() {
 			 	stream.Name, stream.ArrivalTime, stream.DataSize, stream.Deadline, stream.FinishTime)
 		} 
 		number+=1
+
+		break
 	}
 }
 
@@ -41,6 +45,8 @@ func (flows *Flows) Show_Flow() {
 		fmt.Printf("%s : period:%d us, deadline:%d us, datasize:%f bytes\n",
 		name ,flow.Streams[0].FinishTime ,flow.Streams[0].Deadline ,flow.Streams[0].DataSize)	
 		number+=1
+
+		break
 	}
 
 	number = 1
@@ -51,6 +57,8 @@ func (flows *Flows) Show_Flow() {
 		fmt.Printf("%s : period:%d us, deadline:%d us, datasize:%f bytes\n",
 		name ,flow.Streams[0].FinishTime ,flow.Streams[0].Deadline ,flow.Streams[0].DataSize)	
 		number+=1
+
+		break
 	}
 
 }

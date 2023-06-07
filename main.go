@@ -14,7 +14,8 @@ func main() {
     test_case :=  flag.Int("test_case", 50, "Conducting 50 experiments")
     tsn := flag.Int("tsn", 70, "Number of TSN flows")
     avb := flag.Int("avb", 30, "Number of AVB flows")
-    HyperPeriod := flag.Int("HyperPeriod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
+    hyperperiod := flag.Int("hyperperiod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
+    bandwidth := flag.Float64("bandwidth", 750000., "1 Gbps ==> bytes/hyperperiod")
     show_topology := flag.Bool("show_topology", false, "Display all topology information.")
     show_flows := flag.Bool("show_flows", false, "Display all Flows information.")
     show_trees := flag.Bool("show_trees", false, "Display all Trees information.")
@@ -24,7 +25,7 @@ func main() {
     fmt.Println("****************************************")
     fmt.Printf("Test Case: %d\n", *test_case)
     fmt.Printf("TSN flow: %d, AVB flow: %d\n", *tsn, *avb)
-    fmt.Printf("HyperPeriod: %d\n", *HyperPeriod)
+    fmt.Printf("HyperPeriod: %d\n", *hyperperiod)
     fmt.Println("****************************************\n")
 
     // Test-Case
@@ -34,7 +35,7 @@ func main() {
         // 1. Topology Network "src/topology"
         fmt.Println("Topology Network")
         fmt.Println("----------------------------------------")
-        Topology := topology.Generate_Network() 
+        Topology := topology.Generate_Network(*bandwidth) 
         fmt.Println("Topology generation completed.")
 
         if *show_topology { Topology.Show_Topology() }
@@ -42,7 +43,7 @@ func main() {
         // 2. Generate Flows "src/stream"
         fmt.Println("\nGenerate Flows")
         fmt.Println("----------------------------------------")
-        Flows := stream.Generate_Flows(*tsn, *avb, *HyperPeriod)
+        Flows := stream.Generate_Flows(len(Topology.Nodes), *tsn, *avb, *hyperperiod)
 
         if *show_flows { 
             Flows.Show_Flows()
@@ -53,11 +54,16 @@ func main() {
         // 3. Steiner Tree
         fmt.Println("\nSteiner Tree")
         fmt.Println("----------------------------------------")
-        Trees := SMT.SteninerTree(Topology, Flows)
+        Trees := SMT.SteninerTree(Topology, Flows, *bandwidth)
 
         if *show_trees {
             Trees.Show_Trees()
         }
+
+        // 4. K Spanning Tree
+        //fmt.Println("\nK Spanning Tree")
+        //fmt.Println("----------------------------------------")
+
 
         fmt.Println("****************************************")
     }

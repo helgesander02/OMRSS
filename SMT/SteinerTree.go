@@ -1,20 +1,24 @@
 package SMT
 
-import (    
+import (   
+    "fmt"
+    "encoding/json"
+    
     "src/topology"
     "src/stream"
-    "fmt"
 )
 
-func SteninerTree(topology *topology.Topology, flows *stream.Flows) *Trees {
+func SteninerTree(topology *topology.Topology, flows *stream.Flows, cost float64) *Trees {
     trees := &Trees{}
+    
     for _, flow := range flows.TSNFlows {
-        tree := GetTree(topology, flow)
+        tree := GetTree(topology, flow, cost)
         trees.TSNTrees = append(trees.TSNTrees, tree)
     }
     fmt.Println("Finish TSN all SteninerTree")
+
     for _, flow := range flows.AVBFlows {
-        tree := GetTree(topology, flow)
+        tree := GetTree(topology, flow, cost)
         trees.AVBTrees = append(trees.AVBTrees, tree)
     }
     fmt.Println("Finish AVB all SteninerTree")
@@ -22,10 +26,11 @@ func SteninerTree(topology *topology.Topology, flows *stream.Flows) *Trees {
     return trees
 }
 
-func GetTree(topology *topology.Topology, flow *stream.Flow) *Tree {
-    t := topology
-    t.AddT2S(flow.Source)
-    t.AddS2L(flow.Destinations)
+func GetTree(topology *topology.Topology, flow *stream.Flow, cost float64) *Tree {
+    t := DeepCopy(topology) //Duplicate of Topology
+    t.AddT2S(flow.Source, cost)
+    t.AddS2L(flow.Destinations, cost)
+    //t.Show_Topology()
 
     tree := &Tree{}
     for _, terminal := range flow.Destinations {  
@@ -107,17 +112,6 @@ func AddGarph(topology *topology.Topology, terminal int) *Graphs {
     gl.ID = terminal
     graphs.Graphs = append(graphs.Graphs, gl)
 
-    for _, l := range topology.Listener {
-        if l.ID == terminal {
-            if (terminal-2000)<5{
-                graph := graphs.findGraph(0)
-                graph.AddEdge(l.Connections)
-            } else {
-                graph := graphs.findGraph(3)
-                graph.AddEdge(l.Connections)
-            } 
-        }        
-    }
     return graphs
 }
 
@@ -141,3 +135,14 @@ func (graphs *Graphs) findGraph(id int) *Graph {
     return &Graph{}
 }
 
+func DeepCopy(t1 *topology.Topology) (*topology.Topology) {
+    if buf, err := json.Marshal(t1); err != nil {
+        return nil
+    } else {
+        t2 := &topology.Topology{}
+        if err = json.Unmarshal(buf, t2); err != nil {
+            return nil
+        }
+        return t2
+    }
+}

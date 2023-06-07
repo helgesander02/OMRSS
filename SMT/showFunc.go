@@ -22,12 +22,16 @@ func (trees *Trees) Show_Trees() {
         fmt.Printf("TSN Tree %d \n", tsn)
         tree.Show_Tree()
         tsn++
+
+        break  
     }
     avb := 1
     for _,tree := range trees.AVBTrees{
         fmt.Printf("AVB Tree %d \n", avb)
         tree.Show_Tree()
         avb++
+
+        break
     }
 }
 

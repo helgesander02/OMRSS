@@ -46,20 +46,20 @@ func avb_rondam() float64 {
 	return avb_datasize_arr[datasize_rng.Int64()]
 }
 
-func Random_Devices() (int, []int) {
+func Random_Devices(Nnode int) (int, []int) {
     // Talker
-    source, _ := rand.Int(rand.Reader, big.NewInt(10))
+    source, _ := rand.Int(rand.Reader, big.NewInt(int64(Nnode)))
 
     // Listener
     destinations := []int{}
-    for i := 0; i < 10; i++ {
+    for i := 0; i < Nnode; i++ {
         if i != int(source.Int64()) {
             destinations = append(destinations, i)
         }
     }
     
     numDestinations, _ := rand.Int(rand.Reader, big.NewInt(2)) 
-    max := big.NewInt(9) // 10 (0~9) - source = 9
+    max := big.NewInt(int64(Nnode-1)) // 10 (0~9) - source = 9
     num, _ := rand.Int(rand.Reader, max.Sub(max, big.NewInt(3)))
     n := num.Add(num, big.NewInt(3)).Int64()
     numDestinations = numDestinations.Add(numDestinations, big.NewInt(n-1)) 

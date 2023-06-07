@@ -2,7 +2,6 @@ package topology
 
 type Node struct {
     ID            int           
-    Name          string
 	Connections   []*Connection               
 }
 
