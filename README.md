@@ -7,9 +7,7 @@ Taking advantage of the distinctions between the Schedulability, AVB Worst Case 
 Clone this repo by `git clone https://github.com/helgesander02/MST-ACOvsOther`<br />
 
 ## Running
-Quickstart: <br />
-`cd MST-ACOvsOther` <br />
-`go run main.go` <br />
+Quickstart: `cd MST-ACOvsOther` `go run main.go` <br />
 <br />
 More options:
 | Option | Description |

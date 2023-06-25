@@ -20,11 +20,13 @@ type Connection struct {
     Cost          float64     // (125,000,000 bytes/s) 1Gbps => (750,000 bytes/6ms) 750,000 bytes under 6ms for each link
 }
 
-type Graphs struct {
-    Graphs []*Graph 
+type Graph struct {
+    Vertexs []*Vertex
+    Count int
+    Path [][]int 
 }
 
-type Graph struct {
+type Vertex struct {
     ID int
     Visited bool
     Cost int

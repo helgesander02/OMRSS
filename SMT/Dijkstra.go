@@ -4,38 +4,95 @@ import (
 	"math"
 )
 
-func Dijkstra(graphs *Graphs, strat int, terminal int) *Graphs {
+// Sean Chou, "Dijkstra’s Algorithm"
+func Dijkstra(graph *Graph, strat int, terminal int) *Graph {
 	inf := math.MaxInt8
 
-	for _, graph := range graphs.Graphs {
-		graph.Visited = false
-		if graph.ID == strat {
-			graph.Cost = 0
+	for _, vertex := range graph.Vertexs {
+		vertex.Visited = false
+		if vertex.ID == strat {
+			vertex.Cost = 0
 		} else {
-			graph.Cost = inf
+			vertex.Cost = inf
 		}	
-		graph.Path = -1
+		vertex.Path = -1
 	}
 
-	graphs.GetShortestPath(strat, terminal)
+	// depth-first-search return all P(shortest path)
+	graph.GetShortestPath(strat, terminal) 
 
-	return graphs
+	return graph
 } 
 
-func (graphs *Graphs) GetShortestPath(strat int, terminal int) {
-	graph := graphs.findGraph(strat)
-	graph.Visited = true
+func (graph *Graph) GetShortestPath(strat int, terminal int) {
+	vertex := graph.findGraph(strat)
+	vertex.Visited = true
 
-	for _, edge := range graph.Edges {
-		nextgraph := graphs.findGraph(edge.End)
+	for _, edge := range vertex.Edges {
+		nextgraph := graph.findGraph(edge.End)
 		if nextgraph.Visited {continue}
-		if nextgraph.Cost > graph.Cost + edge.Cost {
-			nextgraph.Path = graph.ID
-			nextgraph.Cost = graph.Cost + edge.Cost		
+		if nextgraph.Cost >= vertex.Cost + edge.Cost {
+			nextgraph.Path = vertex.ID
+			nextgraph.Cost = vertex.Cost + edge.Cost
+			
+			// Find all paths to the terminal and filter out the set of shortest paths
+			if nextgraph.ID == terminal {
+				if graph.Count == 0 {
+					graph.Count = nextgraph.Cost
+					graph.AddPath(terminal)
+
+				} else if graph.Count > nextgraph.Cost {
+					graph.Count = nextgraph.Cost
+					graph.Path = graph.Path[:0]
+					graph.AddPath(terminal)
+
+				} else {
+					graph.AddPath(terminal)
+				}
+				
+			}			
 		}
 		
-		graphs.GetShortestPath(edge.End, terminal)
+		graph.GetShortestPath(edge.End, terminal)
 	}
 
-	graph.Visited = false
+	vertex.Visited = false
+}
+
+func (graph *Graph) AddPath(terminal int) {
+	var path []int
+	location := terminal
+	vertex := graph.findGraph(location)
+	path = append(path, terminal)
+
+	for vertex.Path != -1 {
+		path = append(path, vertex.Path)
+
+		location = vertex.Path
+		vertex = graph.findGraph(location)
+	}
+
+	if len(graph.Path) == 0 {
+		graph.Path = append(graph.Path, path)
+	} else {
+		InPath:= true
+		for _, P := range graph.Path {
+			if LoopCompare(P, path) {
+				InPath = false 
+				break 
+			}
+		}
+		if InPath {
+			graph.Path = append(graph.Path, path)
+		}			
+	}
+}
+
+func LoopCompare(a, b []int) bool {
+    for i, v := range a {
+        if v != b[i] {
+            return false
+        }
+    }
+    return true
 }

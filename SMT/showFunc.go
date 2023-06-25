@@ -4,15 +4,15 @@ import (
 	"fmt"
 )
 
-func (graphs *Graphs) Show_Graph() {
-    for _, g := range graphs.Graphs {
+func (graph *Graph) Show_Graph() {
+    for _, g := range graph.Vertexs {
         fmt.Printf("%d\t", g.ID)
         fmt.Printf("%v\t", g.Visited)
         fmt.Printf("%d\t", g.Cost)
         fmt.Printf("%d\n", g.Path)
-		//for _, e := range g.Edges {
-			//fmt.Printf("%d-->%d cost:%d\n", e.Strat, e.End, e.Cost)
-		//}
+		for _, e := range g.Edges {
+			fmt.Printf("%d-->%d cost:%d\n", e.Strat, e.End, e.Cost)
+		}
     } 
 }
 
@@ -37,6 +37,7 @@ func (trees *Trees) Show_Trees() {
 
 func (tree *Tree) Show_Tree() {
     for _, node := range tree.Nodes{
+        fmt.Println(node.ID)
         for _, c := range node.Connections {
             fmt.Printf("%d --> %d \n", c.FromNodeID, c.ToNodeID)
         }      
