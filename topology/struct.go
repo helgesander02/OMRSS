@@ -12,8 +12,8 @@ type Connection struct {
 }
  
 type Topology struct {
-    Talker        []*Node
-    Switch        []*Node
+    Talker        []*Node 
+    Switch        []*Node 
     Listener      []*Node   
     Nodes         []*Node 
 }   

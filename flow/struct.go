@@ -1,4 +1,4 @@
-package stream
+package flow
 
 type TSN struct {
     Period      int    // 100~2000us up500us    

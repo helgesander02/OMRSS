@@ -5,7 +5,7 @@ import (
     "flag"
 
     "src/topology"
-    "src/stream" 
+    "src/flow" 
     "src/SMT"   
 )
 
@@ -40,7 +40,7 @@ func main() {
 
         if *show_topology { Topology.Show_Topology() }
 
-        // 2. Generate Flows "src/stream"
+        // 2. Generate Flows "src/flow" 
         fmt.Println("\nGenerate Flows")
         fmt.Println("----------------------------------------")
         Flows := stream.Generate_Flows(len(Topology.Nodes), *tsn, *avb, *hyperperiod)
@@ -51,7 +51,7 @@ func main() {
             Flows.Show_Stream()
         }
 
-        // 3. Steiner Tree
+        // 3. Steiner Tree "src/SMT"
         fmt.Println("\nSteiner Tree")
         fmt.Println("----------------------------------------")
         Trees := SMT.SteninerTree(Topology, Flows, *bandwidth)

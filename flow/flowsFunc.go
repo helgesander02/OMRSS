@@ -1,4 +1,4 @@
-package stream
+package flow
 
 import (
 	"crypto/rand"
