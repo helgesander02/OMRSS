@@ -6,11 +6,11 @@ import (
     "encoding/json"
     
     "src/topology"
-    "src/stream"
+    "src/flow"
 )
 
 // Bang Ye Wu, Kun-Mao Chao, "Steiner Minimal Trees"
-func SteninerTree(topology *topology.Topology, flows *stream.Flows, cost float64) *Trees {
+func SteninerTree(topology *topology.Topology, flows *flow.Flows, cost float64) *Trees {
     trees := &Trees{}
     
     for _, flow := range flows.TSNFlows {
@@ -28,7 +28,7 @@ func SteninerTree(topology *topology.Topology, flows *stream.Flows, cost float64
     return trees
 }
 
-func GetTree(topology *topology.Topology, flow *stream.Flow, cost float64) *Tree {
+func GetTree(topology *topology.Topology, flow *flow.Flow, cost float64) *Tree {
     t := DeepCopy(topology) // Duplicate of Topology
     t.AddN2S2N(flow.Source, flow.Destinations, cost) // Undirected Graph
 
