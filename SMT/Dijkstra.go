@@ -25,11 +25,11 @@ func Dijkstra(graph *Graph, strat int, terminal int) *Graph {
 } 
 
 func (graph *Graph) GetShortestPath(strat int, terminal int) {
-	vertex := graph.findGraph(strat)
+	vertex := graph.FindGraph(strat)
 	vertex.Visited = true
 
 	for _, edge := range vertex.Edges {
-		nextgraph := graph.findGraph(edge.End)
+		nextgraph := graph.FindGraph(edge.End)
 		if nextgraph.Visited {continue}
 		if nextgraph.Cost >= vertex.Cost + edge.Cost {
 			nextgraph.Path = vertex.ID
@@ -48,11 +48,9 @@ func (graph *Graph) GetShortestPath(strat int, terminal int) {
 
 				} else {
 					graph.AddPath(terminal)
-				}
-				
+				}	
 			}			
-		}
-		
+		}	
 		graph.GetShortestPath(edge.End, terminal)
 	}
 
@@ -62,14 +60,14 @@ func (graph *Graph) GetShortestPath(strat int, terminal int) {
 func (graph *Graph) AddPath(terminal int) {
 	var path []int
 	location := terminal
-	vertex := graph.findGraph(location)
+	vertex := graph.FindGraph(location)
 	path = append(path, terminal)
 
 	for vertex.Path != -1 {
 		path = append(path, vertex.Path)
 
 		location = vertex.Path
-		vertex = graph.findGraph(location)
+		vertex = graph.FindGraph(location)
 	}
 
 	if len(graph.Path) == 0 {
@@ -95,4 +93,13 @@ func LoopCompare(a, b []int) bool {
         }
     }
     return true
+}
+
+func (graph *Graph) FindGraph(id int) *Vertex {
+    for _, vertex := range graph.Vertexs {
+        if vertex.ID == id {
+            return vertex
+        }
+    }
+    return &Vertex{}
 }
