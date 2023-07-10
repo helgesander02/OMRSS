@@ -43,7 +43,7 @@ func main() {
         // 2. Generate Flows "src/flow" 
         fmt.Println("\nGenerate Flows")
         fmt.Println("----------------------------------------")
-        Flows := stream.Generate_Flows(len(Topology.Nodes), *tsn, *avb, *hyperperiod)
+        Flows := flow.Generate_Flows(len(Topology.Nodes), *tsn, *avb, *hyperperiod)
 
         if *show_flows { 
             Flows.Show_Flows()
