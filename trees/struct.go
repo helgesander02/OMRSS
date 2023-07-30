@@ -1,12 +1,17 @@
-package SMT
+package trees
 
 type Trees struct {
-    TSNTrees []*Tree
-    AVBTrees []*Tree
+    TSNTrees []*KTrees
+    AVBTrees []*KTrees
+}
+
+type KTrees struct {
+    Trees []*Tree
 }
 
 type Tree struct {
     Nodes []*Node
+    Weight int
 }
 
 type Node struct {

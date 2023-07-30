@@ -6,7 +6,7 @@ import (
 
     "src/topology"
     "src/flow" 
-    "src/SMT"   
+    "src/trees"   
 )
 
 func main() {    
@@ -16,6 +16,7 @@ func main() {
     avb := flag.Int("avb", 30, "Number of AVB flows")
     hyperperiod := flag.Int("hyperperiod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
     bandwidth := flag.Float64("bandwidth", 750000., "1 Gbps ==> bytes/hyperperiod")
+    K := flag.Int("K", 5, "finds kth minimum spanning tree")
     show_topology := flag.Bool("show_topology", false, "Display all topology information.")
     show_flows := flag.Bool("show_flows", false, "Display all Flows information.")
     show_trees := flag.Bool("show_trees", false, "Display all Trees information.")
@@ -26,6 +27,7 @@ func main() {
     fmt.Printf("Test Case: %d\n", *test_case)
     fmt.Printf("TSN flow: %d, AVB flow: %d\n", *tsn, *avb)
     fmt.Printf("HyperPeriod: %d\n", *hyperperiod)
+    fmt.Printf("Bandwidth: %f\n", *bandwidth)
     fmt.Println("****************************************\n")
 
     // Test-Case
@@ -51,20 +53,16 @@ func main() {
             Flows.Show_Stream()
         }
 
-        // 3. Steiner Tree "src/SMT"
-        fmt.Println("\nSteiner Tree")
+        // 3. Steiner Tree "src/trees SteinerTree.go"
+        // 4. K Spanning Tree "src/trees KSpanningTree.go"
+        fmt.Printf("\nSteiner Tree and %dth Spanning Tree \n", *K)
         fmt.Println("----------------------------------------")
-        Trees := SMT.SteninerTree(Topology, Flows, *bandwidth)
+        Trees := trees.GetTrees(Topology, Flows, *bandwidth, *K)
 
         if *show_trees {
             Trees.Show_Trees()
         }
 
-        // 4. K Spanning Tree
-        //fmt.Println("\nK Spanning Tree")
-        //fmt.Println("----------------------------------------")
-
-
-        fmt.Println("****************************************")
+        fmt.Println("****************************************")    
     }
 }

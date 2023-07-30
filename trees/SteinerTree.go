@@ -1,7 +1,6 @@
-package SMT
+package trees
 
 import (   
-    "fmt"
     "math"
     "encoding/json"
     
@@ -10,25 +9,7 @@ import (
 )
 
 // Bang Ye Wu, Kun-Mao Chao, "Steiner Minimal Trees"
-func SteninerTree(topology *topology.Topology, flows *flow.Flows, cost float64) *Trees {
-    trees := &Trees{}
-    
-    for _, flow := range flows.TSNFlows {
-        tree := GetTree(topology, flow, cost)
-        trees.TSNTrees = append(trees.TSNTrees, tree)
-    }
-    fmt.Println("Finish TSN all SteninerTree")
-
-    for _, flow := range flows.AVBFlows {
-        tree := GetTree(topology, flow, cost)
-        trees.AVBTrees = append(trees.AVBTrees, tree)
-    }
-    fmt.Println("Finish AVB all SteninerTree")
-
-    return trees
-}
-
-func GetTree(topology *topology.Topology, flow *flow.Flow, cost float64) *Tree {
+func SteninerTree(topology *topology.Topology, flow *flow.Flow, cost float64) *Tree {
     t := DeepCopy(topology) // Duplicate of Topology
     t.AddN2S2N(flow.Source, flow.Destinations, cost) // Undirected Graph
 
@@ -38,13 +19,11 @@ func GetTree(topology *topology.Topology, flow *flow.Flow, cost float64) *Tree {
         Terminal = append(Terminal, d+2000)
     }
     
-    // ---------------------------------------------------------------------------------------------------
     // Determine if there is a vertex in the tree. 
     // If not, find all shortest paths between terminals and select the path with the minimum cost. 
     // Then, add all the vertices from this shortest path to the tree. 
     // If there is a vertex, find all shortest paths between the vertex and terminals. 
     // Choose the path with the minimum cost and add all the vertices from this shortest path to the tree.
-    // ---------------------------------------------------------------------------------------------------
     tree := &Tree{}
     var used_tmal []int
     for len(used_tmal) != len(Terminal) {
@@ -53,16 +32,16 @@ func GetTree(topology *topology.Topology, flow *flow.Flow, cost float64) *Tree {
             Vertexs_P := make(map[int]*Graph)
             for _, terminal := range Terminal {  
                 tmalcount := math.MaxInt8
-                for _, tmal :=  range Terminal {
+                for _, tmal :=  range Terminal {                  
                     graph := GetGarph(t)
                     graph = Dijkstra(graph, terminal, tmal)
-                    
+
                     if graph.Count == 0 { continue }
                     if tmalcount > graph.Count {
                         tmalcount = graph.Count
                         Vertexs_P[terminal] = graph
                     }
-                }                
+                }
             }
             
             // Add the shortest path with the minimum cost to the tree in sequence

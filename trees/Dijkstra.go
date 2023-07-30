@@ -1,4 +1,4 @@
-package SMT
+package trees
 
 import (
 	"math"
