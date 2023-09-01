@@ -171,12 +171,18 @@ func (list_of_trees *KTrees) InListOfTrees(MST *Tree) bool {
 		if len(tree.Nodes) == len(MST.Nodes) {
 			for index, node := range tree.Nodes {
 				if node.ID == MST.Nodes[index].ID {
-					for idx, conn := range node.Connections {
-						if conn.ToNodeID != MST.Nodes[index].Connections[idx].ToNodeID {
-							return false
+					if len(node.Connections) == len(MST.Nodes[index].Connections) {
+						for idx, conn := range node.Connections {
+							if conn.ToNodeID != MST.Nodes[index].Connections[idx].ToNodeID {
+								return false
+							}
 						}
+					} else {
+						return false
 					}
 					return true
+				} else {
+					return false
 				}
 			}
 			return false

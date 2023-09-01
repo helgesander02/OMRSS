@@ -26,8 +26,8 @@ func main() {
 	fmt.Println("****************************************")
 	fmt.Printf("Test Case: %d\n", *test_case)
 	fmt.Printf("TSN flow: %d, AVB flow: %d\n", *tsn, *avb)
-	fmt.Printf("HyperPeriod: %d\n", *hyperperiod)
-	fmt.Printf("Bandwidth: %f\n", *bandwidth)
+	fmt.Printf("HyperPeriod: %d us\n", *hyperperiod)
+	fmt.Printf("Bandwidth: %f bytes\n", *bandwidth)
 	fmt.Println("****************************************\n")
 
 	// Test-Case
