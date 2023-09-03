@@ -172,26 +172,19 @@ func (MST_prime *Tree) DFSTree(node *Node, parent *Node, visited map[*Node]bool,
 // If the list contain more than k trees then it removes the tree which have largest weight among them
 func (list_of_trees *KTrees) Add(MST *Tree, K int) {
 	if len(list_of_trees.Trees) < K {
-		list_of_trees.Trees = append(list_of_trees.Trees, MST)
+		if !(list_of_trees.InListOfTrees(MST)) {
+			list_of_trees.Trees = append(list_of_trees.Trees, MST)
+		}
 
 	} else {
 		if list_of_trees.Trees[K-1].Weight > MST.Weight {
-			for _, tree := range list_of_trees.Trees{
-				if tree.Weight < MST.Weight {
-					continue
-	
-				} else if tree.Weight > MST.Weight {
-					list_of_trees.Trees = append(list_of_trees.Trees, MST)
-	
-				} else {
-					if !(list_of_trees.InListOfTrees(MST)) {
-						list_of_trees.Trees = append(list_of_trees.Trees, MST)
-					}
-				}
+			if !(list_of_trees.InListOfTrees(MST)) {
+				list_of_trees.Trees = append(list_of_trees.Trees, MST)
 			}
 		}
-
 	}
+
+	
 
 	sort.Slice(list_of_trees.Trees, func(p, q int) bool {
 		return list_of_trees.Trees[p].Weight < list_of_trees.Trees[q].Weight
@@ -217,7 +210,13 @@ func compareTrees(tree1, tree2 *Tree) bool {
     }
 
     for i := 0; i < len(tree1.Nodes); i++ {
-        if !compareNodes(tree1.Nodes[i], tree2.Nodes[i]) {
+		node1 := tree1.getNodeByID(tree1.Nodes[i].ID)
+		node2 := tree2.getNodeByID(tree1.Nodes[i].ID)
+		if node1 == nil || node2 == nil {
+			return false
+		}
+
+        if !compareNodes(node1, node2) {
             return false
         }
     }
@@ -235,7 +234,7 @@ func compareNodes(node1, node2 *Node) bool {
     }
 
     for i := 0; i < len(node1.Connections); i++ {
-        if !compareConnections(node1.Connections[i], node2.Connections[i]) {
+        if !compareConnections(node1.Connections, node2.Connections) {
             return false
         }
     }
@@ -243,16 +242,22 @@ func compareNodes(node1, node2 *Node) bool {
     return true
 }
 
-func compareConnections(conn1, conn2 *Connection) bool {
-    if conn1.FromNodeID != conn2.FromNodeID || conn1.ToNodeID != conn2.ToNodeID {
-        return false
-    }
+func compareConnections(conn1, conn2 []*Connection) bool {
+	i:=0
+    for _, c1 := range conn1 {
+		for _, c2 := range conn2 {
+			if c2.ToNodeID == c1.ToNodeID {
+				i+=1
+			}
+		}
+	}
 
-    if conn1.Cost != conn2.Cost {
-        return false
-    }
-
-    return true
+	if i == len(conn1) {
+		return true
+	} else {
+		return false
+	}
+    
 }
 
 // Copy MST
