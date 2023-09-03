@@ -2,7 +2,6 @@ package trees
 
 import (
 	"encoding/json"
-
 	"src/topology"
 )
 

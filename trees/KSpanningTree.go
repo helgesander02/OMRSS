@@ -48,13 +48,11 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 						//fmt.Printf("E: %v\n", E)
 						//fmt.Printf("CycleList: %v\n", cyclelist)
 						//fmt.Printf("E': %v\n\n", E_prime)
+						//MST.Show_Tree()
 						MST_prime := MSTDeepCopy(AddE2MST)
 
 						// After removing E' from the AddE2MST, add it to the list_of_trees
-						MST_prime.SearchMST(list_of_trees, AddE2MST, E_prime, E, Terminal)
-						sort.Slice(list_of_trees.Trees, func(p, q int) bool {
-							return list_of_trees.Trees[p].Weight < list_of_trees.Trees[q].Weight
-						})
+						MST_prime.SearchMST(list_of_trees, AddE2MST, E_prime, E, Terminal, cost, K)
 						//list_of_trees.Show_KTrees()
 					}
 				}
@@ -63,29 +61,41 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 	}
 
 	// Select K Trees
-	Ktree := list_of_trees.Select_KTrees(K)
-	for _, tree := range Ktree {
+	//K_MSTS.Select_Min(list_of_trees)
+	for _, tree := range list_of_trees.Trees[:K-1] {
 		K_MSTS.Trees = append(K_MSTS.Trees, tree)
 	}
 
 	return K_MSTS
 }
 
+//func (K_MSTS *KTrees) Select_Min(list_of_trees *KTrees, K int) {	
+//}
+
 // Search for all trees in MST_prime after removing E'
-func (MST_prime *Tree) SearchMST(list_of_trees *KTrees, AddE2MST *Tree, E_prime [][2]int, E []int, Terminal []int) {
+func (MST_prime *Tree) SearchMST(list_of_trees *KTrees, AddE2MST *Tree, E_prime [][2]int, E []int, Terminal []int, cost float64, K int) {
 	for _, e_prime := range E_prime {
 		MST_prime.RemoveEdge(e_prime)
 		if MSTHasCycle, cyclelist := MST_prime.FindCyCle(); MSTHasCycle {
-			notree := len(list_of_trees.Trees) // Determine whether the quantity of trees in list_of_trees has increased
+			notree := len(list_of_trees.Trees) 
 			E_prime := MST_prime.GetFeedbackEdgeSet(cyclelist, E)
-			MST_prime.SearchMST(list_of_trees, MST_prime, E_prime, E, Terminal)
+			MST_prime.SearchMST(list_of_trees, MST_prime, E_prime, E, Terminal, cost, K)
+			 // Determine whether the quantity of trees in list_of_trees has increased
 			if notree < len(list_of_trees.Trees) {
+				// Restore all of them
 				MST_prime = MSTDeepCopy(AddE2MST)
+			} else { 
+				// Restore the removed edge
+				for _, P := range E_prime {
+					p := make([]int, len(P))
+					copy(p, P[:])
+					MST_prime.AddTree(p, cost)
+				}
 			}
 		}
 		if MST_prime.IsTree(Terminal) {
 			MST_prime.Weight = len(MST_prime.Nodes) - 1
-			list_of_trees.Add(MST_prime)
+			list_of_trees.Add(MST_prime, K)
 			MST_prime = MSTDeepCopy(AddE2MST)
 		}
 	}
@@ -160,40 +170,89 @@ func (MST_prime *Tree) DFSTree(node *Node, parent *Node, visited map[*Node]bool,
 
 // Adds tree t into the list, only if tree t is not in the list_of_trees
 // If the list contain more than k trees then it removes the tree which have largest weight among them
-func (list_of_trees *KTrees) Add(MST *Tree) {
-	if !(list_of_trees.InListOfTrees(MST)) {
+func (list_of_trees *KTrees) Add(MST *Tree, K int) {
+	if len(list_of_trees.Trees) < K {
 		list_of_trees.Trees = append(list_of_trees.Trees, MST)
+
+	} else {
+		if list_of_trees.Trees[K-1].Weight > MST.Weight {
+			for _, tree := range list_of_trees.Trees{
+				if tree.Weight < MST.Weight {
+					continue
+	
+				} else if tree.Weight > MST.Weight {
+					list_of_trees.Trees = append(list_of_trees.Trees, MST)
+	
+				} else {
+					if !(list_of_trees.InListOfTrees(MST)) {
+						list_of_trees.Trees = append(list_of_trees.Trees, MST)
+					}
+				}
+			}
+		}
+
 	}
+
+	sort.Slice(list_of_trees.Trees, func(p, q int) bool {
+		return list_of_trees.Trees[p].Weight < list_of_trees.Trees[q].Weight
+	})
 }
 
 func (list_of_trees *KTrees) InListOfTrees(MST *Tree) bool {
 	for _, tree := range list_of_trees.Trees {
-		if len(tree.Nodes) == len(MST.Nodes) {
-			for index, node := range tree.Nodes {
-				if node.ID == MST.Nodes[index].ID {
-					if len(node.Connections) == len(MST.Nodes[index].Connections) {
-						for idx, conn := range node.Connections {
-							if conn.ToNodeID != MST.Nodes[index].Connections[idx].ToNodeID {
-								return false
-							}
-						}
-					} else {
-						return false
-					}
-					return true
-				} else {
-					return false
-				}
-			}
-			return false
+		if compareTrees(tree, MST){
+			return true
 		}
 	}
 	return false
 }
 
-// Select a tree with minimum weight from the list_of_trees
-func (list_of_trees *KTrees) Select_KTrees(K int) []*Tree {
-	return list_of_trees.Trees[:K-1]
+func compareTrees(tree1, tree2 *Tree) bool {
+    if tree1.Weight != tree2.Weight {
+        return false
+    }
+
+    if len(tree1.Nodes) != len(tree2.Nodes) {
+        return false
+    }
+
+    for i := 0; i < len(tree1.Nodes); i++ {
+        if !compareNodes(tree1.Nodes[i], tree2.Nodes[i]) {
+            return false
+        }
+    }
+
+    return true
+}
+
+func compareNodes(node1, node2 *Node) bool {
+    if node1.ID != node2.ID {
+        return false
+    }
+
+    if len(node1.Connections) != len(node2.Connections) {
+        return false
+    }
+
+    for i := 0; i < len(node1.Connections); i++ {
+        if !compareConnections(node1.Connections[i], node2.Connections[i]) {
+            return false
+        }
+    }
+
+    return true
+}
+
+func compareConnections(conn1, conn2 *Connection) bool {
+    if conn1.FromNodeID != conn2.FromNodeID || conn1.ToNodeID != conn2.ToNodeID {
+        return false
+    }
+
+    if conn1.Cost != conn2.Cost {
+        return false
+    }
+
+    return true
 }
 
 // Copy MST

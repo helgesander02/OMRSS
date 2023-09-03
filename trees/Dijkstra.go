@@ -38,15 +38,15 @@ func (graph *Graph) GetShortestPath(strat int, terminal int) {
 		if nextvertex.Visited {
 			continue
 		}
-		if nextvertex.Cost >= vertex.Cost+edge.Cost {
-			nextvertex.Path = vertex.ID
-			nextvertex.Cost = vertex.Cost + edge.Cost
+		
+		nextvertex.Path = vertex.ID
+		nextvertex.Cost = vertex.Cost + edge.Cost
 
-			// Store all the paths from the vertex 'start' to the vertex 'end'
-			if nextvertex.ID == terminal {
-				graph.AddPath(terminal)
-			}
+		// Store all the paths from the vertex 'start' to the vertex 'end'
+		if nextvertex.ID == terminal {
+			graph.AddPath(terminal)
 		}
+		
 		graph.GetShortestPath(edge.End, terminal)
 	}
 

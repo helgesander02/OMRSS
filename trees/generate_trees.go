@@ -14,17 +14,18 @@ func GetTrees(topology *topology.Topology, flows *flow.Flows, cost float64, K in
 	for _, flow := range flows.TSNFlows {
 		tree := SteninerTree(v2v, topology, flow.Source, flow.Destinations, cost)
 		Ktrees := KSpanningTree(v2v, tree, K, flow.Source, flow.Destinations, cost)
+		//fmt.Println(len(Ktrees.Trees))
 		trees.TSNTrees = append(trees.TSNTrees, Ktrees)
-
-		break
+		break		
 	}
 	fmt.Println("Finish TSN all Trees")
 
 	for _, flow := range flows.AVBFlows {
 		tree := SteninerTree(v2v, topology, flow.Source, flow.Destinations, cost)
 		Ktrees := KSpanningTree(v2v, tree, K, flow.Source, flow.Destinations, cost)
+		//fmt.Println(len(Ktrees.Trees))
 		trees.AVBTrees = append(trees.AVBTrees, Ktrees)
-
+		break
 	}
 	fmt.Println("Finish AVB all Trees")
 

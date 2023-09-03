@@ -27,7 +27,7 @@ func (graph *Graph) Show_Path() {
 func (trees *Trees) Show_Trees() {
 	tsn := 1
 	for _, ktrees := range trees.TSNTrees {
-		fmt.Printf("TSN Tree %d \n", tsn)
+		fmt.Printf("\nTSN Tree %d \n", tsn)
 		ktrees.Show_KTrees()
 		tsn++
 
@@ -35,7 +35,7 @@ func (trees *Trees) Show_Trees() {
 	}
 	avb := 1
 	for _, ktrees := range trees.AVBTrees {
-		fmt.Printf("AVB Tree %d \n", avb)
+		fmt.Printf("\nAVB Tree %d \n", avb)
 		ktrees.Show_KTrees()
 		avb++
 
