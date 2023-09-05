@@ -7,6 +7,7 @@ import (
 	"src/flow"
 	"src/topology"
 	"src/trees"
+	"src/osaco"
 )
 
 func main() {
@@ -64,6 +65,11 @@ func main() {
 		if *show_trees {
 			Trees.Show_Trees()
 		}
+
+		// 5. OSACO "src/osaco OSACO.go"
+		fmt.Printf("\nOSACO \n")
+		fmt.Println("----------------------------------------")
+		osaco.OSACO()
 
 		fmt.Println("****************************************")
 	}

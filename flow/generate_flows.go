@@ -17,10 +17,10 @@ func Generate_Flows(Nnode int, tsn int, avb int, HyperPeriod int) *Flows {
 func (flows *Flows) Generate_TSNFlow(Nnode int, TS int, HyperPeriod int){
 	TS2 := TS/2
 	for flow:=0; flow<TS2; flow++ {
-		tsn := TSN_stream() // flowsFunc.go TSN_stream
+		tsn := TSN_stream() 
 
 		// Random End Devices 1. source ==> Talker 2. destinations ==> listener
-        source, destinations := Random_Devices(Nnode) // flowsFunc.go Random_Devices
+        source, destinations := Random_Devices(Nnode) 
 
 		Flow := Generate_stream(tsn.Period, tsn.Deadline, tsn.DataSize, HyperPeriod)
 		Flow.Source = source
@@ -33,10 +33,10 @@ func (flows *Flows) Generate_TSNFlow(Nnode int, TS int, HyperPeriod int){
 func (flows *Flows) Generate_AVBFlow(Nnode int, AS int, HyperPeriod int) {
 	AS2 := AS/2
 	for flow:=0; flow<AS2; flow++ {
-		avb := AVB_stream() // flowsFunc.go TSN_stream
+		avb := AVB_stream() 
 
 		// Random End Devices 1. source ==> Talker 2. destinations ==> listener
-        source, destinations := Random_Devices(Nnode) // flowsFunc.go Random_Devices
+        source, destinations := Random_Devices(Nnode) 
 
 		Flow := Generate_stream(avb.Period, avb.Deadline, avb.DataSize, HyperPeriod)
 		Flow.Source = source

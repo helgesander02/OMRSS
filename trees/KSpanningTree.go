@@ -1,6 +1,8 @@
 package trees
 
 import (
+	"crypto/rand"
+	"math/big"
 	"encoding/json"
 	"sort"
 )
@@ -59,18 +61,42 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 			}
 		}
 	}
-
-	// Select K Trees
-	//K_MSTS.Select_Min(list_of_trees)
-	for _, tree := range list_of_trees.Trees[:K-1] {
-		K_MSTS.Trees = append(K_MSTS.Trees, tree)
-	}
+	K_MSTS.Select_Min(list_of_trees, K)
 
 	return K_MSTS
 }
 
-//func (K_MSTS *KTrees) Select_Min(list_of_trees *KTrees, K int) {	
-//}
+// Select K Trees
+func (K_MSTS *KTrees) Select_Min(list_of_trees *KTrees, K int) {
+	treesmap := make(map[int][]*Tree)	
+	for _, tree := range list_of_trees.Trees {	
+		treesmap[tree.Weight] = append(treesmap[tree.Weight], tree)
+	}
+
+	w := K_MSTS.Trees[0].Weight
+	for len(K_MSTS.Trees) != K {
+		selectq := K - len(K_MSTS.Trees)
+		if value,  exists := treesmap[w]; exists {
+			if len(value) <= selectq {
+				for _, tree := range value {
+					K_MSTS.Trees = append(K_MSTS.Trees, tree)
+				}
+				delete(treesmap, w)
+
+			} else {
+				for q:=0; q<selectq; q++ {
+					randomIndex, _ := rand.Int(rand.Reader, big.NewInt(int64(len(value))))
+					index := int(randomIndex.Int64())
+					K_MSTS.Trees = append(K_MSTS.Trees, value[index])
+					value = append(value[:index], value[index+1:]...)
+				}
+			}
+
+		} else {
+			w += 1
+		}
+	}
+}
 
 // Search for all trees in MST_prime after removing E'
 func (MST_prime *Tree) SearchMST(list_of_trees *KTrees, AddE2MST *Tree, E_prime [][2]int, E []int, Terminal []int, cost float64, K int) {
@@ -183,8 +209,6 @@ func (list_of_trees *KTrees) Add(MST *Tree, K int) {
 			}
 		}
 	}
-
-	
 
 	sort.Slice(list_of_trees.Trees, func(p, q int) bool {
 		return list_of_trees.Trees[p].Weight < list_of_trees.Trees[q].Weight
