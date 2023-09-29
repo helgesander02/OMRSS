@@ -1,4 +1,4 @@
-package trees
+package routes
 
 //tutorialspoint, "Detect Cycle in a an Undirected Graph"
 func (tree *Tree) FindCyCle() (bool, []int) {

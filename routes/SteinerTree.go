@@ -1,12 +1,12 @@
-package trees
+package routes
 
 import (
 	"encoding/json"
-	"src/topology"
+	"src/network"
 )
 
 // Bang Ye Wu, Kun-Mao Chao, "Steiner Minimal Trees"
-func SteninerTree(v2v *V2V, topology *topology.Topology, Source int, Destinations []int, cost float64) *Tree {
+func SteninerTree(v2v *V2V, topology *network.Topology, Source int, Destinations []int, cost float64) *Tree {
 	t := TopologyDeepCopy(topology)        // Duplicate of Topology
 	t.AddN2S2N(Source, Destinations, cost) // Undirected Graph
 
@@ -172,7 +172,7 @@ func (tree *Tree) InTree(id int) (*Node, bool) {
 	return &Node{ID: id}, false
 }
 
-func GetGarph(topology *topology.Topology) *Graph {
+func GetGarph(topology *network.Topology) *Graph {
 	graph := &Graph{}
 	//Talker
 	for _, t := range topology.Talker {
@@ -201,7 +201,7 @@ func GetGarph(topology *topology.Topology) *Graph {
 	return graph
 }
 
-func (vertex *Vertex) AddEdge(connections []*topology.Connection) {
+func (vertex *Vertex) AddEdge(connections []*network.Connection) {
 	for _, c := range connections {
 		edge := &Edge{
 			Strat: c.FromNodeID,
@@ -212,11 +212,11 @@ func (vertex *Vertex) AddEdge(connections []*topology.Connection) {
 	}
 }
 
-func TopologyDeepCopy(t1 *topology.Topology) *topology.Topology {
+func TopologyDeepCopy(t1 *network.Topology) *network.Topology {
 	if buf, err := json.Marshal(t1); err != nil {
 		return nil
 	} else {
-		t2 := &topology.Topology{}
+		t2 := &network.Topology{}
 		if err = json.Unmarshal(buf, t2); err != nil {
 			return nil
 		}

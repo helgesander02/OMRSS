@@ -1,9 +1,9 @@
-package trees
+package routes
 
 import (
 	"crypto/rand"
-	"math/big"
 	"encoding/json"
+	"math/big"
 	"sort"
 )
 
@@ -68,15 +68,15 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 
 // Select K Trees
 func (K_MSTS *KTrees) Select_Min(list_of_trees *KTrees, K int) {
-	treesmap := make(map[int][]*Tree)	
-	for _, tree := range list_of_trees.Trees {	
+	treesmap := make(map[int][]*Tree)
+	for _, tree := range list_of_trees.Trees {
 		treesmap[tree.Weight] = append(treesmap[tree.Weight], tree)
 	}
 
 	w := K_MSTS.Trees[0].Weight
 	for len(K_MSTS.Trees) != K {
 		selectq := K - len(K_MSTS.Trees)
-		if value,  exists := treesmap[w]; exists {
+		if value, exists := treesmap[w]; exists {
 			if len(value) <= selectq {
 				for _, tree := range value {
 					K_MSTS.Trees = append(K_MSTS.Trees, tree)
@@ -84,7 +84,7 @@ func (K_MSTS *KTrees) Select_Min(list_of_trees *KTrees, K int) {
 				delete(treesmap, w)
 
 			} else {
-				for q:=0; q<selectq; q++ {
+				for q := 0; q < selectq; q++ {
 					randomIndex, _ := rand.Int(rand.Reader, big.NewInt(int64(len(value))))
 					index := int(randomIndex.Int64())
 					K_MSTS.Trees = append(K_MSTS.Trees, value[index])
@@ -103,14 +103,14 @@ func (MST_prime *Tree) SearchMST(list_of_trees *KTrees, AddE2MST *Tree, E_prime 
 	for _, e_prime := range E_prime {
 		MST_prime.RemoveEdge(e_prime)
 		if MSTHasCycle, cyclelist := MST_prime.FindCyCle(); MSTHasCycle {
-			notree := len(list_of_trees.Trees) 
+			notree := len(list_of_trees.Trees)
 			E_prime := MST_prime.GetFeedbackEdgeSet(cyclelist, E)
 			MST_prime.SearchMST(list_of_trees, MST_prime, E_prime, E, Terminal, cost, K)
-			 // Determine whether the quantity of trees in list_of_trees has increased
+			// Determine whether the quantity of trees in list_of_trees has increased
 			if notree < len(list_of_trees.Trees) {
 				// Restore all of them
 				MST_prime = MSTDeepCopy(AddE2MST)
-			} else { 
+			} else {
 				// Restore the removed edge
 				for _, P := range E_prime {
 					p := make([]int, len(P))
@@ -217,7 +217,7 @@ func (list_of_trees *KTrees) Add(MST *Tree, K int) {
 
 func (list_of_trees *KTrees) InListOfTrees(MST *Tree) bool {
 	for _, tree := range list_of_trees.Trees {
-		if compareTrees(tree, MST){
+		if compareTrees(tree, MST) {
 			return true
 		}
 	}
@@ -225,53 +225,53 @@ func (list_of_trees *KTrees) InListOfTrees(MST *Tree) bool {
 }
 
 func compareTrees(tree1, tree2 *Tree) bool {
-    if tree1.Weight != tree2.Weight {
-        return false
-    }
+	if tree1.Weight != tree2.Weight {
+		return false
+	}
 
-    if len(tree1.Nodes) != len(tree2.Nodes) {
-        return false
-    }
+	if len(tree1.Nodes) != len(tree2.Nodes) {
+		return false
+	}
 
-    for i := 0; i < len(tree1.Nodes); i++ {
+	for i := 0; i < len(tree1.Nodes); i++ {
 		node1 := tree1.getNodeByID(tree1.Nodes[i].ID)
 		node2 := tree2.getNodeByID(tree1.Nodes[i].ID)
 		if node1 == nil || node2 == nil {
 			return false
 		}
 
-        if !compareNodes(node1, node2) {
-            return false
-        }
-    }
+		if !compareNodes(node1, node2) {
+			return false
+		}
+	}
 
-    return true
+	return true
 }
 
 func compareNodes(node1, node2 *Node) bool {
-    if node1.ID != node2.ID {
-        return false
-    }
+	if node1.ID != node2.ID {
+		return false
+	}
 
-    if len(node1.Connections) != len(node2.Connections) {
-        return false
-    }
+	if len(node1.Connections) != len(node2.Connections) {
+		return false
+	}
 
-    for i := 0; i < len(node1.Connections); i++ {
-        if !compareConnections(node1.Connections, node2.Connections) {
-            return false
-        }
-    }
+	for i := 0; i < len(node1.Connections); i++ {
+		if !compareConnections(node1.Connections, node2.Connections) {
+			return false
+		}
+	}
 
-    return true
+	return true
 }
 
 func compareConnections(conn1, conn2 []*Connection) bool {
-	i:=0
-    for _, c1 := range conn1 {
+	i := 0
+	for _, c1 := range conn1 {
 		for _, c2 := range conn2 {
 			if c2.ToNodeID == c1.ToNodeID {
-				i+=1
+				i += 1
 			}
 		}
 	}
@@ -281,7 +281,7 @@ func compareConnections(conn1, conn2 []*Connection) bool {
 	} else {
 		return false
 	}
-    
+
 }
 
 // Copy MST

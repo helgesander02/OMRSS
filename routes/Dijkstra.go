@@ -1,4 +1,4 @@
-package trees
+package routes
 
 import (
 	"math"

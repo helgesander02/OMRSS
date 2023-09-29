@@ -1,4 +1,4 @@
-package trees
+package routes
 
 import (
 	"fmt"
@@ -24,7 +24,7 @@ func (graph *Graph) Show_Path() {
 	}
 }
 
-func (trees *Trees) Show_Trees() {
+func (trees *KTrees_set) Show_kTrees_Set() {
 	tsn := 1
 	for _, ktrees := range trees.TSNTrees {
 		fmt.Printf("\nTSN Tree %d \n", tsn)
@@ -37,6 +37,25 @@ func (trees *Trees) Show_Trees() {
 	for _, ktrees := range trees.AVBTrees {
 		fmt.Printf("\nAVB Tree %d \n", avb)
 		ktrees.Show_KTrees()
+		avb++
+
+		break
+	}
+}
+
+func (trees *Trees_set) Show_Trees_Set() {
+	tsn := 1
+	for _, tree := range trees.TSNTrees {
+		fmt.Printf("\nTSN Tree %d \n", tsn)
+		tree.Show_Tree()
+		tsn++
+
+		break
+	}
+	avb := 1
+	for _, tree := range trees.AVBTrees {
+		fmt.Printf("\nAVB Tree %d \n", avb)
+		tree.Show_Tree()
 		avb++
 
 		break

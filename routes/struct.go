@@ -1,12 +1,17 @@
-package trees
+package routes
 
-type Trees struct {
+type KTrees_set struct {
 	TSNTrees []*KTrees
 	AVBTrees []*KTrees
 }
 
 type KTrees struct {
 	Trees []*Tree
+}
+
+type Trees_set struct {
+	TSNTrees []*Tree
+	AVBTrees []*Tree
 }
 
 type Tree struct {
