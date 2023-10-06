@@ -1,4 +1,4 @@
-package algo
+package osaco
 
 type Visibility struct {
 	TSN_VB [][]float64

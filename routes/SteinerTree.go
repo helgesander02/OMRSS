@@ -11,9 +11,9 @@ func SteninerTree(v2v *V2V, topology *network.Topology, Source int, Destinations
 	t.AddN2S2N(Source, Destinations, cost) // Undirected Graph
 
 	var Terminal []int
-	Terminal = append(Terminal, Source+1000)
+	Terminal = append(Terminal, Source)
 	for _, d := range Destinations {
-		Terminal = append(Terminal, d+2000)
+		Terminal = append(Terminal, d)
 	}
 
 	// Determine if there is a vertex in the tree.

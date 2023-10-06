@@ -1,4 +1,4 @@
-package algo
+package osaco
 
 func OSACO(vb *Visibility) {
 

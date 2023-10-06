@@ -29,7 +29,7 @@ func (tree *Tree) DFSCyCle(node *Node, visited map[int]bool, parentID int, start
 		if visited[conn.ToNodeID] {
 			continue
 		}
-		toNode := tree.getNodeByID(conn.ToNodeID)
+		toNode := tree.GetNodeByID(conn.ToNodeID)
 		if tree.DFSCyCle(toNode, visited, node.ID, startID) {
 			return true
 		}
@@ -40,7 +40,7 @@ func (tree *Tree) DFSCyCle(node *Node, visited map[int]bool, parentID int, start
 func (MST_prime *Tree) GetFeedbackEdgeSet(cyclelist []int, E []int) [][2]int {
 	var E_prime [][2]int
 	for _, cycle := range cyclelist {
-		node := MST_prime.getNodeByID(cycle)
+		node := MST_prime.GetNodeByID(cycle)
 		for _, conn := range node.Connections {
 			if !(InCycleList(cyclelist, conn.ToNodeID)) {
 				continue
@@ -96,7 +96,7 @@ func InEPrime(E_prime [][2]int, nodeconn [2]int) bool {
 	return false
 }
 
-func (tree *Tree) getNodeByID(id int) *Node {
+func (tree *Tree) GetNodeByID(id int) *Node {
 	for _, node := range tree.Nodes {
 		if node.ID == id {
 			return node

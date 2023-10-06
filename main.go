@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 
-	"src/algo"
 	"src/flow"
 	"src/network"
+	algo1 "src/osaco"
 	"src/routes"
 )
 
@@ -31,7 +31,9 @@ func main() {
 	fmt.Printf("TSN flow: %d, AVB flow: %d\n", *tsn, *avb)
 	fmt.Printf("HyperPeriod: %d ns\n", *hyperperiod)
 	fmt.Printf("Bandwidth: %f bytes\n", *bandwidth)
-	fmt.Println("****************************************\n")
+	fmt.Println("****************************************")
+
+	bytes_rate := 1. / (*bandwidth / float64(*hyperperiod))
 
 	// Test-Case
 	for ts := 0; ts < *test_case; ts++ {
@@ -40,7 +42,7 @@ func main() {
 		// 1. Topology Network "generate_network.go"
 		fmt.Println("Topology Network")
 		fmt.Println("----------------------------------------")
-		Topology := network.Generate_Network(*bandwidth)
+		Topology := network.Generate_Network(bytes_rate)
 		fmt.Println("Topology generation completed.")
 
 		if *show_topology {
@@ -67,7 +69,7 @@ func main() {
 		// 3. Steiner Tree, K Spanning Tree "generate_trees.go"
 		fmt.Printf("\nSteiner Tree and %dth Spanning Tree \n", *K)
 		fmt.Println("----------------------------------------")
-		ktrees_set, Input_tree_set, BG_tree_set := routes.GetRoutes(Topology, Input_flow_set, BG_flow_set, *bandwidth, *K)
+		ktrees_set, Input_tree_set, BG_tree_set := routes.GetRoutes(Topology, Input_flow_set, BG_flow_set, bytes_rate, *K)
 
 		if *show_input_routes {
 			Input_tree_set.Show_Trees_Set()
@@ -80,9 +82,8 @@ func main() {
 		// 4. OSACO "OSACO.go"
 		fmt.Printf("\nOSACO \n")
 		fmt.Println("----------------------------------------")
-		bytes_rate := 1. / (*bandwidth / float64(*hyperperiod))
-		visibility := algo.CompVB(ktrees_set, Input_flow_set, BG_flow_set, bytes_rate)
-		algo.OSACO(visibility)
+		visibility := algo1.CompVB(ktrees_set, BG_tree_set, Input_flow_set, BG_flow_set)
+		algo1.OSACO(visibility)
 
 		fmt.Println("****************************************")
 	}

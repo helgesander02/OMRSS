@@ -22,9 +22,9 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 
 	// step2~K (K=2~K)
 	var Terminal []int
-	Terminal = append(Terminal, Source+1000)
+	Terminal = append(Terminal, Source)
 	for _, d := range Destinations {
-		Terminal = append(Terminal, d+2000)
+		Terminal = append(Terminal, d)
 	}
 
 	// Generate all possible trees and then select K of them based on their weight
@@ -128,8 +128,8 @@ func (MST_prime *Tree) SearchMST(list_of_trees *KTrees, AddE2MST *Tree, E_prime 
 }
 
 func (MST_prime *Tree) RemoveEdge(e_prime [2]int) {
-	node1 := MST_prime.getNodeByID(e_prime[0])
-	node2 := MST_prime.getNodeByID(e_prime[1])
+	node1 := MST_prime.GetNodeByID(e_prime[0])
+	node2 := MST_prime.GetNodeByID(e_prime[1])
 
 	for index, conn1 := range node1.Connections {
 		if conn1.ToNodeID == node2.ID {
@@ -163,10 +163,10 @@ func (MST_prime *Tree) IsTree(Terminal []int) bool {
 	root := MST_prime.Nodes[0]
 	visited := make(map[*Node]bool)
 
-	return MST_prime.DFSTree(root, nil, visited, Terminal) && len(visited) == len(MST_prime.Nodes)
+	return DFSTree(MST_prime, root, nil, visited, Terminal) && len(visited) == len(MST_prime.Nodes)
 }
 
-func (MST_prime *Tree) DFSTree(node *Node, parent *Node, visited map[*Node]bool, Terminal []int) bool {
+func DFSTree(MST_prime *Tree, node *Node, parent *Node, visited map[*Node]bool, Terminal []int) bool {
 	if visited[node] {
 		return false
 	}
@@ -186,7 +186,7 @@ func (MST_prime *Tree) DFSTree(node *Node, parent *Node, visited map[*Node]bool,
 			}
 
 		}
-		if MST_prime.getNodeByID(conn.ToNodeID) != parent && !(MST_prime.DFSTree(MST_prime.getNodeByID(conn.ToNodeID), node, visited, Terminal)) {
+		if MST_prime.GetNodeByID(conn.ToNodeID) != parent && !(DFSTree(MST_prime, MST_prime.GetNodeByID(conn.ToNodeID), node, visited, Terminal)) {
 			return false
 		}
 	}
@@ -234,8 +234,8 @@ func compareTrees(tree1, tree2 *Tree) bool {
 	}
 
 	for i := 0; i < len(tree1.Nodes); i++ {
-		node1 := tree1.getNodeByID(tree1.Nodes[i].ID)
-		node2 := tree2.getNodeByID(tree1.Nodes[i].ID)
+		node1 := tree1.GetNodeByID(tree1.Nodes[i].ID)
+		node2 := tree2.GetNodeByID(tree1.Nodes[i].ID)
 		if node1 == nil || node2 == nil {
 			return false
 		}
@@ -281,7 +281,6 @@ func compareConnections(conn1, conn2 []*Connection) bool {
 	} else {
 		return false
 	}
-
 }
 
 // Copy MST
