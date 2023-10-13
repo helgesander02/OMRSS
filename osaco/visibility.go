@@ -1,13 +1,13 @@
 package osaco
 
 import (
+	"fmt"
 	"src/flow"
 	"src/routes"
 	"time"
 )
 
 func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
-	BG_trees_set := X.BG_SteinerTree_set()
 	Input_flow_set := flow_set.Input_flow_set()
 	BG_flow_set := flow_set.BG_flow_set()
 
@@ -46,13 +46,13 @@ func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 			}
 
 			if nth < bg_avb_start {
-				//fmt.Printf("Input flow%d tree%d \n", nth, kth)
-				value := mult / WCD(z, BG_trees_set, Input_flow_set.AVBFlows[nth])
+				fmt.Printf("Input flow%d tree%d \n", nth, kth)
+				value := mult / WCD(z, X, Input_flow_set.AVBFlows[nth], flow_set)
 				v = append(v, value)
 
 			} else {
-				//fmt.Printf("Backgourd flow%d tree%d \n", nth, kth)
-				value := mult / WCD(z, BG_trees_set, BG_flow_set.AVBFlows[nth-bg_avb_start])
+				fmt.Printf("Backgourd flow%d tree%d \n", nth, kth)
+				value := mult / WCD(z, X, BG_flow_set.AVBFlows[nth-bg_avb_start], flow_set)
 				v = append(v, value)
 			}
 		}
@@ -62,18 +62,18 @@ func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 	return visibility
 }
 
-func WCD(z *routes.Tree, BG_trees_set *routes.Trees_set, flow *flow.Flow) float64 {
+func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *flow.Flow, flow_set *flow.Flows) float64 {
 	end2end := time.Duration(0)
 	node := z.GetNodeByID(flow.Source)
-	wcd := EndtoEndDelay(node, -1, end2end, z, BG_trees_set, flow)
-	//fmt.Printf("max wcd: %v \n", wcd)
+	wcd := EndtoEndDelay(node, -1, end2end, z, KTrees_set, flow, flow_set)
+	fmt.Printf("max wcd: %v \n", wcd)
 
 	return float64(wcd)
 }
 
 // Use DFS to find all dataflow paths in the Route
 // Calculate the End to End Delay for each dataflow path and select the maximum one
-func EndtoEndDelay(node *routes.Node, parentID int, end2end time.Duration, z *routes.Tree, BG_trees_set *routes.Trees_set, flow *flow.Flow) time.Duration {
+func EndtoEndDelay(node *routes.Node, parentID int, end2end time.Duration, z *routes.Tree, KTrees_set *routes.KTrees_set, flow *flow.Flow, flow_set *flow.Flows) time.Duration {
 	//fmt.Printf("%d: %v \n", node.ID, end2end)
 	maxE2E := end2end
 	for _, link := range node.Connections {
@@ -85,12 +85,12 @@ func EndtoEndDelay(node *routes.Node, parentID int, end2end time.Duration, z *ro
 			// Calculation of latency for a single link
 			per_hop += transmit_avb_itself(flow.Streams[0].DataSize, link.Cost)
 			//per_hop += interfere_from_be(conn.Cost)
-			per_hop += interfere_from_avb(link, BG_trees_set, flow.Streams[0].DataSize)
-			per_hop += interfere_from_tsn(per_hop, link, flow)
+			per_hop += interfere_from_avb(link, KTrees_set, flow.Streams[0].DataSize)
+			per_hop += interfere_from_tsn(link, KTrees_set, flow_set)
 			end2end += per_hop
 
 			nextnode := z.GetNodeByID(link.ToNodeID)
-			nextE2E := EndtoEndDelay(nextnode, node.ID, end2end, z, BG_trees_set, flow)
+			nextE2E := EndtoEndDelay(nextnode, node.ID, end2end, z, KTrees_set, flow, flow_set)
 
 			if maxE2E < nextE2E {
 				maxE2E = nextE2E
@@ -123,15 +123,17 @@ func interfere_from_be(bytes_rate float64) time.Duration {
 }
 
 // The time occupied by other AVB packets during transmission
-func interfere_from_avb(link *routes.Connection, BG_trees_set *routes.Trees_set, datasize float64) time.Duration {
+func interfere_from_avb(link *routes.Connection, KTrees_set *routes.KTrees_set, datasize float64) time.Duration {
 	// Occupied bytes by other AVB
 	var occupiedbytes float64
-	for _, tree := range BG_trees_set.AVBTrees {
-		node := tree.GetNodeByID(link.FromNodeID)
-		if node != nil {
-			for _, conn := range node.Connections {
-				if conn.ToNodeID == link.ToNodeID {
-					occupiedbytes += datasize
+	for _, avb_ktree := range KTrees_set.AVBTrees {
+		for _, tree := range avb_ktree.Trees {
+			node := tree.GetNodeByID(link.FromNodeID)
+			if node != nil {
+				for _, conn := range node.Connections {
+					if conn.ToNodeID == link.ToNodeID {
+						occupiedbytes += datasize
+					}
 				}
 			}
 		}
@@ -143,7 +145,23 @@ func interfere_from_avb(link *routes.Connection, BG_trees_set *routes.Trees_set,
 
 // Sune Mølgaard Laursen, Paul Pop, Wilfried Steiner, "Routing Optimization of AVB Streams in TSN Networks"
 // The known time occupied by TSN packets during transmission
-func interfere_from_tsn(twc time.Duration, link *routes.Connection, linkflow *flow.Flow) time.Duration {
+func interfere_from_tsn(link *routes.Connection, KTrees_set *routes.KTrees_set, flow_set *flow.Flows) time.Duration {
+	// Occupied bytes by TSN
+	var occupiedbytes float64
+	for nth, tsn_ktree := range KTrees_set.TSNTrees {
+		for _, tree := range tsn_ktree.Trees {
+			node := tree.GetNodeByID(link.FromNodeID)
+			if node != nil {
+				for _, conn := range node.Connections {
+					if conn.ToNodeID == link.ToNodeID {
+						// occupiedbytes += datasize * (hyperPeriod / period)
+						occupiedbytes += flow_set.TSNFlows[nth].Streams[0].DataSize *
+							(float64(flow_set.TSNFlows[nth].Streams[len(flow_set.TSNFlows[nth].Streams)-1].FinishTime) / float64(flow_set.TSNFlows[nth].Streams[1].ArrivalTime))
+					}
+				}
+			}
+		}
+	}
 
-	return time.Duration(0)
+	return transmit_avb_itself(occupiedbytes, link.Cost)
 }
