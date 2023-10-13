@@ -12,9 +12,7 @@ func SteninerTree(v2v *V2V, topology *network.Topology, Source int, Destinations
 
 	var Terminal []int
 	Terminal = append(Terminal, Source)
-	for _, d := range Destinations {
-		Terminal = append(Terminal, d)
-	}
+	Terminal = append(Terminal, Destinations...)
 
 	// Determine if there is a vertex in the tree.
 	// If not, find all shortest paths between terminals and select the path with the minimum cost.

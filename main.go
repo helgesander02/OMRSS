@@ -18,11 +18,10 @@ func main() {
 	hyperperiod := flag.Int("hyperperiod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
 	bandwidth := flag.Float64("bandwidth", 750000., "1 Gbps ==> bytes/hyperperiod")
 	K := flag.Int("K", 5, "finds kth minimum spanning tree")
+
 	show_topology := flag.Bool("show_topology", false, "Display all topology information.")
-	show_input_flows := flag.Bool("show_input_flows", false, "Display all input Flows information.")
-	show_bg_flows := flag.Bool("show_bg_flows", false, "Display all background Flows information.")
-	show_input_routes := flag.Bool("show_input_routes", false, "Display all inputflows routes information.")
-	show_bg_routes := flag.Bool("show_bg_routes", false, "Display all backgroundflows routes information.")
+	show_flows := flag.Bool("show_flows", false, "Display all flows information.")
+	show_routes := flag.Bool("show_routes", false, "Display all routes information.")
 	flag.Parse()
 
 	fmt.Println("The experimental parameters are as follows.")
@@ -52,37 +51,27 @@ func main() {
 		// 2. Generate Flows "generate_flows.go"
 		fmt.Println("\nGenerate Flows")
 		fmt.Println("----------------------------------------")
-		Input_flow_set, BG_flow_set := flow.Generate_Flows(len(Topology.Nodes), *tsn, *avb, *hyperperiod)
+		flow_set := flow.Generate_Flows(len(Topology.Nodes), *tsn, *avb, *hyperperiod)
 
-		if *show_input_flows {
-			Input_flow_set.Show_Flows()
-			Input_flow_set.Show_Flow()
-			Input_flow_set.Show_Stream()
-		}
-
-		if *show_bg_flows {
-			BG_flow_set.Show_Flows()
-			BG_flow_set.Show_Flow()
-			BG_flow_set.Show_Stream()
+		if *show_flows {
+			flow_set.Show_Flows()
+			flow_set.Show_Flow()
+			flow_set.Show_Stream()
 		}
 
 		// 3. Steiner Tree, K Spanning Tree "generate_trees.go"
 		fmt.Printf("\nSteiner Tree and %dth Spanning Tree \n", *K)
 		fmt.Println("----------------------------------------")
-		ktrees_set, Input_tree_set, BG_tree_set := routes.GetRoutes(Topology, Input_flow_set, BG_flow_set, bytes_rate, *K)
+		ktrees_set := routes.GetRoutes(Topology, flow_set, bytes_rate, *K)
 
-		if *show_input_routes {
-			Input_tree_set.Show_Trees_Set()
-		}
-
-		if *show_bg_routes {
-			BG_tree_set.Show_Trees_Set()
+		if *show_routes {
+			ktrees_set.Show_kTrees_Set()
 		}
 
 		// 4. OSACO "OSACO.go"
 		fmt.Printf("\nOSACO \n")
 		fmt.Println("----------------------------------------")
-		visibility := algo1.CompVB(ktrees_set, BG_tree_set, Input_flow_set, BG_flow_set)
+		visibility := algo1.CompVB(ktrees_set, flow_set)
 		algo1.OSACO(visibility)
 
 		fmt.Println("****************************************")

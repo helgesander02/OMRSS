@@ -4,23 +4,16 @@ import (
 	"fmt"
 )
 
-func Generate_Flows(Nnode int, tsn int, avb int, HyperPeriod int) (*Flows, *Flows) {
-	Input_flow_set := &Flows{}
-	BG_flow_set := &Flows{}
+func Generate_Flows(Nnode int, tsn int, avb int, HyperPeriod int) *Flows {
+	flow_set := &Flows{}
 	for round := 0; round < 2; round++ {
-		if round == 0 {
-			Input_flow_set.Generate_TSNFlow(Nnode, tsn, HyperPeriod)
-			Input_flow_set.Generate_AVBFlow(Nnode, avb, HyperPeriod)
-			fmt.Printf("Complete generating input streams.\n")
+		flow_set.Generate_TSNFlow(Nnode, tsn, HyperPeriod)
+		flow_set.Generate_AVBFlow(Nnode, avb, HyperPeriod)
+		fmt.Printf("Complete generating round%d streams.\n", round+1)
 
-		} else {
-			BG_flow_set.Generate_TSNFlow(Nnode, tsn, HyperPeriod)
-			BG_flow_set.Generate_AVBFlow(Nnode, avb, HyperPeriod)
-			fmt.Printf("Complete generating background streams.\n")
-
-		}
 	}
-	return Input_flow_set, BG_flow_set
+
+	return flow_set
 }
 
 func (flows *Flows) Generate_TSNFlow(Nnode int, TS int, HyperPeriod int) {
@@ -28,7 +21,7 @@ func (flows *Flows) Generate_TSNFlow(Nnode int, TS int, HyperPeriod int) {
 	for flow := 0; flow < TS2; flow++ {
 		tsn := TSN_stream()
 
-		// Random End Devices 1. source ==> Talker 2. destinations ==> listener
+		// Random End Devices 1. source(Talker) 2. destinations(listener)
 		source, destinations := Random_Devices(Nnode)
 
 		Flow := Generate_stream(tsn.Period, tsn.Deadline, tsn.DataSize, HyperPeriod)
@@ -44,7 +37,7 @@ func (flows *Flows) Generate_AVBFlow(Nnode int, AS int, HyperPeriod int) {
 	for flow := 0; flow < AS2; flow++ {
 		avb := AVB_stream()
 
-		// Random End Devices 1. source ==> Talker 2. destinations ==> listener
+		// Random End Devices 1. source(Talker) 2. destinations(listener)
 		source, destinations := Random_Devices(Nnode)
 
 		Flow := Generate_stream(avb.Period, avb.Deadline, avb.DataSize, HyperPeriod)

@@ -1,11 +1,12 @@
 package routes
 
-//tutorialspoint, "Detect Cycle in a an Undirected Graph"
+// Detect Cycle in a an Undirected Graph
+// https://www.tutorialspoint.com/Detect-Cycle-in-a-an-Undirected-Graph
 func (tree *Tree) FindCyCle() (bool, []int) {
 	var cyclelist []int
 	for _, node := range tree.Nodes {
 		visited := make(map[int]bool)
-		if tree.DFSCyCle(node, visited, -1, node.ID) {
+		if DFSCyCle(tree, node, visited, -1, node.ID) {
 			cyclelist = append(cyclelist, node.ID)
 
 		}
@@ -17,7 +18,7 @@ func (tree *Tree) FindCyCle() (bool, []int) {
 	}
 }
 
-func (tree *Tree) DFSCyCle(node *Node, visited map[int]bool, parentID int, startID int) bool {
+func DFSCyCle(tree *Tree, node *Node, visited map[int]bool, parentID int, startID int) bool {
 	visited[node.ID] = true
 	for _, conn := range node.Connections {
 		if conn.ToNodeID == parentID {
@@ -30,13 +31,15 @@ func (tree *Tree) DFSCyCle(node *Node, visited map[int]bool, parentID int, start
 			continue
 		}
 		toNode := tree.GetNodeByID(conn.ToNodeID)
-		if tree.DFSCyCle(toNode, visited, node.ID, startID) {
+		if DFSCyCle(tree, toNode, visited, node.ID, startID) {
 			return true
 		}
 	}
 	return false
 }
 
+// How to find feedback edge set in undirected graph
+// https://stackoverflow.com/questions/10791689/how-to-find-feedback-edge-set-in-undirected-graph
 func (MST_prime *Tree) GetFeedbackEdgeSet(cyclelist []int, E []int) [][2]int {
 	var E_prime [][2]int
 	for _, cycle := range cyclelist {
@@ -94,13 +97,4 @@ func InEPrime(E_prime [][2]int, nodeconn [2]int) bool {
 		}
 	}
 	return false
-}
-
-func (tree *Tree) GetNodeByID(id int) *Node {
-	for _, node := range tree.Nodes {
-		if node.ID == id {
-			return node
-		}
-	}
-	return nil
 }

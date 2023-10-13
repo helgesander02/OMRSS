@@ -19,10 +19,8 @@ More options:
 | --bandwidth | 1 Gbps ==> bytes/hyperperiod  |
 | --K | finds kth minimum spanning tree |
 | --show_topology | Display all topology information |
-| --show_input_flows | Display all input Flows information |
-| --show_bg_flows | Display all background Flows information |
-| --show_input_trees | Display all input Flows Trees information |
-| --show_bg_trees | Display all background Flows Trees information |
+| --show_flows | Display all flows information |
+| --show_routes | Display all routes information |
 
 
 ## Reference
@@ -31,7 +29,6 @@ More options:
 [Amal P M, Ajish Kumar K S, "An Algorithm for kth Minimum Spanning Tree"](https://www.sciencedirect.com/science/article/abs/pii/S157106531630083X)<br />
 [Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"](https://www.researchgate.net/publication/347154804_Online_Stream-Aware_Routing_for_TSN-Based_Industrial_Control_Systems)<br />
 [Sune Mølgaard Laursen, Paul Pop, Wilfried Steiner, "Routing Optimization of AVB Streams in TSN Networks"](https://backend.orbit.dtu.dk/ws/files/127311642/Sune_Molgaard_Laursen2016aa_Routing_Optimization_of_AVB_St_SIGBED_Review_1.pdf)<br />
-[Don Pannell, "AVB Latency Math"](https://www.ieee802.org/1/files/public/docs2010/BA-pannell-latency-math-1110-v5.pdf)<br />
 
 
 

@@ -10,22 +10,19 @@ import (
 // Amal P M, Ajish Kumar K S, "An Algorithm for kth Minimum Spanning Tree"
 func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations []int, cost float64) *KTrees {
 	K_MSTS := &KTrees{}        // An array(K MSTS) of length k, which contain k minimum spanning trees
-	MST := &Tree{}             // Select a tree with minimum weight
 	list_of_trees := &KTrees{} // stores a list of trees
 
 	// first step of the algorithm finds the minimum spanning tree using Prims algorithm,
 	// But this step using MST-Steiner algorithm finds the steiner tree
 	// step1 (K=1)
-	MST = steninertree // Prims ==> MST-Steiner
+	MST := steninertree // Prims ==> MST-Steiner Select a tree with minimum weight
 	MST.Weight = len(steninertree.Nodes) - 1
 	K_MSTS.Trees = append(K_MSTS.Trees, MST)
 
 	// step2~K (K=2~K)
 	var Terminal []int
 	Terminal = append(Terminal, Source)
-	for _, d := range Destinations {
-		Terminal = append(Terminal, d)
-	}
+	Terminal = append(Terminal, Destinations...)
 
 	// Generate all possible trees and then select K of them based on their weight
 	for _, terminal := range Terminal {
@@ -46,16 +43,9 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 					E_prime := AddE2MST.GetFeedbackEdgeSet(cyclelist, E)
 
 					if MSTHasCycle {
-						//fmt.Printf("\nFrom %d to %d\n", terminal, tmal)
-						//fmt.Printf("E: %v\n", E)
-						//fmt.Printf("CycleList: %v\n", cyclelist)
-						//fmt.Printf("E': %v\n\n", E_prime)
-						//MST.Show_Tree()
 						MST_prime := MSTDeepCopy(AddE2MST)
-
 						// After removing E' from the AddE2MST, add it to the list_of_trees
 						MST_prime.SearchMST(list_of_trees, AddE2MST, E_prime, E, Terminal, cost, K)
-						//list_of_trees.Show_KTrees()
 					}
 				}
 			}
@@ -78,9 +68,7 @@ func (K_MSTS *KTrees) Select_Min(list_of_trees *KTrees, K int) {
 		selectq := K - len(K_MSTS.Trees)
 		if value, exists := treesmap[w]; exists {
 			if len(value) <= selectq {
-				for _, tree := range value {
-					K_MSTS.Trees = append(K_MSTS.Trees, tree)
-				}
+				K_MSTS.Trees = append(K_MSTS.Trees, value...)
 				delete(treesmap, w)
 
 			} else {
