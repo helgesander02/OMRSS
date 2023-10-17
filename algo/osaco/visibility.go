@@ -2,7 +2,7 @@ package osaco
 
 import (
 	"fmt"
-	"src/flow"
+	"src/network/flow"
 	"src/routes"
 	"time"
 )
@@ -20,7 +20,6 @@ func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 	visibility := &Visibility{}
 	// OSACO CompVB line 9
 	// TSN flow
-
 	for nth, tsn_ktree := range X.TSNTrees {
 		var v []float64
 		for kth := range tsn_ktree.Trees {
@@ -83,9 +82,9 @@ func EndtoEndDelay(node *routes.Node, parentID int, end2end time.Duration, z *ro
 
 		} else {
 			// Calculation of latency for a single link
-			per_hop += transmit_avb_itself(flow.Streams[0].DataSize, link.Cost)
+			per_hop += transmit_avb_itself(flow.DataSize, link.Cost)
 			//per_hop += interfere_from_be(conn.Cost)
-			per_hop += interfere_from_avb(link, KTrees_set, flow.Streams[0].DataSize)
+			per_hop += interfere_from_avb(link, KTrees_set, flow.DataSize)
 			per_hop += interfere_from_tsn(link, KTrees_set, flow_set)
 			end2end += per_hop
 
@@ -143,7 +142,6 @@ func interfere_from_avb(link *routes.Connection, KTrees_set *routes.KTrees_set, 
 	return transmit_avb_itself(occupiedbytes, link.Cost)
 }
 
-// Sune Mølgaard Laursen, Paul Pop, Wilfried Steiner, "Routing Optimization of AVB Streams in TSN Networks"
 // The known time occupied by TSN packets during transmission
 func interfere_from_tsn(link *routes.Connection, KTrees_set *routes.KTrees_set, flow_set *flow.Flows) time.Duration {
 	// Occupied bytes by TSN
@@ -155,8 +153,8 @@ func interfere_from_tsn(link *routes.Connection, KTrees_set *routes.KTrees_set, 
 				for _, conn := range node.Connections {
 					if conn.ToNodeID == link.ToNodeID {
 						// occupiedbytes += datasize * (hyperPeriod / period)
-						occupiedbytes += flow_set.TSNFlows[nth].Streams[0].DataSize *
-							(float64(flow_set.TSNFlows[nth].Streams[len(flow_set.TSNFlows[nth].Streams)-1].FinishTime) / float64(flow_set.TSNFlows[nth].Streams[1].ArrivalTime))
+						occupiedbytes += flow_set.TSNFlows[nth].DataSize *
+							(float64(flow_set.TSNFlows[nth].HyperPeriod) / float64(flow_set.TSNFlows[nth].Period))
 					}
 				}
 			}

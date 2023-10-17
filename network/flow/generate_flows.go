@@ -46,10 +46,9 @@ func (flows *Flows) Generate_AVBFlow(Nnode int, AS int, HyperPeriod int) {
 
 		flows.AVBFlows = append(flows.AVBFlows, Flow)
 	}
-
 }
 
-func Generate_stream(period int, deadline int, dataSize float64, HyperPeriod int) *Flow {
+func Generate_stream(period int, deadline int, datasize float64, HyperPeriod int) *Flow {
 	var (
 		ArrivalTime int = 0
 		FinishTime  int = 0
@@ -57,7 +56,7 @@ func Generate_stream(period int, deadline int, dataSize float64, HyperPeriod int
 		number      int = 0
 	)
 
-	flow := &Flow{}
+	flow := &Flow{Period: period, Deadline: deadline, DataSize: datasize, HyperPeriod: HyperPeriod}
 	for FinishTime < HyperPeriod {
 		Deadline += deadline
 		FinishTime += period
@@ -66,7 +65,7 @@ func Generate_stream(period int, deadline int, dataSize float64, HyperPeriod int
 		stream := &Stream{
 			Name:        name,
 			ArrivalTime: ArrivalTime,
-			DataSize:    dataSize,
+			DataSize:    datasize,
 			Deadline:    Deadline,
 			FinishTime:  FinishTime,
 		}

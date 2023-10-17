@@ -1,19 +1,17 @@
 package network
 
-type Node struct {
-	ID          int
-	Connections []*Connection
-}
+import (
+	"src/network/flow"
+	"src/network/graph"
+	"src/network/topology"
+)
 
-type Connection struct {
-	FromNodeID int     // strat
-	ToNodeID   int     // next
-	Cost       float64 // (125,000,000 bytes/s) 1Gbps => (750,000 bytes/6ms) 750,000 bytes under 6ms for each link ==> 125 bytes/ns
-}
-
-type Topology struct {
-	Talker   []*Node
-	Switch   []*Node
-	Listener []*Node
-	Nodes    []*Node
+type Network struct {
+	TSN         int
+	AVB         int
+	Bytes_Rate  float64
+	HyperPeriod int
+	Topology    *topology.Topology
+	Flow_Set    *flow.Flows
+	Graph_Set   *graph.Graphs
 }

@@ -1,4 +1,4 @@
-package network
+package topology
 
 func (topology *Topology) AddS2S(fromNodeID int, toNodeID int, cost float64) {
 	connection1 := &Connection{
