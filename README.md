@@ -18,10 +18,11 @@ More options:
 | --HyperPeriod | Greatest Common Divisor of Simulated Time LCM |
 | --bandwidth | 1 Gbps |
 | --K | finds kth minimum spanning tree |
+| --show_network | Present all network information comprehensively |
 | --show_topology | Display all topology information |
 | --show_flows | Display all flows information |
 | --show_graphs | Display all show_graphs information |
-| --show_routes | Display all routes information |
+| --show_plan | Provide a comprehensive display of all plan information |
 | --show_osaco | Display all Osaco compute information comprehensively |
 
 

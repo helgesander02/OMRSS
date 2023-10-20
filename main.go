@@ -16,10 +16,12 @@ func main() {
 	bandwidth := flag.Float64("bandwidth", 1e9, "1 Gbps")
 	K := flag.Int("K", 5, "finds kth minimum spanning tree")
 
+	show_network := flag.Bool("show_network", false, "Present all network information comprehensively.")
 	show_topology := flag.Bool("show_topology", false, "Display all topology information.")
 	show_flows := flag.Bool("show_flows", false, "Display all flows information.")
 	show_graphs := flag.Bool("show_graphs", false, "Display all show_graphs information.")
-	show_routes := flag.Bool("show_routes", false, "Display all routes information.")
+
+	show_plan := flag.Bool("show_plan", false, "Provide a comprehensive display of all plan information.")
 	show_osaco := flag.Bool("show_osaco", false, "Display all Osaco compute information comprehensively.")
 	flag.Parse()
 
@@ -38,9 +40,13 @@ func main() {
 		// Network (1. Topology 2. Flows 3. Graphs)
 		Network := network.Generate_Network(*tsn, *avb, *hyperperiod, *bandwidth, *show_topology, *show_flows, *show_graphs)
 
+		if *show_network {
+			Network.Show_Network()
+		}
+
 		Plan := plan.NewPlan(Network)
-		// Plan (1. SteinerTree(*show_routes) 2. OSACO(*K, *show_osaco) 3. ...)
-		Plan.InitiatePlan(*show_routes, *K, *show_osaco)
+		// Plan (1. SteinerTree() 2. OSACO(*K) 3. ...)
+		Plan.InitiatePlan(*K, *show_plan, *show_osaco)
 
 		fmt.Println("****************************************")
 	}

@@ -1,11 +1,44 @@
 package osaco
 
 import (
-	"fmt"
 	"src/network/flow"
 	"src/routes"
 	"time"
 )
+
+func CompPRM(X *routes.KTrees_set) *Pheromone {
+	var (
+		bg_tsn_start int = len(X.TSNTrees) / 2
+		bg_avb_start int = len(X.AVBTrees) / 2
+	)
+
+	pheromone := &Pheromone{}
+	for nth, ktree := range X.TSNTrees {
+		var prm []float64
+		for i := 0; i < len(ktree.Trees); i++ {
+			if nth >= bg_tsn_start {
+				prm = append(prm, 0.)
+			} else {
+				prm = append(prm, 1.)
+			}
+		}
+		pheromone.TSN_PRM = append(pheromone.TSN_PRM, prm)
+	}
+
+	for nth, ktree := range X.AVBTrees {
+		var prm []float64
+		for i := 0; i < len(ktree.Trees); i++ {
+			if nth >= bg_avb_start {
+				prm = append(prm, 0.)
+			} else {
+				prm = append(prm, 1.)
+			}
+		}
+		pheromone.AVB_PRM = append(pheromone.AVB_PRM, prm)
+	}
+
+	return pheromone
+}
 
 func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 	Input_flow_set := flow_set.Input_flow_set()
@@ -45,13 +78,13 @@ func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 			}
 
 			if nth < bg_avb_start {
-				fmt.Printf("Input flow%d tree%d \n", nth, kth)
-				value := mult / WCD(z, X, Input_flow_set.AVBFlows[nth], flow_set)
+				//fmt.Printf("Input flow%d tree%d \n", nth, kth)
+				value := mult / float64(WCD(z, X, Input_flow_set.AVBFlows[nth], flow_set))
 				v = append(v, value)
 
 			} else {
-				fmt.Printf("Backgourd flow%d tree%d \n", nth, kth)
-				value := mult / WCD(z, X, BG_flow_set.AVBFlows[nth-bg_avb_start], flow_set)
+				//fmt.Printf("Backgourd flow%d tree%d \n", nth, kth)
+				value := mult / float64(WCD(z, X, BG_flow_set.AVBFlows[nth-bg_avb_start], flow_set))
 				v = append(v, value)
 			}
 		}
@@ -61,13 +94,14 @@ func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 	return visibility
 }
 
-func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *flow.Flow, flow_set *flow.Flows) float64 {
+// Worse-Case Delay
+func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *flow.Flow, flow_set *flow.Flows) time.Duration {
 	end2end := time.Duration(0)
 	node := z.GetNodeByID(flow.Source)
 	wcd := EndtoEndDelay(node, -1, end2end, z, KTrees_set, flow, flow_set)
-	fmt.Printf("max wcd: %v \n", wcd)
+	//fmt.Printf("max wcd: %v \n", wcd)
 
-	return float64(wcd)
+	return wcd
 }
 
 // Use DFS to find all dataflow paths in the Route

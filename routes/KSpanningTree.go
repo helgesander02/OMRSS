@@ -205,14 +205,14 @@ func (list_of_trees *KTrees) Add(MST *Tree, K int) {
 
 func (list_of_trees *KTrees) InListOfTrees(MST *Tree) bool {
 	for _, tree := range list_of_trees.Trees {
-		if compareTrees(tree, MST) {
+		if CompareTrees(tree, MST) {
 			return true
 		}
 	}
 	return false
 }
 
-func compareTrees(tree1, tree2 *Tree) bool {
+func CompareTrees(tree1, tree2 *Tree) bool {
 	if tree1.Weight != tree2.Weight {
 		return false
 	}
@@ -228,7 +228,7 @@ func compareTrees(tree1, tree2 *Tree) bool {
 			return false
 		}
 
-		if !compareNodes(node1, node2) {
+		if !CompareNodes(node1, node2) {
 			return false
 		}
 	}
@@ -236,7 +236,7 @@ func compareTrees(tree1, tree2 *Tree) bool {
 	return true
 }
 
-func compareNodes(node1, node2 *Node) bool {
+func CompareNodes(node1, node2 *Node) bool {
 	if node1.ID != node2.ID {
 		return false
 	}
@@ -246,7 +246,7 @@ func compareNodes(node1, node2 *Node) bool {
 	}
 
 	for i := 0; i < len(node1.Connections); i++ {
-		if !compareConnections(node1.Connections, node2.Connections) {
+		if !CompareConnections(node1.Connections, node2.Connections) {
 			return false
 		}
 	}
@@ -254,7 +254,7 @@ func compareNodes(node1, node2 *Node) bool {
 	return true
 }
 
-func compareConnections(conn1, conn2 []*Connection) bool {
+func CompareConnections(conn1, conn2 []*Connection) bool {
 	i := 0
 	for _, c1 := range conn1 {
 		for _, c2 := range conn2 {
