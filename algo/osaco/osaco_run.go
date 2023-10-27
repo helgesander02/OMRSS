@@ -8,7 +8,7 @@ import (
 
 // Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"
 func Run(network *network.Network, K int, show_osaco bool) (*routes.Trees_set, *routes.Trees_set, *routes.Trees_set, *routes.Trees_set) {
-	// 4. SteinerTree and  5. OSACO
+	// 4. SteinerTree  5. OSACO
 	fmt.Printf("\nOSACO \n")
 	fmt.Println("----------------------------------------")
 	X := routes.GetRoutes(network, K)
@@ -23,63 +23,66 @@ func Run(network *network.Network, K int, show_osaco bool) (*routes.Trees_set, *
 	if show_osaco {
 		fmt.Printf("\nSteiner Tree and %dth Spanning Tree \n", K)
 		X.Show_kTrees_Set()
+		fmt.Println("Visibility and Pheromone")
 		fmt.Println(visibility)
 		fmt.Println(pheromone)
 	}
 
-	IIV, IIV_prime := Epoch(network, X, visibility, pheromone)
+	fmt.Printf("\nepoch%d:\n", 1)
+	IIV := Epoch(network, X, II_prime, visibility, pheromone)
 
 	if show_osaco {
 		IIV.Show_Trees_Set()
-		IIV_prime.Show_Trees_Set()
 	}
 
 	// SteinerTree (Input_SMT, BG_SMT), OSACO (II, II_prime)
 	return Input_SMT, BG_SMT, II, II_prime
 }
 
-func Epoch(network *network.Network, X *routes.KTrees_set, VB *Visibility, PRM *Pheromone) (*routes.Trees_set, *routes.Trees_set) {
-	//p := 6. //0 <= p <= 1
-	IIV, IIV_prime, input_k_location, bg_k_location := Probability(X, VB, PRM)
-	fmt.Printf("Input select routes %v \n", input_k_location)
-	fmt.Printf("BG select routes %v \n", bg_k_location)
+func Epoch(network *network.Network, X *routes.KTrees_set, II_prime *routes.Trees_set, VB *Visibility, PRM *Pheromone) *routes.Trees_set {
+	IIV, _, input_k_location, _ := Probability(X, VB, PRM)
+	// IIV, IIV_prime, input_k_location, bg_k_location := Probability(X, VB, PRM) // BG ... pass
+	fmt.Printf("Select input routes %v \n", input_k_location)
+	// fmt.Printf("Select background routes %v \n", bg_k_location) // BG ... pass
 
-	cost := Obj(network, X, IIV, IIV_prime)
-	p := 6.
+	cost := Obj(network, X, IIV, II_prime)
+	// cost := Obj(network, X, IIV, IIV_prime) // BG ... pass
+	fmt.Printf("O1: %f O2: %f O3: pass O4: %f\n", cost[0], cost[1], cost[3])
 
+	p := 6. //0 <= p <= 1
 	for nth, ktree := range X.TSNTrees {
-		for kth, _ := range ktree.Trees {
-			if nth >= (len(X.TSNTrees) / 2) {
-				PRM.TSN_PRM[nth][kth] *= p
-				if kth == bg_k_location[0][nth] {
-					PRM.TSN_PRM[nth][kth] += (1 / cost)
-				}
-			} else {
+		for kth := range ktree.Trees {
+			if nth >= (len(X.TSNTrees) / 2) { // BG ... pass
+				//PRM.TSN_PRM[nth][kth] *= p
+				//if kth == bg_k_location[0][nth] {
+				//PRM.TSN_PRM[nth][kth] += (1 / cost[3])
+				//}
+			} else { // Input
 				PRM.TSN_PRM[nth][kth] *= p
 				if kth == input_k_location[0][nth] {
-					PRM.TSN_PRM[nth][kth] += (1 / cost)
+					PRM.TSN_PRM[nth][kth] += (1 / cost[3])
 				}
 			}
 		}
 	}
 
 	for nth, ktree := range X.AVBTrees {
-		for kth, _ := range ktree.Trees {
-			if nth >= (len(X.AVBTrees) / 2) {
-				PRM.AVB_PRM[nth][kth] *= p
-				if kth == bg_k_location[1][nth] {
-					PRM.AVB_PRM[nth][kth] += (1 / cost)
-				}
-			} else {
+		for kth := range ktree.Trees {
+			if nth >= (len(X.AVBTrees) / 2) { // BG ... pass
+				//PRM.AVB_PRM[nth][kth] *= p
+				//if kth == bg_k_location[1][nth] {
+				//PRM.AVB_PRM[nth][kth] += (1 / cost[3])
+				//}
+			} else { // Input
 				PRM.AVB_PRM[nth][kth] *= p
 				if kth == input_k_location[1][nth] {
-					PRM.AVB_PRM[nth][kth] += (1 / cost)
+					PRM.AVB_PRM[nth][kth] += (1 / cost[3])
 				}
 			}
 		}
 	}
 
-	return IIV, IIV_prime
+	return IIV
 }
 
 func Probability(X *routes.KTrees_set, VB *Visibility, PRM *Pheromone) (*routes.Trees_set, *routes.Trees_set, [2][]int, [2][]int) {

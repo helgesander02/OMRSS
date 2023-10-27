@@ -10,6 +10,7 @@ type Network struct {
 	TSN         int
 	AVB         int
 	Bytes_Rate  float64
+	Bandwidth   float64
 	HyperPeriod int
 	Topology    *topology.Topology
 	Flow_Set    *flow.Flows

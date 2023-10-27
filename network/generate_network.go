@@ -8,13 +8,15 @@ import (
 )
 
 func Generate_Network(tsn int, avb int, hyperperiod int, bandwidth float64, show_topology bool, show_flows bool, show_graphs bool) *Network {
-	bytes_rate := 1. / ((bandwidth / 8) * 1e-6)
-	Network := &Network{TSN: tsn, AVB: avb, Bytes_Rate: bytes_rate, HyperPeriod: hyperperiod}
+	bw := (bandwidth / 8) * 1e-6
+	bytes_rate := 1. / bw
+	bw *= float64(hyperperiod)
+	Network := &Network{TSN: tsn, AVB: avb, Bytes_Rate: bytes_rate, Bandwidth: bw, HyperPeriod: hyperperiod}
 
 	// 1. Generate Topology "generate_topology.go"
 	fmt.Println("Generate Topology")
 	fmt.Println("----------------------------------------")
-	Topology := topology.Generate_Topology(bytes_rate)
+	Topology := topology.Generate_Topology(bytes_rate) // bytes/us * hyperperiod
 	Network.Topology = Topology
 	fmt.Println("Topology generation completed.")
 

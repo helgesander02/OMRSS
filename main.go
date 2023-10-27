@@ -37,15 +37,15 @@ func main() {
 	for ts := 0; ts < *test_case; ts++ {
 		fmt.Printf("TestCase%d \n", ts+1)
 		fmt.Println("****************************************")
-		// Network (1. Topology 2. Flows 3. Graphs)
+		// Network (1.Topology 2.Flows 3.Graphs)
 		Network := network.Generate_Network(*tsn, *avb, *hyperperiod, *bandwidth, *show_topology, *show_flows, *show_graphs)
 
 		if *show_network {
 			Network.Show_Network()
 		}
 
+		// Plan (1.SteinerTree 2.OSACO 3. ...)
 		Plan := plan.NewPlan(Network)
-		// Plan (1. SteinerTree() 2. OSACO(*K) 3. ...)
 		Plan.InitiatePlan(*K, *show_plan, *show_osaco)
 
 		fmt.Println("****************************************")
