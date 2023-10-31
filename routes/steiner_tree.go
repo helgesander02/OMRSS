@@ -43,7 +43,7 @@ func SteninerTree(v2v *V2V, Graph *topology.Topology, Source int, Destinations [
 						}
 
 					} else {
-						path := v2vedge.GetPath(tmal)
+						path := v2vedge.GetV2VPath(tmal)
 						if len(BP) == 0 {
 							BP = path[0]
 						} else {
@@ -59,14 +59,14 @@ func SteninerTree(v2v *V2V, Graph *topology.Topology, Source int, Destinations [
 			}
 
 			// Add the shortest path with the minimum cost to the tree in sequence
-			tree.AddTree(BP, cost)
+			tree.IntoTree(BP, cost)
 			used_tmal = append(used_tmal, BP[0])
 			used_tmal = append(used_tmal, BP[len(BP)-1])
 
 		} else {
 			var BP []int
 			for _, terminal := range Terminal {
-				if TerminalBeenUsed(used_tmal, terminal) {
+				if terminal_been_used(used_tmal, terminal) {
 					continue
 				}
 				// Find the set of all shortest paths from Vertex to Vertexs
@@ -90,7 +90,7 @@ func SteninerTree(v2v *V2V, Graph *topology.Topology, Source int, Destinations [
 						}
 
 					} else {
-						path := v2vedge.GetPath(terminal)
+						path := v2vedge.GetV2VPath(terminal)
 						if len(BP) == 0 {
 							BP = path[0]
 						} else {
@@ -106,65 +106,20 @@ func SteninerTree(v2v *V2V, Graph *topology.Topology, Source int, Destinations [
 				}
 			}
 			// Add the shortest path with the minimum cost to the tree in sequence
-			tree.AddTree(BP, cost)
+			tree.IntoTree(BP, cost)
 			used_tmal = append(used_tmal, BP[0])
 		}
 	}
 	return tree
 }
 
-func TerminalBeenUsed(A []int, b int) bool {
+func terminal_been_used(A []int, b int) bool {
 	for _, a := range A {
 		if a == b {
 			return true
 		}
 	}
 	return false
-}
-
-func (tree *Tree) AddTree(P []int, cost float64) {
-	for l := len(P) - 1; l > 0; l-- {
-		node1, b1 := tree.InTree(P[l])
-		node2, b2 := tree.InTree(P[l-1])
-
-		if !(b1) {
-			tree.Nodes = append(tree.Nodes, node1)
-		}
-		if !(b2) {
-			tree.Nodes = append(tree.Nodes, node2)
-		}
-
-		b3 := true
-		for _, conn := range node1.Connections {
-
-			if conn.ToNodeID == P[l-1] {
-				b3 = false
-			}
-		}
-		if b3 {
-			connection1 := &Connection{
-				FromNodeID: P[l],
-				ToNodeID:   P[l-1],
-				Cost:       cost,
-			}
-			node1.Connections = append(node1.Connections, connection1)
-			connection2 := &Connection{
-				FromNodeID: P[l-1],
-				ToNodeID:   P[l],
-				Cost:       cost,
-			}
-			node2.Connections = append(node2.Connections, connection2)
-		}
-	}
-}
-
-func (tree *Tree) InTree(id int) (*Node, bool) {
-	for _, node := range tree.Nodes {
-		if node.ID == id {
-			return node, true
-		}
-	}
-	return &Node{ID: id}, false
 }
 
 func GetGarph(topology *topology.Topology) *Graph {
@@ -225,7 +180,7 @@ func (v2vedge *V2VEdge) InV2VEdge(tmal int) bool {
 	return false
 }
 
-func (v2vedge *V2VEdge) GetPath(tmal int) [][]int {
+func (v2vedge *V2VEdge) GetV2VPath(tmal int) [][]int {
 	var path [][]int
 	for _, graph := range v2vedge.Graphs {
 		if graph.ToVertex == tmal {

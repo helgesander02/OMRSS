@@ -17,7 +17,7 @@ func CompPRM(X *routes.KTrees_set) *Pheromone {
 		var prm []float64
 		for i := 0; i < len(ktree.Trees); i++ {
 			if nth >= bg_tsn_start {
-				prm = append(prm, 0.)
+				prm = append(prm, 0.5)
 			} else {
 				prm = append(prm, 1.)
 			}
@@ -29,7 +29,7 @@ func CompPRM(X *routes.KTrees_set) *Pheromone {
 		var prm []float64
 		for i := 0; i < len(ktree.Trees); i++ {
 			if nth >= bg_avb_start {
-				prm = append(prm, 0.)
+				prm = append(prm, 0.5)
 			} else {
 				prm = append(prm, 1.)
 			}
@@ -98,7 +98,7 @@ func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *flow.Flow, flow_set *flow.Flows) time.Duration {
 	end2end := time.Duration(0)
 	node := z.GetNodeByID(flow.Source)
-	wcd := EndtoEndDelay(node, -1, end2end, z, KTrees_set, flow, flow_set)
+	wcd := end2end_delay(node, -1, end2end, z, KTrees_set, flow, flow_set)
 	//fmt.Printf("max wcd: %v \n", wcd)
 
 	return wcd
@@ -106,7 +106,7 @@ func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *flow.Flow, flow_se
 
 // Use DFS to find all dataflow paths in the Route
 // Calculate the End to End Delay for each dataflow path and select the maximum one
-func EndtoEndDelay(node *routes.Node, parentID int, end2end time.Duration, z *routes.Tree, KTrees_set *routes.KTrees_set, flow *flow.Flow, flow_set *flow.Flows) time.Duration {
+func end2end_delay(node *routes.Node, parentID int, end2end time.Duration, z *routes.Tree, KTrees_set *routes.KTrees_set, flow *flow.Flow, flow_set *flow.Flows) time.Duration {
 	//fmt.Printf("%d: %v \n", node.ID, end2end)
 	maxE2E := end2end
 	for _, link := range node.Connections {
@@ -123,7 +123,7 @@ func EndtoEndDelay(node *routes.Node, parentID int, end2end time.Duration, z *ro
 			end2end += per_hop
 
 			nextnode := z.GetNodeByID(link.ToNodeID)
-			nextE2E := EndtoEndDelay(nextnode, node.ID, end2end, z, KTrees_set, flow, flow_set)
+			nextE2E := end2end_delay(nextnode, node.ID, end2end, z, KTrees_set, flow, flow_set)
 
 			if maxE2E < nextE2E {
 				maxE2E = nextE2E
@@ -146,14 +146,14 @@ func transmit_avb_itself(datasize float64, bytes_rate float64) time.Duration {
 }
 
 // The time occupied by a BE packet before transmission
-func interfere_from_be(bytes_rate float64) time.Duration {
-	// Maximum number of bytes in a frame.
-	const MTU float64 = 1500.
-	nanoseconds := MTU * bytes_rate
-	duration := time.Duration(int64(nanoseconds))
-
-	return duration
-}
+//func interfere_from_be(bytes_rate float64) time.Duration {
+//	// Maximum number of bytes in a frame.
+//	const MTU float64 = 1500.
+//	nanoseconds := MTU * bytes_rate
+//	duration := time.Duration(int64(nanoseconds))
+//
+//	return duration
+//}
 
 // The time occupied by other AVB packets during transmission
 func interfere_from_avb(link *routes.Connection, KTrees_set *routes.KTrees_set, datasize float64) time.Duration {

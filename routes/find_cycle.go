@@ -40,10 +40,10 @@ func DFSCyCle(tree *Tree, node *Node, visited map[int]bool, parentID int, startI
 
 // How to find feedback edge set in undirected graph
 // https://stackoverflow.com/questions/10791689/how-to-find-feedback-edge-set-in-undirected-graph
-func (MST_prime *Tree) GetFeedbackEdgeSet(cyclelist []int, E []int) [][2]int {
+func (tree *Tree) GetFeedbackEdgeSet(cyclelist []int, E []int) [][2]int {
 	var E_prime [][2]int
 	for _, cycle := range cyclelist {
-		node := MST_prime.GetNodeByID(cycle)
+		node := tree.GetNodeByID(cycle)
 		for _, conn := range node.Connections {
 			if !(InCycleList(cyclelist, conn.ToNodeID)) {
 				continue

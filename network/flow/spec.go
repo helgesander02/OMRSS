@@ -9,9 +9,9 @@ func TSN_stream() *TSN {
 	t_period, t_datasize := tsn_random()
 
 	tsn := &TSN{
-		Period:   t_period,   // 100~2000us up500us
+		Period:   t_period,   // 100~2000us up 500us
 		Deadline: t_period,   // Period = Deadline
-		DataSize: t_datasize, // 30~100bytes up10bytes
+		DataSize: t_datasize, // 30~100bytes up 10bytes
 	}
 
 	return tsn
@@ -23,7 +23,7 @@ func AVB_stream() *AVB {
 	avb := &AVB{
 		Period:   125,        // 125us
 		Deadline: 2000,       // 2000us
-		DataSize: a_datasize, // 1000~1500bytes  up100bytes
+		DataSize: a_datasize, // 1000~1500bytes  up 100bytes
 	}
 
 	return avb

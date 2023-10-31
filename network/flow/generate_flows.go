@@ -7,8 +7,8 @@ import (
 func Generate_Flows(Nnode int, tsn int, avb int, HyperPeriod int) *Flows {
 	flow_set := &Flows{}
 	for round := 0; round < 2; round++ {
-		flow_set.Generate_TSNFlow(Nnode, tsn, HyperPeriod)
-		flow_set.Generate_AVBFlow(Nnode, avb, HyperPeriod)
+		Generate_TSNFlow(flow_set, Nnode, tsn, HyperPeriod)
+		Generate_AVBFlow(flow_set, Nnode, avb, HyperPeriod)
 		fmt.Printf("Complete generating round%d streams.\n", round+1)
 
 	}
@@ -16,7 +16,7 @@ func Generate_Flows(Nnode int, tsn int, avb int, HyperPeriod int) *Flows {
 	return flow_set
 }
 
-func (flows *Flows) Generate_TSNFlow(Nnode int, TS int, HyperPeriod int) {
+func Generate_TSNFlow(flows *Flows, Nnode int, TS int, HyperPeriod int) {
 	TS2 := TS / 2
 	for flow := 0; flow < TS2; flow++ {
 		tsn := TSN_stream()
@@ -32,7 +32,7 @@ func (flows *Flows) Generate_TSNFlow(Nnode int, TS int, HyperPeriod int) {
 	}
 }
 
-func (flows *Flows) Generate_AVBFlow(Nnode int, AS int, HyperPeriod int) {
+func Generate_AVBFlow(flows *Flows, Nnode int, AS int, HyperPeriod int) {
 	AS2 := AS / 2
 	for flow := 0; flow < AS2; flow++ {
 		avb := AVB_stream()

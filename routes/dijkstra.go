@@ -5,7 +5,8 @@ import (
 	"sort"
 )
 
-// Sean Chou, "Dijkstra’s Algorithm"
+// Dijkstra’s Algorithm
+// https://medium.com/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/%E5%9F%BA%E7%A4%8E%E6%BC%94%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97-graph-%E8%B3%87%E6%96%99%E7%B5%90%E6%A7%8B%E8%88%87dijkstras-algorithm-6134f62c1fc2
 func Dijkstra(graph *Graph, strat int, terminal int) *Graph {
 	inf := math.MaxInt8
 
@@ -19,8 +20,7 @@ func Dijkstra(graph *Graph, strat int, terminal int) *Graph {
 		vertex.Path = -1
 	}
 
-	// depth-first-search return all P(shortest path)
-	graph.GetShortestPath(strat, terminal)
+	GetShortestPath(graph, strat, terminal)
 
 	sort.Slice(graph.Path, func(p, q int) bool {
 		return len(graph.Path[p]) < len(graph.Path[q])
@@ -29,7 +29,8 @@ func Dijkstra(graph *Graph, strat int, terminal int) *Graph {
 	return graph
 }
 
-func (graph *Graph) GetShortestPath(strat int, terminal int) {
+// DFS graph return all P(shortest path)
+func GetShortestPath(graph *Graph, strat int, terminal int) {
 	vertex := graph.FindVertex(strat)
 	vertex.Visited = true
 
@@ -47,7 +48,7 @@ func (graph *Graph) GetShortestPath(strat int, terminal int) {
 				graph.AddPath(terminal)
 			}
 		}
-		graph.GetShortestPath(edge.End, terminal)
+		GetShortestPath(graph, edge.End, terminal)
 	}
 
 	vertex.Visited = false
@@ -72,7 +73,7 @@ func (graph *Graph) AddPath(terminal int) {
 		InPath := true
 		for _, P := range graph.Path {
 			// If P is already present in the path, do not include it
-			if LoopCompare(P, path) {
+			if loopcompare(P, path) {
 				InPath = false
 				break
 			}
@@ -83,7 +84,7 @@ func (graph *Graph) AddPath(terminal int) {
 	}
 }
 
-func LoopCompare(a, b []int) bool {
+func loopcompare(a, b []int) bool {
 	if len(a) != len(b) {
 		return false
 	}
