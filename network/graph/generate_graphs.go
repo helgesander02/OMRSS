@@ -1,7 +1,6 @@
 package graph
 
 import (
-	"fmt"
 	"src/network/flow"
 	"src/network/topology"
 )
@@ -20,7 +19,6 @@ func Generate_Graphs(topology *topology.Topology, flows *flow.Flows, bytes_rate 
 		t.AddN2S2N(flow.Source, flow.Destinations, bytes_rate) // Undirected Graph
 		graphs.AVBGraphs = append(graphs.AVBGraphs, t)
 	}
-	fmt.Println("Complete Generating Graphs")
 
 	return graphs
 }

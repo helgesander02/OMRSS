@@ -9,7 +9,7 @@ import (
 )
 
 // Objectives
-func Obj(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set) ([4]float64, int) {
+func obj(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set) ([4]float64, int) {
 	S := network.Flow_Set.Input_flow_set()
 	S_prime := network.Flow_Set.BG_flow_set()
 	var (
@@ -32,7 +32,7 @@ func Obj(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, I
 	}
 	// O2 and O4
 	for nth, route := range II_prime.AVBTrees {
-		wcd := WCD(route, X, S_prime.AVBFlows[nth], network.Flow_Set)
+		wcd := wcd(route, X, S_prime.AVBFlows[nth], network.Flow_Set)
 		avb_wcd_sum += wcd
 		schedulability := schedulability(wcd, S_prime.AVBFlows[nth], route, linkmap, network.Bandwidth, network.HyperPeriod)
 		avb_failed_count += 1 - schedulability
@@ -51,7 +51,7 @@ func Obj(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, I
 	}
 	// O2 and O4
 	for nth, route := range II.AVBTrees {
-		wcd := WCD(route, X, S.AVBFlows[nth], network.Flow_Set)
+		wcd := wcd(route, X, S.AVBFlows[nth], network.Flow_Set)
 		avb_wcd_sum += wcd
 		schedulability := schedulability(wcd, S.AVBFlows[nth], route, linkmap, network.Bandwidth, network.HyperPeriod)
 		avb_failed_count += 1 - schedulability
@@ -89,7 +89,7 @@ func schedulable(node *routes.Node, parentID int, flow *flow.Flow, route *routes
 			continue
 
 		} else {
-			/// Duplex
+			//// Duplex
 			//if !(link.FromNodeID == flow.Source || loopcompare(link.ToNodeID, flow.Destinations)) {
 			//	key := fmt.Sprintf("%d>%d", link.FromNodeID, link.ToNodeID)
 			//	linkmap[key] += flow.DataSize * float64((hyperPeriod / flow.Period))
@@ -98,7 +98,7 @@ func schedulable(node *routes.Node, parentID int, flow *flow.Flow, route *routes
 			//	}
 			//}
 
-			/// Simplex
+			// Simplex
 			if !(link.FromNodeID == flow.Source || loopcompare(link.ToNodeID, flow.Destinations)) {
 				key := ""
 				key1 := fmt.Sprintf("%d>%d", link.FromNodeID, link.ToNodeID)

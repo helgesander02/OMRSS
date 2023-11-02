@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func CompPRM(X *routes.KTrees_set) *Pheromone {
+func compute_prm(X *routes.KTrees_set) *Pheromone {
 	var (
 		bg_tsn_start int = len(X.TSNTrees) / 2
 		bg_avb_start int = len(X.AVBTrees) / 2
@@ -40,7 +40,7 @@ func CompPRM(X *routes.KTrees_set) *Pheromone {
 	return pheromone
 }
 
-func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
+func compute_vb(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 	Input_flow_set := flow_set.Input_flow_set()
 	BG_flow_set := flow_set.BG_flow_set()
 
@@ -79,12 +79,12 @@ func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 
 			if nth < bg_avb_start {
 				//fmt.Printf("Input flow%d tree%d \n", nth, kth)
-				value := mult / float64(WCD(z, X, Input_flow_set.AVBFlows[nth], flow_set))
+				value := mult / float64(wcd(z, X, Input_flow_set.AVBFlows[nth], flow_set))
 				v = append(v, value)
 
 			} else {
 				//fmt.Printf("Backgourd flow%d tree%d \n", nth, kth)
-				value := mult / float64(WCD(z, X, BG_flow_set.AVBFlows[nth-bg_avb_start], flow_set))
+				value := mult / float64(wcd(z, X, BG_flow_set.AVBFlows[nth-bg_avb_start], flow_set))
 				v = append(v, value)
 			}
 		}
@@ -95,7 +95,7 @@ func CompVB(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 }
 
 // Worse-Case Delay
-func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *flow.Flow, flow_set *flow.Flows) time.Duration {
+func wcd(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *flow.Flow, flow_set *flow.Flows) time.Duration {
 	end2end := time.Duration(0)
 	node := z.GetNodeByID(flow.Source)
 	wcd := end2end_delay(node, -1, end2end, z, KTrees_set, flow, flow_set)
