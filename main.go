@@ -37,8 +37,8 @@ func main() {
 
 	// Test-Case
 	var (
-		average_obj_SMT   [4]float64 = [4]float64{0.0, 0.0, 0.0, 0.0}
-		average_obj_osaco [4]float64 = [4]float64{0.0, 0.0, 0.0, 0.0}
+		average_objs_smt   [3][4]float64 // 100ms{o1, o2, o3, o4} 50ms{o1, o2, o3, o4} 10ms{o1, o2, o3, o4}
+		average_objs_osaco [3][4]float64 // 100ms{o1, o2, o3, o4} 50ms{o1, o2, o3, o4} 10ms{o1, o2, o3, o4}
 	)
 
 	for ts := 0; ts < *test_case; ts++ {
@@ -53,22 +53,34 @@ func main() {
 
 		// Plan (1.SteinerTree 2.OSACO 3. ...)
 		Plan := plan.NewPlan(Network)
-		obj_SMT, obj_osaco := Plan.InitiatePlan(*K, *show_plan, *show_smt, *show_osaco, *timeout)
-		for i := 0; i < 4; i++ {
-			average_obj_SMT[i] += obj_SMT[i]
-			average_obj_osaco[i] += obj_osaco[i]
+		objs_smt, objs_osaco := Plan.InitiatePlan(*K, *show_plan, *show_smt, *show_osaco, *timeout)
+
+		for i := 0; i < 3; i++ {
+			for j := 0; j < 4; j++ {
+				average_objs_smt[i][j] += objs_smt[i][j]
+				average_objs_osaco[i][j] += objs_osaco[i][j]
+			}
 		}
 
 		fmt.Println("****************************************")
 	}
 
 	// Result
-	for i := 0; i < 4; i++ {
-		average_obj_SMT[i] = average_obj_SMT[i] / float64(*test_case)
-		average_obj_osaco[i] = average_obj_osaco[i] / float64(*test_case)
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 4; j++ {
+			average_objs_smt[i][j] = average_objs_smt[i][j] / float64(*test_case)
+			average_objs_osaco[i][j] = average_objs_osaco[i][j] / float64(*test_case)
+		}
 	}
+
 	fmt.Println()
 	fmt.Println("--- The experimental results are as follows ---")
-	fmt.Printf("The average objective result for the Steiner Tree: O1: %f O2: %f O3: pass O4: %f \n", average_obj_SMT[0], average_obj_SMT[1], average_obj_SMT[3])
-	fmt.Printf("The average objective result for OSACO: O1: %f O2: %f O3: pass O4: %f \n", average_obj_osaco[0], average_obj_osaco[1], average_obj_osaco[3])
+	fmt.Println("The average objective result for the Steiner Tree:")
+	fmt.Printf("100ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_smt[0][0], average_objs_smt[0][1], average_objs_smt[0][3])
+	fmt.Printf("50ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_smt[1][0], average_objs_smt[1][1], average_objs_smt[1][3])
+	fmt.Printf("10ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_smt[2][0], average_objs_smt[2][1], average_objs_smt[2][3])
+	fmt.Println("The average objective result for OSACO:")
+	fmt.Printf("100ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[0][0], average_objs_osaco[0][1], average_objs_osaco[0][3])
+	fmt.Printf("50ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[1][0], average_objs_osaco[1][1], average_objs_osaco[1][3])
+	fmt.Printf("10ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[2][0], average_objs_osaco[2][1], average_objs_osaco[2][3])
 }
