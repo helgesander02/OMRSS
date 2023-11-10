@@ -3,7 +3,8 @@ package plan
 import (
 	"fmt"
 	"src/network"
-	"src/plan/algo/osaco"
+	"src/plan/algo"
+	"src/plan/routes"
 )
 
 func NewPlan(network *network.Network) *Plan {
@@ -11,26 +12,29 @@ func NewPlan(network *network.Network) *Plan {
 	return &Plan{Network: network}
 }
 
-func (plan *Plan) InitiatePlan(K int, show_plan bool, show_smt bool, show_osaco bool, time_out int) ([3][4]float64, [3][4]float64) {
+func (plan *Plan) InitiatePlan(show_plan bool, show_smt bool, show_osaco bool) ([5][4]float64, [5][4]float64) {
 	var (
-		objs_SMT   [3][4]float64 // 100ms{o1, o2, o3, o4} 50ms{o1, o2, o3, o4} 10ms{o1, o2, o3, o4}
-		objs_osaco [3][4]float64 // 100ms{o1, o2, o3, o4} 50ms{o1, o2, o3, o4} 10ms{o1, o2, o3, o4}
+		objs_SMT   [5][4]float64 // 100ms{o1, o2, o3, o4} 50ms{o1, o2, o3, o4} 10ms{o1, o2, o3, o4}
+		objs_osaco [5][4]float64 // 100ms{o1, o2, o3, o4} 50ms{o1, o2, o3, o4} 10ms{o1, o2, o3, o4}
+		timeout    int           = 500
 	)
 
-	// timeout 100ms
-	obj_smt_100, obj_osaco_100 := osaco.Run(plan.Network, K, show_smt, show_osaco, time_out)
-	objs_SMT[0] = obj_smt_100
-	objs_osaco[0] = obj_osaco_100
+	// The timeout of each run is set as 100~500 ms
+	fmt.Println("Steiner Tree")
+	fmt.Println("----------------------------------------")
+	SMT := algo.SMT_Run(plan.Network, show_smt)
 
-	// timeout 50ms
-	obj_smt_50, obj_osaco_50 := osaco.Run(plan.Network, K, show_smt, show_osaco, 50)
-	objs_SMT[1] = obj_smt_50
-	objs_osaco[1] = obj_osaco_50
+	fmt.Println()
+	fmt.Println("OSACO")
+	fmt.Println("----------------------------------------")
+	X := routes.Get_OSACO_Routing(plan.Network, SMT)
+	for i := 0; i < 5; i++ {
+		obj_smt, obj_osaco := algo.OSACO_Run(plan.Network, SMT, X, show_osaco, timeout)
+		objs_SMT[i] = obj_smt
+		objs_osaco[i] = obj_osaco
 
-	// timeout 10ms
-	obj_smt_10, obj_osaco_10 := osaco.Run(plan.Network, K, show_smt, show_osaco, 10)
-	objs_SMT[2] = obj_smt_10
-	objs_osaco[2] = obj_osaco_10
+		timeout -= 100
+	}
 
 	if show_plan {
 		fmt.Println("Steiner Tree")

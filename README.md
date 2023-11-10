@@ -17,8 +17,6 @@ More options:
 | --avb | Number of AVB flows |
 | --HyperPeriod | Greatest Common Divisor of Simulated Time LCM |
 | --bandwidth | 1 Gbps |
-| --K | Finds kth minimum spanning tree |
-| --timeout | The timeout of each run is set as 10~100 ms |
 | --show_network | Present all network information comprehensively |
 | --show_topology | Display all topology information |
 | --show_flows | Display all flows information |
@@ -31,8 +29,10 @@ More options:
 ## Reference
 [Bang Ye Wu, Kun-Mao Chao, "Steiner Minimal Trees"](https://www.csie.ntu.edu.tw/~kmchao/tree10spr/Steiner.pdf)<br />
 [Amal P M, Ajish Kumar K S, "An Algorithm for kth Minimum Spanning Tree"](https://www.sciencedirect.com/science/article/abs/pii/S157106531630083X)<br />
-[Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"](https://www.researchgate.net/publication/347154804_Online_Stream-Aware_Routing_for_TSN-Based_Industrial_Control_Systems)<br />
 [Sune Mølgaard Laursen, Paul Pop, Wilfried Steiner, "Routing Optimization of AVB Streams in TSN Networks"](https://backend.orbit.dtu.dk/ws/files/127311642/Sune_Molgaard_Laursen2016aa_Routing_Optimization_of_AVB_St_SIGBED_Review_1.pdf)<br />
+[Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"](https://www.researchgate.net/publication/347154804_Online_Stream-Aware_Routing_for_TSN-Based_Industrial_Control_Systems)<br />
+[QINGHAN YU et al., "Online Scheduling for Dynamic VM Migration in Multicast Time-Sensitive Networks"](https://ieeexplore.ieee.org/document/8747398)<br />
+
 
 
 

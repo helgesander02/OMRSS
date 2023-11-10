@@ -43,7 +43,7 @@ func (flows *Flows) Show_Flow() {
 		fmt.Printf("Source: %d\n", flow.Source)
 		fmt.Printf("Destinations: %v\n", flow.Destinations)
 		fmt.Printf("%s : period:%d us, deadline:%d us, datasize:%f bytes\n",
-			name, flow.Streams[0].FinishTime, flow.Streams[0].Deadline, flow.Streams[0].DataSize)
+			name, flow.Period, flow.Deadline, flow.DataSize)
 		number += 1
 
 		break
@@ -55,7 +55,7 @@ func (flows *Flows) Show_Flow() {
 		fmt.Printf("Source: %d\n", flow.Source)
 		fmt.Printf("Destinations: %v\n", flow.Destinations)
 		fmt.Printf("%s : period:%d us, deadline:%d us, datasize:%f bytes\n",
-			name, flow.Streams[0].FinishTime, flow.Streams[0].Deadline, flow.Streams[0].DataSize)
+			name, flow.Period, flow.Deadline, flow.DataSize)
 		number += 1
 
 		break

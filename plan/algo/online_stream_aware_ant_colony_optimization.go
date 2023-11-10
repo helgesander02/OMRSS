@@ -1,4 +1,4 @@
-package osaco
+package algo
 
 import (
 	"crypto/rand"
@@ -11,23 +11,28 @@ import (
 	"time"
 )
 
-// Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"
-func Run(network *network.Network, K int, show_smt bool, show_osaco bool, time_out int) ([4]float64, [4]float64) {
-	// 4. SteinerTree  5. OSACO
-	fmt.Println("Steiner Tree and OSACO")
-	fmt.Println("----------------------------------------")
-	X := routes.Get_OSACO_Routing(network, K)
-	II := X.Input_SteinerTree_set()
-	II_prime := X.BG_SteinerTree_set()
-	Input_SMT := II
-	BG_SMT := II_prime
+type Visibility struct {
+	TSN_VB [][]float64
+	AVB_VB [][]float64
+}
 
+type Pheromone struct {
+	TSN_PRM [][]float64
+	AVB_PRM [][]float64
+}
+
+// Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"
+func OSACO_Run(network *network.Network, SMT *routes.Trees_set, X *routes.KTrees_set, show_osaco bool, time_out int) ([4]float64, [4]float64) {
+	// 5. OSACO
+	II := SMT.Input_SteinerTree_set()
+	II_prime := SMT.BG_SteinerTree_set()
 	pheromone := compute_prm(X)
 	visibility := compute_vb(X, network.Flow_Set)
 
 	if show_osaco {
-		fmt.Printf("\n--- %dth Spanning Tree ---\n", K)
+		fmt.Printf("\n--- 5th Spanning Tree ---\n")
 		X.Show_kTrees_Set()
+		fmt.Println()
 		fmt.Println("--- Visibility and Pheromone ---")
 		fmt.Println(visibility)
 		fmt.Println(pheromone)
@@ -64,12 +69,8 @@ func Run(network *network.Network, K int, show_smt bool, show_osaco bool, time_o
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
 
 	// SteinerTree (Input_SMT, BG_SMT, initialobj), OSACO (II, II_prime, resultobj)
-	if show_smt {
-		fmt.Println("--- The Steiner Tree final selected routing---")
-		Input_SMT.Show_Trees_Set()
-		BG_SMT.Show_Trees_Set()
-	}
 	if show_osaco {
+		fmt.Println()
 		fmt.Println("--- The OSACO final selected routing ---")
 		II.Show_Trees_Set()
 		II_prime.Show_Trees_Set()

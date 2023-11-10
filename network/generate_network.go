@@ -30,11 +30,11 @@ func Generate_Network(tsn int, avb int, hyperperiod int, bandwidth float64, show
 	fmt.Println("----------------------------------------")
 	Flow_Set := flow.Generate_Flows(len(Topology.Nodes), tsn, avb, hyperperiod)
 	Network.Flow_Set = Flow_Set
+	Flow_Set.Show_Flows()
+	Flow_Set.Show_Flow()
 	fmt.Println()
 
 	if show_flows {
-		Flow_Set.Show_Flows()
-		Flow_Set.Show_Flow()
 		Flow_Set.Show_Stream()
 	}
 

@@ -91,35 +91,35 @@ func schedulable(node *routes.Node, parentID int, flow *flow.Flow, route *routes
 
 		} else {
 			//// Duplex
-			//if !(link.FromNodeID == flow.Source || loopcompare(link.ToNodeID, flow.Destinations)) {
-			//	key := fmt.Sprintf("%d>%d", link.FromNodeID, link.ToNodeID)
-			//	linkmap[key] += flow.DataSize * float64((hyperPeriod / flow.Period))
-			//	if linkmap[key] > bandwidth {
-			//		return false, linkmap
-			//	}
-			//}
-
-			// Simplex
 			if !(link.FromNodeID == flow.Source || loopcompare(link.ToNodeID, flow.Destinations)) {
-				key := ""
-				key1 := fmt.Sprintf("%d>%d", link.FromNodeID, link.ToNodeID)
-				key2 := fmt.Sprintf("%d>%d", link.ToNodeID, link.FromNodeID)
-				if _, ok := linkmap[key1]; !ok {
-					if _, ok := linkmap[key2]; !ok {
-						key = key1
-					} else {
-						key = key2
-					}
-
-				} else {
-					key = key1
-				}
-
+				key := fmt.Sprintf("%d>%d", link.FromNodeID, link.ToNodeID)
 				linkmap[key] += flow.DataSize * float64((hyperPeriod / flow.Period))
 				if linkmap[key] > bandwidth {
 					return false, linkmap
 				}
 			}
+
+			//// Simplex
+			//if !(link.FromNodeID == flow.Source || loopcompare(link.ToNodeID, flow.Destinations)) {
+			//	key := ""
+			//	key1 := fmt.Sprintf("%d>%d", link.FromNodeID, link.ToNodeID)
+			//	key2 := fmt.Sprintf("%d>%d", link.ToNodeID, link.FromNodeID)
+			//	if _, ok := linkmap[key1]; !ok {
+			//		if _, ok := linkmap[key2]; !ok {
+			//			key = key1
+			//		} else {
+			//			key = key2
+			//		}
+			//
+			//	} else {
+			//		key = key1
+			//	}
+			//
+			//	linkmap[key] += flow.DataSize * float64((hyperPeriod / flow.Period))
+			//	if linkmap[key] > bandwidth {
+			//		return false, linkmap
+			//	}
+			//}
 
 			nextnode := route.GetNodeByID(link.ToNodeID)
 			schedulable, updatedLinkmap := schedulable(nextnode, node.ID, flow, route, linkmap, bandwidth, hyperPeriod)
