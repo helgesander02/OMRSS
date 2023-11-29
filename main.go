@@ -23,7 +23,7 @@ func main() {
 
 	show_plan := flag.Bool("show_plan", false, "Provide a comprehensive display of all plan information.")
 	show_smt := flag.Bool("show_smt", false, "Display all Steiner Tree compute information comprehensively.")
-	show_mdt := flag.Bool("show_mdt", false, "Display all Steiner Tree compute information comprehensively.")
+	show_mdt := flag.Bool("show_mdt", false, "Display all Distance Tree compute information comprehensively.")
 	show_osaco := flag.Bool("show_osaco", false, "Display all Osaco compute information comprehensively.")
 	flag.Parse()
 

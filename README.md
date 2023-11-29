@@ -7,7 +7,7 @@ Taking advantage of the distinctions between the Schedulability, AVB Worst Case 
 Clone this repo by `git clone https://github.com/helgesander02/MST-ACOvsOther`<br />
 
 ## Running
-Quickstart: `cd MST-ACOvsOther` `go run main.go` <br />
+Quickstart: `cd MST-ACOvsOther` `sh output.sh` <br />
 <br />
 More options:
 | Option | Description |
@@ -23,6 +23,7 @@ More options:
 | --show_graphs | Display all show_graphs information |
 | --show_plan | Provide a comprehensive display of all plan information |
 | --show_smt | Display all Steiner Tree compute information comprehensively |
+| --show_mdt | Display all Distance Tree compute information comprehensively. |
 | --show_osaco | Display all Osaco compute information comprehensively |
 
 
