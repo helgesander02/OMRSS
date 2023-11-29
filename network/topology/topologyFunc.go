@@ -14,3 +14,22 @@ func (t1 *Topology) TopologyDeepCopy() *Topology {
 		return t2
 	}
 }
+
+func (t *Topology) GetNodeByID(id int) *Node {
+	for _, node := range t.Talker {
+		if node.ID == id {
+			return node
+		}
+	}
+	for _, node := range t.Switch {
+		if node.ID == id {
+			return node
+		}
+	}
+	for _, node := range t.Listener {
+		if node.ID == id {
+			return node
+		}
+	}
+	return nil
+}

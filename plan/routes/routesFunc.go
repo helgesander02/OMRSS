@@ -200,3 +200,24 @@ func (tree1 *Tree) TreeDeepCopy() *Tree {
 		return tree2
 	}
 }
+
+func loopcompare_simplex(a int, b []int) bool {
+	for _, v := range b {
+		if a == v {
+			return true
+		}
+	}
+	return false
+}
+
+func loopcompare_complex(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"src/network"
 	"src/plan"
 )
@@ -22,6 +23,7 @@ func main() {
 
 	show_plan := flag.Bool("show_plan", false, "Provide a comprehensive display of all plan information.")
 	show_smt := flag.Bool("show_smt", false, "Display all Steiner Tree compute information comprehensively.")
+	show_mdt := flag.Bool("show_mdt", false, "Display all Steiner Tree compute information comprehensively.")
 	show_osaco := flag.Bool("show_osaco", false, "Display all Osaco compute information comprehensively.")
 	flag.Parse()
 
@@ -35,8 +37,9 @@ func main() {
 
 	// Test-Case
 	var (
-		average_objs_smt   [5][4]float64 // 100ms{o1, o2, o3, o4} 50ms{o1, o2, o3, o4} 10ms{o1, o2, o3, o4}
-		average_objs_osaco [5][4]float64 // 100ms{o1, o2, o3, o4} 50ms{o1, o2, o3, o4} 10ms{o1, o2, o3, o4}
+		average_obj_smt    [4]float64    // {o1, o2, o3, o4}
+		average_obj_mdt    [4]float64    // {o1, o2, o3, o4}
+		average_objs_osaco [5][4]float64 // 1000ms{o1, o2, o3, o4} 800ms{o1, o2, o3, o4} 600ms{o1, o2, o3, o4}, 400ms{o1, o2, o3, o4}, 200ms{o1, o2, o3, o4}
 	)
 
 	for ts := 0; ts < *test_case; ts++ {
@@ -49,40 +52,84 @@ func main() {
 			Network.Show_Network()
 		}
 
-		// Plan (1.SteinerTree 2.OSACO 3. ...)
+		// Plan (1.SteinerTree  2.DistanceTree  3.OSACO)
 		Plan := plan.NewPlan(Network)
-		objs_smt, objs_osaco := Plan.InitiatePlan(*show_plan, *show_smt, *show_osaco)
+		obj_smt, obj_mdt, objs_osaco := Plan.InitiatePlan(*show_plan, *show_smt, *show_mdt, *show_osaco)
 
 		for i := 0; i < 5; i++ {
 			for j := 0; j < 4; j++ {
-				average_objs_smt[i][j] += objs_smt[i][j]
+				if i == 1 {
+					average_obj_smt[j] += obj_smt[j]
+					average_obj_mdt[j] += obj_mdt[j]
+				}
 				average_objs_osaco[i][j] += objs_osaco[i][j]
 			}
 		}
-
 		fmt.Println("****************************************")
 	}
 
 	// Result
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 4; j++ {
-			average_objs_smt[i][j] = average_objs_smt[i][j] / float64(*test_case)
+			if i == 1 {
+				average_obj_smt[j] = average_obj_smt[j] / float64(*test_case)
+				average_obj_mdt[j] = average_obj_mdt[j] / float64(*test_case)
+			}
 			average_objs_osaco[i][j] = average_objs_osaco[i][j] / float64(*test_case)
 		}
 	}
-
 	fmt.Println()
 	fmt.Println("--- The experimental results are as follows ---")
 	fmt.Println("The average objective result for the Steiner Tree:")
-	fmt.Printf("500ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_smt[0][0], average_objs_smt[0][1], average_objs_smt[0][3])
-	fmt.Printf("400ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_smt[1][0], average_objs_smt[1][1], average_objs_smt[1][3])
-	fmt.Printf("300ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_smt[2][0], average_objs_smt[2][1], average_objs_smt[2][3])
-	fmt.Printf("200ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_smt[3][0], average_objs_smt[3][1], average_objs_smt[3][3])
-	fmt.Printf("100ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_smt[4][0], average_objs_smt[4][1], average_objs_smt[4][3])
+	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", average_obj_smt[0], average_obj_smt[1], average_obj_smt[3])
+	fmt.Println("The average objective result for the MDTC:")
+	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", average_obj_mdt[0], average_obj_mdt[1], average_obj_mdt[3])
 	fmt.Println("The average objective result for OSACO:")
-	fmt.Printf("500ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[0][0], average_objs_osaco[0][1], average_objs_osaco[0][3])
-	fmt.Printf("400ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[1][0], average_objs_osaco[1][1], average_objs_osaco[1][3])
-	fmt.Printf("300ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[2][0], average_objs_osaco[2][1], average_objs_osaco[2][3])
-	fmt.Printf("200ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[3][0], average_objs_osaco[3][1], average_objs_osaco[3][3])
-	fmt.Printf("100ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[4][0], average_objs_osaco[4][1], average_objs_osaco[4][3])
+	fmt.Printf("1000ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[0][0], average_objs_osaco[0][1], average_objs_osaco[0][3])
+	fmt.Printf("800ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[1][0], average_objs_osaco[1][1], average_objs_osaco[1][3])
+	fmt.Printf("600ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[2][0], average_objs_osaco[2][1], average_objs_osaco[2][3])
+	fmt.Printf("400ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[3][0], average_objs_osaco[3][1], average_objs_osaco[3][3])
+	fmt.Printf("200ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[4][0], average_objs_osaco[4][1], average_objs_osaco[4][3])
+
+	// Store files
+	dirName := "result"
+	_, err := os.Stat(dirName)
+	if err != nil && os.IsNotExist(err) {
+		err := os.MkdirAll(dirName, os.ModePerm)
+		if err != nil {
+			fmt.Println("Folder creation failed：", err)
+			return
+		}
+	}
+	err = os.Chdir(dirName)
+	if err != nil {
+		fmt.Println("Folder switching failed：", err)
+		return
+	}
+
+	name := fmt.Sprintf("testcae%d_tsn%d_avb%d_output.txt", *test_case, *tsn, *avb)
+	file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	var text string
+	fmt.Fprintln(file, "--- The experimental results are as follows --- \n The average objective result for the Steiner Tree:")
+	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", average_obj_smt[0], average_obj_smt[1], average_obj_smt[3])
+	text += "The average objective result for the MDTC:\n"
+	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", average_obj_mdt[0], average_obj_mdt[1], average_obj_mdt[3])
+	text += "The average objective result for OSACO:\n"
+	text += fmt.Sprintf("1000ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[0][0], average_objs_osaco[0][1], average_objs_osaco[0][3])
+	text += fmt.Sprintf("800ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[1][0], average_objs_osaco[1][1], average_objs_osaco[1][3])
+	text += fmt.Sprintf("600ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[2][0], average_objs_osaco[2][1], average_objs_osaco[2][3])
+	text += fmt.Sprintf("400ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[3][0], average_objs_osaco[3][1], average_objs_osaco[3][3])
+	text += fmt.Sprintf("200ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[4][0], average_objs_osaco[4][1], average_objs_osaco[4][3])
+	fmt.Fprintln(file, text)
+	file.Close()
+
+	err = os.Chdir("..")
+	if err != nil {
+		fmt.Println("Folder switching failed：", err)
+		return
+	}
 }

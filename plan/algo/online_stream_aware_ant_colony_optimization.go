@@ -22,10 +22,10 @@ type Pheromone struct {
 }
 
 // Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"
-func OSACO_Run(network *network.Network, SMT *routes.Trees_set, X *routes.KTrees_set, show_osaco bool, time_out int) ([4]float64, [4]float64) {
-	// 5. OSACO
-	II := SMT.Input_SteinerTree_set()
-	II_prime := SMT.BG_SteinerTree_set()
+func OSACO_Run(network *network.Network, SMT *routes.Trees_set, X *routes.KTrees_set, time_out int, show_osaco bool) [4]float64 {
+	// 6. OSACO
+	II := SMT.Input_Tree_set()
+	II_prime := SMT.BG_Tree_set()
 	pheromone := compute_prm(X)
 	visibility := compute_vb(X, network.Flow_Set)
 
@@ -76,7 +76,7 @@ func OSACO_Run(network *network.Network, SMT *routes.Trees_set, X *routes.KTrees
 		II_prime.Show_Trees_Set()
 	}
 
-	return initialobj, resultobj
+	return resultobj
 }
 
 func compute_prm(X *routes.KTrees_set) *Pheromone {
@@ -124,7 +124,7 @@ func compute_vb(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 	)
 
 	visibility := &Visibility{}
-	// OSACO CompVB line 9
+	// OSACO CompVB
 	// TSN flow
 	for nth, tsn_ktree := range X.TSNTrees {
 		var v []float64
@@ -140,7 +140,7 @@ func compute_vb(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 		visibility.TSN_VB = append(visibility.TSN_VB, v)
 	}
 
-	// OSACO CompVB line 11
+	// OSACO CompVB
 	// AVB flow
 	for nth, avb_ktree := range X.AVBTrees {
 		var v []float64

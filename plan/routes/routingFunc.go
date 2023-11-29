@@ -25,7 +25,25 @@ func Get_SteninerTree_Routing(network *network.Network) *Trees_set {
 	return Trees_set
 }
 
-func (trees_set *Trees_set) Input_SteinerTree_set() *Trees_set {
+func Get_DistanceTree_Routing(network *network.Network) *Trees_set {
+	Trees_set := &Trees_set{}
+
+	for nth, flow := range network.Flow_Set.TSNFlows {
+		tree := DistanceTree(network.Graph_Set.TSNGraphs[nth], flow.Source, flow.Destinations, network.Bytes_Rate)
+		Trees_set.TSNTrees = append(Trees_set.TSNTrees, tree)
+	}
+	fmt.Printf("Finish Distance Tree %d TSN streams routing\n", len(Trees_set.TSNTrees))
+
+	for nth, flow := range network.Flow_Set.AVBFlows {
+		tree := DistanceTree(network.Graph_Set.AVBGraphs[nth], flow.Source, flow.Destinations, network.Bytes_Rate)
+		Trees_set.AVBTrees = append(Trees_set.AVBTrees, tree)
+	}
+	fmt.Printf("Finish Distance Tree %d AVB streams routing\n", len(Trees_set.AVBTrees))
+
+	return Trees_set
+}
+
+func (trees_set *Trees_set) Input_Tree_set() *Trees_set {
 	Input_tree_set := &Trees_set{}
 
 	var (
@@ -39,7 +57,7 @@ func (trees_set *Trees_set) Input_SteinerTree_set() *Trees_set {
 	return Input_tree_set
 }
 
-func (trees_set *Trees_set) BG_SteinerTree_set() *Trees_set {
+func (trees_set *Trees_set) BG_Tree_set() *Trees_set {
 	BG_tree_set := &Trees_set{}
 
 	var (
@@ -53,8 +71,8 @@ func (trees_set *Trees_set) BG_SteinerTree_set() *Trees_set {
 }
 
 func Get_OSACO_Routing(network *network.Network, SMT *Trees_set) *KTrees_set {
-	const K int = 5
 	ktrees_set := &KTrees_set{}
+	const K int = 5
 
 	for nth, flow := range network.Flow_Set.TSNFlows {
 		Ktrees := KSpanningTree(v2v, SMT.TSNTrees[nth], K, flow.Source, flow.Destinations, network.Bytes_Rate)
@@ -97,10 +115,4 @@ func (ktrees_set *KTrees_set) BG_ktree_set() *KTrees_set {
 	BG_ktree_set.AVBTrees = append(BG_ktree_set.AVBTrees, ktrees_set.AVBTrees[bg_avb_start:]...)
 
 	return BG_ktree_set
-}
-
-func Get_DistanceTree_Routing(network *network.Network) *Trees_set {
-	Trees_set := &Trees_set{}
-
-	return Trees_set
 }
