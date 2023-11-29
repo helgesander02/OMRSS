@@ -114,7 +114,7 @@ func main() {
 		return
 	}
 	var text string
-	fmt.Fprintln(file, "--- The experimental results are as follows --- \n The average objective result for the Steiner Tree:")
+	fmt.Fprintln(file, "--- The experimental results are as follows --- \nThe average objective result for the Steiner Tree:")
 	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", average_obj_smt[0], average_obj_smt[1], average_obj_smt[3])
 	text += "The average objective result for the MDTC:\n"
 	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", average_obj_mdt[0], average_obj_mdt[1], average_obj_mdt[3])
