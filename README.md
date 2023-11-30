@@ -1,13 +1,13 @@
-# MST-ACOvsOther
+# Online Multicast Routing Simulation System
 Simulate TSN and AVB data streams to find the best path in the topology. <br />
 <br />
 Taking advantage of the distinctions between the Schedulability, AVB Worst Case Delay, and Computation Time statistical algorithms. <br />
 
 ## Installation
-Clone this repo by `git clone https://github.com/helgesander02/MST-ACOvsOther`<br />
+Clone this repo by `git clone https://github.com/helgesander02/OMRSS`<br />
 
 ## Running
-Quickstart: `cd MST-ACOvsOther` `sh output.sh` <br />
+Quickstart: `cd OMRSS` `sh output.sh` <br />
 <br />
 More options:
 | Option | Description |
