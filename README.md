@@ -7,7 +7,6 @@ Taking advantage of the distinctions between the Schedulability, AVB Worst Case 
 * Clone this repo by `git clone https://github.com/helgesander02/OMRSS`
 * Env setting `cd OMRSS` 
     * Install yaml.v2 by `go get gopkg.in/yaml.v2`
-<br />
 
 ## Running
 Quickstart: `sh output.sh` <br />

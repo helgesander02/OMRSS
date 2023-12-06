@@ -124,30 +124,34 @@ func In_ListOfTrees(list_of_trees *KTrees, MST *Tree) bool {
 
 // Select K Trees
 func (K_MSTS *KTrees) Select_Min(list_of_trees *KTrees, K int) {
-	treesmap := make(map[int][]*Tree)
-	for _, tree := range list_of_trees.Trees {
-		treesmap[tree.Weight] = append(treesmap[tree.Weight], tree)
-	}
+	if len(list_of_trees.Trees) > K {
+		treesmap := make(map[int][]*Tree)
+		for _, tree := range list_of_trees.Trees {
+			treesmap[tree.Weight] = append(treesmap[tree.Weight], tree)
+		}
 
-	w := K_MSTS.Trees[0].Weight
-	for len(K_MSTS.Trees) != K {
-		selectq := K - len(K_MSTS.Trees)
-		if value, exists := treesmap[w]; exists {
-			if len(value) <= selectq {
-				K_MSTS.Trees = append(K_MSTS.Trees, value...)
-				delete(treesmap, w)
+		w := K_MSTS.Trees[0].Weight
+		for len(K_MSTS.Trees) != K {
+			selectq := K - len(K_MSTS.Trees)
+			if value, exists := treesmap[w]; exists {
+				if len(value) <= selectq {
+					K_MSTS.Trees = append(K_MSTS.Trees, value...)
+					delete(treesmap, w)
+
+				} else {
+					for q := 0; q < selectq; q++ {
+						randomIndex, _ := rand.Int(rand.Reader, big.NewInt(int64(len(value))))
+						index := int(randomIndex.Int64())
+						K_MSTS.Trees = append(K_MSTS.Trees, value[index])
+						value = append(value[:index], value[index+1:]...)
+					}
+				}
 
 			} else {
-				for q := 0; q < selectq; q++ {
-					randomIndex, _ := rand.Int(rand.Reader, big.NewInt(int64(len(value))))
-					index := int(randomIndex.Int64())
-					K_MSTS.Trees = append(K_MSTS.Trees, value[index])
-					value = append(value[:index], value[index+1:]...)
-				}
+				w += 1
 			}
-
-		} else {
-			w += 1
 		}
+	} else {
+		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees...)
 	}
 }
