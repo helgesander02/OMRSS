@@ -1,65 +1,62 @@
 package topology
 
-func Generate_Topology(cost float64) *Topology {
-	// Create Topology
+import (
+	"io/ioutil"
+	"log"
+
+	"gopkg.in/yaml.v2"
+)
+
+func Generate_Topology(topology_name string, cost float64) *Topology {
+	// 1. Read YAML file
+	// 2. Create Data
+	// 3. Parse YAML into the Data
+	data, err := ioutil.ReadFile("yaml/" + topology_name + ".yaml")
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	d := Data{}
+	err = yaml.Unmarshal([]byte(data), &d)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	// 1. Create Topology
 	topology := &Topology{}
 
-	// Create Switch Node
-	// Switchs (Bridges) number
-	for s := 0; s < 12; s++ {
+	// 2. Create Switch Node
+	// 2.1 Switchs (Bridges) number
+	// 2.2 Switch Connection
+	for s := 0; s < d.Scale.Bridges; s++ {
 		snode := &Node{ID: s}
 		topology.Switch = append(topology.Switch, snode)
 	}
-	// Switch Connection
-	Define_Switch_Connection(topology, cost)
+	Define_Switch_Connection(topology, d.BridgeEdges, cost)
 
-	// Create null Nodes
-	// END Devices (End Stations) number
-	for i := 0; i < 6; i++ {
-		node := &Node{ID: i}
+	// 3. Create null Nodes
+	// 3.1 END Devices (End Stations) number
+	// 3.2 END Devices Connection
+	for i := 0; i < d.Scale.EndStations; i++ {
+		node := &Node{ID: i + 3000}
 		topology.Nodes = append(topology.Nodes, node)
 	}
+	Define_Nodes_Connection(topology, d.EndStationEdges, cost)
 
 	return topology
 }
 
 // Define a topology where switches are interconnected with each other
-func Define_Switch_Connection(topology *Topology, cost float64) {
-	topology.AddS2S(0, 1, cost)
-	topology.AddS2S(0, 4, cost)
-	topology.AddS2S(1, 2, cost)
-	topology.AddS2S(1, 5, cost)
-	topology.AddS2S(2, 3, cost)
-	topology.AddS2S(2, 6, cost)
-	topology.AddS2S(3, 7, cost)
-	topology.AddS2S(4, 5, cost)
-	topology.AddS2S(4, 8, cost)
-	topology.AddS2S(5, 6, cost)
-	topology.AddS2S(5, 9, cost)
-	topology.AddS2S(6, 7, cost)
-	topology.AddS2S(6, 10, cost)
-	topology.AddS2S(8, 9, cost)
-	topology.AddS2S(9, 10, cost)
-	topology.AddS2S(10, 11, cost)
-	topology.AddS2S(11, 7, cost)
+func Define_Switch_Connection(topology *Topology, bridge_edges []Edge, cost float64) {
+	for _, edge := range bridge_edges {
+		topology.AddS2S(edge.Ends[0], edge.Ends[1], cost)
+	}
+
 }
 
 // Define a topology where null nodes are connected to switches
-func Define_NullNodes_Connection(inputID int) int {
-	var nodeID int
-	if inputID == 0 {
-		nodeID = 0
-	} else if inputID == 1 {
-		nodeID = 4
-	} else if inputID == 2 {
-		nodeID = 8
-	} else if inputID == 3 {
-		nodeID = 3
-	} else if inputID == 4 {
-		nodeID = 7
-	} else {
-		nodeID = 11
+func Define_Nodes_Connection(topology *Topology, endstation_edges []Edge, cost float64) {
+	for _, edge := range endstation_edges {
+		topology.AddnullN2S(edge.Ends[0], edge.Ends[1], cost)
 	}
 
-	return nodeID
 }

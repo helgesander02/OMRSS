@@ -11,6 +11,7 @@ import (
 func main() {
 	// Define Parameters
 	test_case := flag.Int("test_case", 100, "Conducting 50 experiments.")
+	topology_name := flag.String("topology_name", "typical_complex", "Topology architecture has typical_complex and typical_simple")
 	tsn := flag.Int("tsn", 70, "Number of TSN flows.")
 	avb := flag.Int("avb", 30, "Number of AVB flows.")
 	hyperperiod := flag.Int("hyperperiod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
@@ -29,6 +30,7 @@ func main() {
 
 	fmt.Println("The experimental parameters are as follows.")
 	fmt.Println("****************************************")
+	fmt.Printf("Topology file name: %s\n", *topology_name)
 	fmt.Printf("Test Case: %d\n", *test_case)
 	fmt.Printf("TSN flow: %d, AVB flow: %d\n", *tsn, *avb)
 	fmt.Printf("HyperPeriod: %d us\n", *hyperperiod)
@@ -46,7 +48,7 @@ func main() {
 		fmt.Printf("\nTestCase%d \n", ts+1)
 		fmt.Println("****************************************")
 		// Network (1.Topology 2.Flows 3.Graphs)
-		Network := network.Generate_Network(*tsn, *avb, *hyperperiod, *bandwidth, *show_topology, *show_flows, *show_graphs)
+		Network := network.Generate_Network(*topology_name, *tsn, *avb, *hyperperiod, *bandwidth, *show_topology, *show_flows, *show_graphs)
 
 		if *show_network {
 			Network.Show_Network()
@@ -107,7 +109,7 @@ func main() {
 		return
 	}
 
-	name := fmt.Sprintf("testcae%d_tsn%d_avb%d_output.txt", *test_case, *tsn, *avb)
+	name := fmt.Sprintf("testcase%d_tsn%d_avb%d_output.txt", *test_case, *tsn, *avb)
 	file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println(err)

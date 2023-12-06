@@ -17,3 +17,16 @@ type Topology struct {
 	Listener []*Node
 	Nodes    []*Node
 }
+
+type Edge struct {
+	Ends []int `yaml:"ends"`
+}
+
+type Data struct {
+	Scale struct {
+		EndStations int `yaml:"end_stations"`
+		Bridges     int `yaml:"bridges"`
+	} `yaml:"scale"`
+	EndStationEdges []Edge `yaml:"end_station_edges"`
+	BridgeEdges     []Edge `yaml:"bridge_edges"`
+}

@@ -1,0 +1,24 @@
+name: typical_simple
+
+scale:
+  end_stations: 10
+  bridges: 4
+
+end_station_edges:
+- ends: [3000, 0]
+- ends: [3001, 0]
+- ends: [3002, 0]
+- ends: [3003, 0]
+- ends: [3004, 0]
+- ends: [3005, 3]
+- ends: [3006, 3]
+- ends: [3007, 3]
+- ends: [3008, 3]
+- ends: [3009, 3]
+
+bridge_edges:
+- ends: [0, 1]
+- ends: [0, 2]
+- ends: [0, 3]
+- ends: [1, 3]
+- ends: [2, 3]

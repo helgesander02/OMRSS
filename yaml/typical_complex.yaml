@@ -1,0 +1,32 @@
+name: typical_complex
+
+scale:
+  end_stations: 6
+  bridges: 12
+
+end_station_edges:
+- ends: [3000, 0]
+- ends: [3001, 4]
+- ends: [3002, 8]
+- ends: [3003, 3]
+- ends: [3004, 7]
+- ends: [3005, 11]
+
+bridge_edges:
+- ends: [0, 1]
+- ends: [0, 4]
+- ends: [1, 2]
+- ends: [1, 5]
+- ends: [2, 3]
+- ends: [2, 6]
+- ends: [3, 7]
+- ends: [4, 5]
+- ends: [4, 8]
+- ends: [5, 6]
+- ends: [5, 9]
+- ends: [6, 7]
+- ends: [6, 10]
+- ends: [8, 9]
+- ends: [9, 10]
+- ends: [10, 11]
+- ends: [11, 7]

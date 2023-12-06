@@ -7,7 +7,7 @@ import (
 	"src/network/topology"
 )
 
-func Generate_Network(tsn int, avb int, hyperperiod int, bandwidth float64, show_topology bool, show_flows bool, show_graphs bool) *Network {
+func Generate_Network(topology_name string, tsn int, avb int, hyperperiod int, bandwidth float64, show_topology bool, show_flows bool, show_graphs bool) *Network {
 	bw := (bandwidth / 8) * 1e-6
 	bytes_rate := 1. / bw      // The number of bytes that can be transmitted in 1us
 	bw *= float64(hyperperiod) // The bytes that can be transmitted in 6000us (bytes/us * hyperperiod)
@@ -16,7 +16,7 @@ func Generate_Network(tsn int, avb int, hyperperiod int, bandwidth float64, show
 	// 1. Generate Topology
 	fmt.Println("Generate Topology")
 	fmt.Println("----------------------------------------")
-	Topology := topology.Generate_Topology(bytes_rate)
+	Topology := topology.Generate_Topology(topology_name, bytes_rate)
 	Network.Topology = Topology
 	fmt.Println("Topology generation completed.")
 	fmt.Println()

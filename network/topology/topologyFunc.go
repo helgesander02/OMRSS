@@ -31,5 +31,10 @@ func (t *Topology) GetNodeByID(id int) *Node {
 			return node
 		}
 	}
+	for _, node := range t.Nodes {
+		if node.ID == id {
+			return node
+		}
+	}
 	return nil
 }

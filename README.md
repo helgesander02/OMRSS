@@ -4,15 +4,19 @@ Simulate TSN and AVB data streams to find the best path in the topology. <br />
 Taking advantage of the distinctions between the Schedulability, AVB Worst Case Delay, and Computation Time statistical algorithms. <br />
 
 ## Installation
-Clone this repo by `git clone https://github.com/helgesander02/OMRSS`<br />
+* Clone this repo by `git clone https://github.com/helgesander02/OMRSS`
+* Env setting `cd OMRSS` 
+    * Install yaml.v2 by `go get gopkg.in/yaml.v2`
+<br />
 
 ## Running
-Quickstart: `cd OMRSS` `sh output.sh` <br />
+Quickstart: `sh output.sh` <br />
 <br />
 More options:
 | Option | Description |
 | -------- | ---- | 
 | --test_case | Conducting n experiments |
+| --topology_name | Topology architecture has typical_complex and typical_simple |
 | --tsn | Number of TSN flows |
 | --avb | Number of AVB flows |
 | --HyperPeriod | Greatest Common Divisor of Simulated Time LCM |
