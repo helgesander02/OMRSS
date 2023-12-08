@@ -1,0 +1,33 @@
+name: ring
+
+scale:
+  end_stations: 12
+  bridges: 12
+
+end_station_edges:
+- ends: [3000, 1]
+- ends: [3001, 2]
+- ends: [3002, 3]
+- ends: [3003, 0]
+- ends: [3004, 4]
+- ends: [3005, 5]
+- ends: [3006, 6]
+- ends: [3007, 7]
+- ends: [3008, 11]
+- ends: [3009, 8]
+- ends: [3010, 9]
+- ends: [3011, 10]
+
+bridge_edges:
+- ends: [0, 1]
+- ends: [0, 5]
+- ends: [1, 2]
+- ends: [2, 3]
+- ends: [3, 4]
+- ends: [4, 6]
+- ends: [5, 7]
+- ends: [6, 11]
+- ends: [7, 8]
+- ends: [8, 9]
+- ends: [9, 10]
+- ends: [10, 11]

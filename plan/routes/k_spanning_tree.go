@@ -124,7 +124,7 @@ func In_ListOfTrees(list_of_trees *KTrees, MST *Tree) bool {
 
 // Select K Trees
 func (K_MSTS *KTrees) Select_Min(list_of_trees *KTrees, K int) {
-	if len(list_of_trees.Trees) > K {
+	if len(list_of_trees.Trees) >= K {
 		treesmap := make(map[int][]*Tree)
 		for _, tree := range list_of_trees.Trees {
 			treesmap[tree.Weight] = append(treesmap[tree.Weight], tree)

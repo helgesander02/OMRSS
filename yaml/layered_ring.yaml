@@ -1,0 +1,31 @@
+name: layerd_ring
+
+scale:
+  end_stations: 5
+  bridges: 14
+
+end_station_edges:
+- ends: [3000, 0]
+- ends: [3001, 1]
+- ends: [3002, 9]
+- ends: [3003, 12]
+- ends: [3004, 13]
+
+bridge_edges:
+- ends: [0, 2]
+- ends: [0, 4]
+- ends: [1, 3]
+- ends: [1, 4]
+- ends: [2, 3]
+- ends: [2, 5]
+- ends: [3, 4]
+- ends: [4, 7]
+- ends: [5, 6]
+- ends: [5, 8]
+- ends: [6, 7]
+- ends: [6, 11]
+- ends: [7, 13]
+- ends: [8, 9]
+- ends: [8, 10]
+- ends: [9, 10]
+- ends: [11, 12]

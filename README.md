@@ -15,7 +15,7 @@ More options:
 | Option | Description |
 | -------- | ---- | 
 | --test_case | Conducting n experiments |
-| --topology_name | Topology architecture has typical_complex and typical_simple |
+| --topology_name | Topology architecture has typical_complex, typical_simple, ring and layerd_ring |
 | --tsn | Number of TSN flows |
 | --avb | Number of AVB flows |
 | --HyperPeriod | Greatest Common Divisor of Simulated Time LCM |
@@ -36,6 +36,7 @@ More options:
 [Sune Mølgaard Laursen, Paul Pop, Wilfried Steiner, "Routing Optimization of AVB Streams in TSN Networks"](https://backend.orbit.dtu.dk/ws/files/127311642/Sune_Molgaard_Laursen2016aa_Routing_Optimization_of_AVB_St_SIGBED_Review_1.pdf)<br />
 [Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"](https://www.researchgate.net/publication/347154804_Online_Stream-Aware_Routing_for_TSN-Based_Industrial_Control_Systems)<br />
 [QINGHAN YU et al., "Online Scheduling for Dynamic VM Migration in Multicast Time-Sensitive Networks"](https://ieeexplore.ieee.org/document/8747398)<br />
+[Jiachen Wen  et al., "Online Updating in Multicast Time-Sensitive Networking"](https://ieeexplore.ieee.org/document/10258186)<br />
 
 
 

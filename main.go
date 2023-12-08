@@ -11,7 +11,7 @@ import (
 func main() {
 	// Define Parameters
 	test_case := flag.Int("test_case", 100, "Conducting 50 experiments.")
-	topology_name := flag.String("topology_name", "typical_complex", "Topology architecture has typical_complex and typical_simple")
+	topology_name := flag.String("topology_name", "typical_complex", "Topology architecture has typical_complex, typical_simple, ring and layered_ring")
 	tsn := flag.Int("tsn", 70, "Number of TSN flows.")
 	avb := flag.Int("avb", 30, "Number of AVB flows.")
 	hyperperiod := flag.Int("hyperperiod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
@@ -109,7 +109,7 @@ func main() {
 		return
 	}
 
-	name := fmt.Sprintf("testcase%d_tsn%d_avb%d_output.txt", *test_case, *tsn, *avb)
+	name := fmt.Sprintf("%s_testcase%d_tsn%d_avb%d_output.txt", *topology_name, *test_case, *tsn, *avb)
 	file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println(err)

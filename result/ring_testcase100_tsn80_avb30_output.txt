@@ -1,0 +1,12 @@
+--- The experimental results are as follows --- 
+The average objective result for the Steiner Tree:
+O1: 0.000000 O2: 4.860000 O3: pass O4: 640.920000 
+The average objective result for the MDTC:
+O1: 0.040000 O2: 7.160000 O3: pass O4: 542.520000 
+The average objective result for OSACO:
+1000ms: O1: 0.000000 O2: 3.880000 O3: pass O4: 661.100000 
+800ms: O1: 0.000000 O2: 4.090000 O3: pass O4: 658.370000 
+600ms: O1: 0.000000 O2: 4.080000 O3: pass O4: 657.030000 
+400ms: O1: 0.000000 O2: 4.220000 O3: pass O4: 656.140000 
+200ms: O1: 0.000000 O2: 4.440000 O3: pass O4: 651.140000 
+
