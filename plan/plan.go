@@ -44,14 +44,15 @@ func (plan *Plan) InitiatePlan(show_plan bool, show_smt bool, show_mdt bool, sho
 	obj_mdt, _ := schedule.OBJ(plan.Network, K_MST, MDT.Input_Tree_set(), MDT.BG_Tree_set())
 
 	if show_plan {
+		fmt.Println()
 		fmt.Println("Steiner Tree")
 		fmt.Println("----------------------------------------")
 		SMT.Show_Trees_Set()
-
+		fmt.Println()
 		fmt.Println("OSACO")
 		fmt.Println("----------------------------------------")
 		K_MST.Show_kTrees_Set()
-
+		fmt.Println()
 		fmt.Println("MDTC")
 		fmt.Println("----------------------------------------")
 		MDT.Show_Trees_Set()

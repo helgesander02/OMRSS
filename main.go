@@ -109,14 +109,9 @@ func main() {
 		return
 	}
 
-	name := fmt.Sprintf("%s_testcase%d_tsn%d_avb%d_output.txt", *topology_name, *test_case, *tsn, *avb)
-	file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
 	var text string
-	fmt.Fprintln(file, "--- The experimental results are as follows --- \nThe average objective result for the Steiner Tree:")
+	text += "--- The experimental results are as follows --- \n"
+	text += "The average objective result for the Steiner Tree:\n"
 	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", average_obj_smt[0], average_obj_smt[1], average_obj_smt[3])
 	text += "The average objective result for the MDTC:\n"
 	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", average_obj_mdt[0], average_obj_mdt[1], average_obj_mdt[3])
@@ -126,8 +121,22 @@ func main() {
 	text += fmt.Sprintf("600ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[2][0], average_objs_osaco[2][1], average_objs_osaco[2][3])
 	text += fmt.Sprintf("400ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[3][0], average_objs_osaco[3][1], average_objs_osaco[3][3])
 	text += fmt.Sprintf("200ms: O1: %f O2: %f O3: pass O4: %f \n", average_objs_osaco[4][0], average_objs_osaco[4][1], average_objs_osaco[4][3])
-	fmt.Fprintln(file, text)
-	file.Close()
+
+	name := fmt.Sprintf("%s_testcase%d_tsn%d_avb%d_output.txt", *topology_name, *test_case, *tsn, *avb)
+	file, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		file, err = os.OpenFile(name, os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			fmt.Println("Use the file failed：", err)
+			return
+		}
+		fmt.Fprintln(file, text)
+		file.Close()
+
+	} else {
+		fmt.Fprintln(file, text)
+		file.Close()
+	}
 
 	err = os.Chdir("..")
 	if err != nil {

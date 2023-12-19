@@ -60,7 +60,7 @@ func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, I
 		//fmt.Printf("Input AVB route%d: %b \n", nth, schedulability)
 	}
 	// O3 ... pass
-
+	//fmt.Println(linkmap)
 	obj[0] = float64(tsn_failed_count)
 	obj[1] = float64(avb_failed_count)
 	obj[2] = float64(all_rerouted_count) // O3 ... pass

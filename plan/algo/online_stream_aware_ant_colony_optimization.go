@@ -3,6 +3,7 @@ package algo
 import (
 	"crypto/rand"
 	"fmt"
+	"math"
 	"math/big"
 	"src/network"
 	"src/network/flow"
@@ -63,8 +64,8 @@ func OSACO_Run(network *network.Network, SMT *routes.Trees_set, X *routes.KTrees
 		}
 	}
 
-	resultobj, resultcost := schedule.OBJ(network, X, II, II_prime)
 	fmt.Println()
+	resultobj, resultcost := schedule.OBJ(network, X, II, II_prime)
 	fmt.Printf("result value: %d \n", resultcost)
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
 
@@ -134,7 +135,8 @@ func compute_vb(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 				mult = preference
 			}
 
-			value := mult / float64(tsn_ktree.Trees[0].Weight) // mult / SteinerTree weight
+			//value := mult / float64(tsn_ktree.Trees[0].Weight) // mult / Tree weight
+			value := mult / math.Exp(float64(tsn_ktree.Trees[0].Weight)) // mult / exponential function( Tree weight )
 			v = append(v, value)
 		}
 		visibility.TSN_VB = append(visibility.TSN_VB, v)
@@ -243,7 +245,7 @@ func epoch(network *network.Network, X *routes.KTrees_set, II_prime *routes.Tree
 	_, cost := schedule.OBJ(network, X, IIV, II_prime)
 	//obj, cost := Obj(network, X, IIV, IIV_prime) // BG ... pass
 
-	p := 0.9 //0 <= p <= 1
+	p := 0.8 //0 <= p <= 1
 	for nth, ktree := range X.TSNTrees {
 		for kth := range ktree.Trees {
 			if nth >= (len(X.TSNTrees) / 2) { // BG ... pass

@@ -8,6 +8,18 @@ Taking advantage of the distinctions between the Schedulability, AVB Worst Case 
 * Env setting `cd OMRSS` 
     * Install yaml.v2 by `go get gopkg.in/yaml.v2`
 
+## Simulation Settings
+We consider a typical topology for TSN-based industrial factories <br />
+
+| typical_complex | typical_simple |
+| --- | --- |
+|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/typical1.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/typical2.png)|
+
+| layered_ring | ring |
+| --- | --- |
+|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/layeredring.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/ring.png)|
+
+
 ## Running
 Quickstart: `sh output.sh` <br />
 <br />
@@ -15,7 +27,7 @@ More options:
 | Option | Description |
 | -------- | ---- | 
 | --test_case | Conducting n experiments |
-| --topology_name | Topology architecture has typical_complex, typical_simple, ring and layerd_ring |
+| --topology_name | Topology architecture has typical_complex, typical_simple, ring and layered_ring |
 | --tsn | Number of TSN flows |
 | --avb | Number of AVB flows |
 | --HyperPeriod | Greatest Common Divisor of Simulated Time LCM |
