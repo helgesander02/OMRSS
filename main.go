@@ -49,7 +49,6 @@ func main() {
 		fmt.Println("****************************************")
 		// Network (1.Topology 2.Flows 3.Graphs)
 		Network := network.Generate_Network(*topology_name, *tsn, *avb, *hyperperiod, *bandwidth, *show_topology, *show_flows, *show_graphs)
-
 		if *show_network {
 			Network.Show_Network()
 		}

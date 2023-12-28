@@ -19,7 +19,7 @@ func (plan *Plan) InitiatePlan(show_plan bool, show_smt bool, show_mdt bool, sho
 		timeout    int           = 1000
 	)
 
-	// The timeout of each run is set as 100~500 ms
+	// The timeout of each run is set as 100~1000 ms
 	fmt.Println("Steiner Tree")
 	fmt.Println("----------------------------------------")
 	SMT := algo.SMT_Run(plan.Network, show_smt)
@@ -40,8 +40,12 @@ func (plan *Plan) InitiatePlan(show_plan bool, show_smt bool, show_mdt bool, sho
 
 		timeout -= 200
 	}
+
 	obj_smt, _ := schedule.OBJ(plan.Network, K_MST, SMT.Input_Tree_set(), SMT.BG_Tree_set())
+	fmt.Printf("SMT computing time:")
+
 	obj_mdt, _ := schedule.OBJ(plan.Network, K_MST, MDT.Input_Tree_set(), MDT.BG_Tree_set())
+	fmt.Printf("MDTC computing time:")
 
 	if show_plan {
 		fmt.Println()

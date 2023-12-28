@@ -31,7 +31,7 @@ func OSACO_Run(network *network.Network, SMT *routes.Trees_set, X *routes.KTrees
 	visibility := compute_vb(X, network.Flow_Set)
 
 	if show_osaco {
-		fmt.Printf("\n--- 5th Spanning Tree ---\n")
+		fmt.Println("--- 5th Spanning Tree ---")
 		X.Show_kTrees_Set()
 		fmt.Println()
 		fmt.Println("--- Visibility and Pheromone ---")
@@ -64,10 +64,13 @@ func OSACO_Run(network *network.Network, SMT *routes.Trees_set, X *routes.KTrees
 		}
 	}
 
-	fmt.Println()
 	resultobj, resultcost := schedule.OBJ(network, X, II, II_prime)
+	fmt.Println()
 	fmt.Printf("result value: %d \n", resultcost)
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
+	fmt.Println()
+
+	fmt.Printf("OSACO computing time:")
 
 	// SteinerTree (Input_SMT, BG_SMT, initialobj), OSACO (II, II_prime, resultobj)
 	if show_osaco {

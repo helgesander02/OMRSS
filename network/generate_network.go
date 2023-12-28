@@ -11,7 +11,7 @@ func Generate_Network(topology_name string, tsn int, avb int, hyperperiod int, b
 	bw := (bandwidth / 8) * 1e-6
 	bytes_rate := 1. / bw      // The number of bytes that can be transmitted in 1us
 	bw *= float64(hyperperiod) // The bytes that can be transmitted in 6000us (bytes/us * hyperperiod)
-	Network := &Network{TSN: tsn, AVB: avb, Bytes_Rate: bytes_rate, Bandwidth: bw, HyperPeriod: hyperperiod}
+	Network := &Network{TSN: tsn, AVB: avb, BytesRate: bytes_rate, Bandwidth: bw, HyperPeriod: hyperperiod}
 
 	// 1. Generate Topology
 	fmt.Println("Generate Topology")
@@ -30,11 +30,12 @@ func Generate_Network(topology_name string, tsn int, avb int, hyperperiod int, b
 	fmt.Println("----------------------------------------")
 	Flow_Set := flow.Generate_Flows(len(Topology.Nodes), tsn, avb, hyperperiod)
 	Network.Flow_Set = Flow_Set
-	Flow_Set.Show_Flows()
-	Flow_Set.Show_Flow()
+	fmt.Println("Complete Generating Flows")
 	fmt.Println()
 
 	if show_flows {
+		Flow_Set.Show_Flows()
+		Flow_Set.Show_Flow()
 		Flow_Set.Show_Stream()
 	}
 
