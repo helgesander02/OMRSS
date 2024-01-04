@@ -5,8 +5,7 @@ import (
 )
 
 // Bang Ye Wu, Kun-Mao Chao, "Steiner Minimal Trees"
-func SteninerTree(v2v *V2V, Graph *topology.Topology, Source int, Destinations []int, cost float64) *Tree {
-	t := Graph
+func SteninerTree(v2v *V2V, t *topology.Topology, Source int, Destinations []int, cost float64) *Tree {
 	var Terminal []int
 	Terminal = append(Terminal, Source)
 	Terminal = append(Terminal, Destinations...)
@@ -16,8 +15,11 @@ func SteninerTree(v2v *V2V, Graph *topology.Topology, Source int, Destinations [
 	// Then, add all the vertices from this shortest path to the tree.
 	// If there is a vertex, find all shortest paths between the vertex and terminals.
 	// Choose the path with the minimum cost and add all the vertices from this shortest path to the tree.
-	tree := &Tree{}
-	var used_tmal []int
+	var (
+		tree      *Tree = &Tree{}
+		used_tmal []int
+	)
+
 	for len(used_tmal) != len(Terminal) {
 		if len(tree.Nodes) == 0 {
 			// Find the set of all shortest paths from Vertex to Vertexs

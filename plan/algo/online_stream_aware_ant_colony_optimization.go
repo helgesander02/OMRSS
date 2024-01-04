@@ -248,7 +248,7 @@ func epoch(network *network.Network, X *routes.KTrees_set, II_prime *routes.Tree
 	_, cost := schedule.OBJ(network, X, IIV, II_prime)
 	//obj, cost := Obj(network, X, IIV, IIV_prime) // BG ... pass
 
-	p := 0.8 //0 <= p <= 1
+	p := 0.7 //0 <= p <= 1
 	for nth, ktree := range X.TSNTrees {
 		for kth := range ktree.Trees {
 			if nth >= (len(X.TSNTrees) / 2) { // BG ... pass

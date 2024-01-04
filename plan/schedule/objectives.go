@@ -16,10 +16,10 @@ func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, I
 	var (
 		obj                [4]float64
 		cost               int
-		tsn_failed_count   int = 0
-		avb_failed_count   int = 0
-		all_rerouted_count int = 0 // O3 ... pass
-		avb_wcd_sum        time.Duration
+		tsn_failed_count   int           = 0 // O1
+		avb_failed_count   int           = 0 // O2
+		all_rerouted_count int           = 0 // O3 ... pass
+		avb_wcd_sum        time.Duration     // O4
 	)
 	linkmap := map[string]float64{}
 
@@ -59,10 +59,10 @@ func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, I
 	}
 	// O3 ... pass
 
-	obj[0] = float64(tsn_failed_count)
-	obj[1] = float64(avb_failed_count)
-	obj[2] = float64(all_rerouted_count) // O3 ... pass
-	obj[3] = float64(avb_wcd_sum / time.Microsecond)
+	obj[0] = float64(tsn_failed_count)               // O1
+	obj[1] = float64(avb_failed_count)               // O2
+	obj[2] = float64(all_rerouted_count)             // O3 ... pass
+	obj[3] = float64(avb_wcd_sum / time.Microsecond) // O4
 
 	cost += int(avb_wcd_sum/time.Microsecond) * 1
 	cost += avb_failed_count * 1000

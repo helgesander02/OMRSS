@@ -36,8 +36,8 @@ func Generate_Topology(topology_name string, cost float64) *Topology {
 	// 3. Create null Nodes
 	// 3.1 END Devices (End Stations) number
 	// 3.2 END Devices Connection
-	for i := 0; i < d.Scale.EndStations; i++ {
-		node := &Node{ID: i + 3000}
+	for es := 0; es < d.Scale.EndStations; es++ {
+		node := &Node{ID: es + 3000}
 		topology.Nodes = append(topology.Nodes, node)
 	}
 	Define_Nodes_Connection(topology, d.EndStationEdges, cost)
