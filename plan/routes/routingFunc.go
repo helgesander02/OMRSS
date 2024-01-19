@@ -70,9 +70,8 @@ func (trees_set *Trees_set) BG_Tree_set() *Trees_set {
 	return BG_tree_set
 }
 
-func Get_OSACO_Routing(network *network.Network, SMT *Trees_set) *KTrees_set {
+func Get_OSACO_Routing(network *network.Network, SMT *Trees_set, K int) *KTrees_set {
 	ktrees_set := &KTrees_set{}
-	const K int = 20
 
 	for nth, flow := range network.Flow_Set.TSNFlows {
 		Ktrees := KSpanningTree(v2v, SMT.TSNTrees[nth], K, flow.Source, flow.Destinations, network.BytesRate)

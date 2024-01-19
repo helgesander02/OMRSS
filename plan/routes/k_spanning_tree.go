@@ -51,7 +51,10 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 			}
 		}
 	}
-	K_MSTS.Select_Min(list_of_trees, K)
+	K_MSTS.Select_Min_Weight(list_of_trees, K)
+	//K_MSTS.Select_Increasing_Arithmetic_Sequence_Weight(list_of_trees, K)
+	//K_MSTS.Select_Average_Arithmetic_Sequence_Weight(list_of_trees, K)
+	//K_MSTS.Select_High_Dissimilarity(list_of_trees, K)
 
 	return K_MSTS
 }
@@ -122,8 +125,8 @@ func In_ListOfTrees(list_of_trees *KTrees, MST *Tree) bool {
 	return false
 }
 
-// Select K Trees
-func (K_MSTS *KTrees) Select_Min(list_of_trees *KTrees, K int) {
+// 1. Select the minimum weight KTrees [0, 1, 2, 3]
+func (K_MSTS *KTrees) Select_Min_Weight(list_of_trees *KTrees, K int) {
 	if len(list_of_trees.Trees) >= K {
 		treesmap := make(map[int][]*Tree)
 		for _, tree := range list_of_trees.Trees {
@@ -154,4 +157,35 @@ func (K_MSTS *KTrees) Select_Min(list_of_trees *KTrees, K int) {
 	} else {
 		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees...)
 	}
+}
+
+// 2. Select Increasing Arithmetic Sequence Weight KTrees [1, 3 ,5 ,7] or [0, 2, 4, 6], up=2
+func (K_MSTS *KTrees) Select_Increasing_Arithmetic_Sequence_Weight(list_of_trees *KTrees, K int) {
+	var ArithmeticSequence int = 2
+	if len(list_of_trees.Trees) >= K {
+		for idx := 0; idx < 8; idx += ArithmeticSequence {
+			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees[idx])
+		}
+	} else {
+		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees...)
+	}
+
+}
+
+// 3. Select Average Arithmetic Sequence Weight KTrees  [0, up, 2up, 3up], up=len(list_of_trees)/K
+func (K_MSTS *KTrees) Select_Average_Arithmetic_Sequence_Weight(list_of_trees *KTrees, K int) {
+	var ArithmeticSequence int = int(float64(len(list_of_trees.Trees)) / float64(K-1))
+	if len(list_of_trees.Trees) >= K {
+		for idx := 0; idx < len(list_of_trees.Trees); idx += ArithmeticSequence {
+			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees[idx])
+		}
+	} else {
+		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees...)
+	}
+
+}
+
+// 4. Select high dissimilarity KTrees
+func (K_MSTS *KTrees) Select_High_Dissimilarity(list_of_trees *KTrees, K int) {
+
 }

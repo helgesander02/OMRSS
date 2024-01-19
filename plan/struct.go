@@ -2,12 +2,12 @@ package plan
 
 import (
 	"src/network"
+	"src/plan/algo"
 )
 
 type Plan struct {
-	Network   *network.Network // Network (1. Topology 2. Flows 3. Graphs)
-	Algorithm *Algorithm       // A. OSACO (1. Ktree 2.WCD ...) B. SteinerTree ...
-}
-
-type Algorithm struct {
+	Network *network.Network
+	SMT     *algo.SMT
+	MDTC    *algo.MDTC
+	OSACO   *algo.OSACO
 }

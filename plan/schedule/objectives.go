@@ -65,7 +65,7 @@ func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, I
 	obj[3] = float64(avb_wcd_sum / time.Microsecond) // O4
 
 	cost += int(avb_wcd_sum/time.Microsecond) * 1
-	cost += avb_failed_count * 1000
+	cost += avb_failed_count * 1000 //100 ~ 500
 	cost += tsn_failed_count * 100000
 
 	return obj, cost

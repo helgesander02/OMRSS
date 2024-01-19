@@ -34,14 +34,12 @@ More options:
 | --avb | Number of AVB flows |
 | --HyperPeriod | Greatest Common Divisor of Simulated Time LCM |
 | --bandwidth | 1 Gbps |
+| --osaco_timeout | Timeout in milliseconds |
+| --osaco_K | Select K trees with different weights |
+| --osaco_P | The pheromone value of each routing path starts to evaporate, where P is the given evaporation coefficient (0 <= p <= 1)|
 | --show_network | Present all network information comprehensively |
-| --show_topology | Display all topology information |
-| --show_flows | Display all flows information |
-| --show_graphs | Display all show_graphs information |
 | --show_plan | Provide a comprehensive display of all plan information |
-| --show_smt | Display all Steiner Tree compute information comprehensively |
-| --show_mdt | Display all Distance Tree compute information comprehensively. |
-| --show_osaco | Display all Osaco compute information comprehensively |
+| --store_data | Store all statistical data |
 
 
 ## Reference
