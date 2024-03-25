@@ -40,7 +40,7 @@ func init() {
 	flag.Float64Var(&bandwidth, "bandwidth", 1e9, "1 Gbps.")
 	flag.IntVar(&osaco_timeout, "osaco_timeout", 200, "Timeout in milliseconds")
 	flag.IntVar(&osaco_K, "osaco_K", 5, "Select K trees with different weights.")
-	flag.Float64Var(&osaco_P, "osaco_P", 0.7, "The pheromone value of each routing path starts to evaporate, where P is the given evaporation coefficient. (0 <= p <= 1)")
+	flag.Float64Var(&osaco_P, "osaco_P", 0.6, "The pheromone value of each routing path starts to evaporate, where P is the given evaporation coefficient. (0 <= p <= 1)")
 
 	flag.BoolVar(&show_network, "show_network", false, "Present all network information comprehensively.")
 	flag.BoolVar(&show_plan, "show_plan", false, "Provide a comprehensive display of all plan information.")
@@ -57,7 +57,7 @@ func main() {
 	var (
 		average_obj_smt    [4]float64    // {o1, o2, o3, o4}
 		average_obj_mdt    [4]float64    // {o1, o2, o3, o4}
-		average_objs_osaco [5][4]float64 // 1000ms{o1, o2, o3, o4} 800ms{o1, o2, o3, o4} 600ms{o1, o2, o3, o4}, 400ms{o1, o2, o3, o4}, 200ms{o1, o2, o3, o4}
+		average_objs_osaco [5][4]float64 // 200ms{o1, o2, o3, o4} 400ms{o1, o2, o3, o4} 600ms{o1, o2, o3, o4}, 800ms{o1, o2, o3, o4}, 1000ms{o1, o2, o3, o4}
 	)
 
 	for ts := 0; ts < test_case; ts++ {
@@ -70,7 +70,7 @@ func main() {
 		}
 
 		// 2. Create new plan
-		Plan := plan.NewPlan(Network, osaco_timeout, osaco_K, osaco_P)
+		Plan := plan.NewPlan(Network, osaco_timeout, osaco_K, osaco_P) // TODO: To process parameters with a dictionary structure
 
 		// 3. Initiate plan
 		Plan.InitiatePlan()
@@ -102,13 +102,14 @@ func main() {
 	}
 	// 5. Statistical results
 	if store_data {
+		// Save as CSV
 		Store_Data(average_obj_smt, average_obj_mdt, average_objs_osaco)
 	}
 	// --------------------------------------------------------------------------------
 
 	// Output results
 	Output_Results(average_obj_smt, average_obj_mdt, average_objs_osaco)
-	// Store files
+	// Save as TXT
 	Store_Files(average_obj_smt, average_obj_mdt, average_objs_osaco)
 }
 

@@ -163,8 +163,12 @@ func (K_MSTS *KTrees) Select_Min_Weight(list_of_trees *KTrees, K int) {
 func (K_MSTS *KTrees) Select_Increasing_Arithmetic_Sequence_Weight(list_of_trees *KTrees, K int) {
 	var ArithmeticSequence int = 2
 	if len(list_of_trees.Trees) >= K {
-		for idx := 0; idx < 8; idx += ArithmeticSequence {
-			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees[idx])
+		if len(list_of_trees.Trees) >= ArithmeticSequence*(K-1) {
+			for idx := 0; idx < ArithmeticSequence*(K-1); idx += ArithmeticSequence {
+				K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees[idx])
+			}
+		} else {
+			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees[:K-1]...)
 		}
 	} else {
 		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees...)

@@ -1,4 +1,4 @@
-package schedule
+package algo_timer
 
 import (
 	"fmt"
