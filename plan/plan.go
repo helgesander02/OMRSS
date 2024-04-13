@@ -1,45 +1,41 @@
 package plan
 
 import (
-	"fmt"
 	"src/network"
 	"src/plan/algo"
-	"src/plan/routes"
-	"src/plan/schedule"
 )
 
-func NewPlan(network *network.Network, osaco_timeout int, osaco_K int, osaco_P float64) *Plan {
-	Plan := &Plan{Network: network}
-
-	Plan.SMT = &algo.SMT{}
-	Plan.MDTC = &algo.MDTC{}
-	Plan.OSACO = &algo.OSACO{Timeout: osaco_timeout, K: osaco_K, P: osaco_P}
-
-	return Plan
+type Plans interface {
+	Initiate_Plan()
+	Show_Plan()
 }
 
-func (plan *Plan) InitiatePlan() {
-	fmt.Println("Steiner Tree")
-	fmt.Println("----------------------------------------")
-	plan.SMT.SMT_Run(plan.Network)
+func New_Plans(network *network.Network, osaco_timeout int, osaco_K int, osaco_P float64) map[string]Plans {
+	// plan1 ...
+	OMACO := New_OMACO_Plan(network, osaco_timeout, osaco_K, osaco_P)
 
-	fmt.Println()
-	fmt.Println("MDTC")
-	fmt.Println("----------------------------------------")
-	plan.MDTC.MDTC_Run(plan.Network)
-
-	// The timeout of each run is set as 100~1000 ms
-	fmt.Println()
-	fmt.Println("OSACO")
-	fmt.Println("----------------------------------------")
-	plan.OSACO.KTrees = routes.Get_OSACO_Routing(plan.Network, plan.SMT.Trees, plan.OSACO.K)
-	plan.OSACO.InputTrees = plan.SMT.Trees.Input_Tree_set()
-	plan.OSACO.BGTrees = plan.SMT.Trees.BG_Tree_set()
-	for i := 0; i < 5; i++ {
-		plan.OSACO.Objs_osaco[i] = plan.OSACO.OSACO_Run(plan.Network, i)
+	// Look-up table method
+	Plans := map[string]Plans{
+		"omaco": OMACO,
+		//plan2,
+		//plan3,
+		// ...
 	}
-	obj_smt, _ := schedule.OBJ(plan.Network, plan.OSACO.KTrees, plan.SMT.Trees.Input_Tree_set(), plan.SMT.Trees.BG_Tree_set())
-	plan.SMT.Objs_smt = obj_smt
-	obj_mdt, _ := schedule.OBJ(plan.Network, plan.OSACO.KTrees, plan.MDTC.Trees.Input_Tree_set(), plan.MDTC.Trees.BG_Tree_set())
-	plan.MDTC.Objs_mdtc = obj_mdt
+
+	return Plans
 }
+
+// Developing the OMACO plan
+func New_OMACO_Plan(network *network.Network, osaco_timeout int, osaco_K int, osaco_P float64) *OMACO {
+	OMACO := &OMACO{Network: network}
+
+	OMACO.SMT = &algo.SMT{}
+	OMACO.MDTC = &algo.MDTC{}
+	OMACO.OSACO = &algo.OSACO{Timeout: osaco_timeout, K: osaco_K, P: osaco_P}
+
+	return OMACO
+}
+
+// Plan2
+// Plan3
+// ...
