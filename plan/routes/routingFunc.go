@@ -8,7 +8,7 @@ import (
 var v2v *V2V = &V2V{}
 
 func Get_SteninerTree_Routing(network *network.Network) *Trees_set {
-	Trees_set := &Trees_set{}
+	Trees_set := new_Trees_Set()
 
 	for nth, flow := range network.Flow_Set.TSNFlows {
 		tree := SteninerTree(v2v, network.Graph_Set.TSNGraphs[nth], flow.Source, flow.Destinations, network.BytesRate)
@@ -26,7 +26,7 @@ func Get_SteninerTree_Routing(network *network.Network) *Trees_set {
 }
 
 func Get_DistanceTree_Routing(network *network.Network) *Trees_set {
-	Trees_set := &Trees_set{}
+	Trees_set := new_Trees_Set()
 
 	for nth, flow := range network.Flow_Set.TSNFlows {
 		tree := DistanceTree(network.Graph_Set.TSNGraphs[nth], flow.Source, flow.Destinations, network.BytesRate)
@@ -44,7 +44,7 @@ func Get_DistanceTree_Routing(network *network.Network) *Trees_set {
 }
 
 func (trees_set *Trees_set) Input_Tree_set() *Trees_set {
-	Input_tree_set := &Trees_set{}
+	Input_tree_set := new_Trees_Set()
 
 	var (
 		input_tsn_end int = len(trees_set.TSNTrees) / 2
@@ -58,7 +58,7 @@ func (trees_set *Trees_set) Input_Tree_set() *Trees_set {
 }
 
 func (trees_set *Trees_set) BG_Tree_set() *Trees_set {
-	BG_tree_set := &Trees_set{}
+	BG_tree_set := new_Trees_Set()
 
 	var (
 		bg_tsn_start int = len(trees_set.TSNTrees) / 2
@@ -71,7 +71,7 @@ func (trees_set *Trees_set) BG_Tree_set() *Trees_set {
 }
 
 func Get_OSACO_Routing(network *network.Network, SMT *Trees_set, K int) *KTrees_set {
-	ktrees_set := &KTrees_set{}
+	ktrees_set := new_KTrees_Set()
 
 	for nth, flow := range network.Flow_Set.TSNFlows {
 		Ktrees := KSpanningTree(v2v, SMT.TSNTrees[nth], K, flow.Source, flow.Destinations, network.BytesRate)
@@ -89,7 +89,7 @@ func Get_OSACO_Routing(network *network.Network, SMT *Trees_set, K int) *KTrees_
 }
 
 func (ktrees_set *KTrees_set) Input_ktree_set() *KTrees_set {
-	Input_ktree_set := &KTrees_set{}
+	Input_ktree_set := new_KTrees_Set()
 
 	var (
 		input_tsn_end int = len(ktrees_set.TSNTrees) / 2
@@ -103,7 +103,7 @@ func (ktrees_set *KTrees_set) Input_ktree_set() *KTrees_set {
 }
 
 func (ktrees_set *KTrees_set) BG_ktree_set() *KTrees_set {
-	BG_ktree_set := &KTrees_set{}
+	BG_ktree_set := new_KTrees_Set()
 
 	var (
 		bg_tsn_start int = len(ktrees_set.TSNTrees) / 2

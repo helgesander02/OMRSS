@@ -16,7 +16,7 @@ func SteninerTree(v2v *V2V, t *topology.Topology, Source int, Destinations []int
 	// If there is a vertex, find all shortest paths between the vertex and terminals.
 	// Choose the path with the minimum cost and add all the vertices from this shortest path to the tree.
 	var (
-		tree      *Tree = &Tree{}
+		tree      *Tree = new_Tree()
 		used_tmal []int
 	)
 

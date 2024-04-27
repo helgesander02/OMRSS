@@ -11,28 +11,16 @@ type Memorizers interface {
 }
 
 func New_Memorizers() map[string]Memorizers {
-	// computer1 ...
-	OMACO := New_OMACO_Memorizer()
+	// memorizer1 ...
+	OMACO := new_OMACO_Memorizer()
 
 	// Look-up table method
-	Computers := map[string]Memorizers{
+	memorizers := map[string]Memorizers{
 		"omaco": OMACO,
-		//computer2,
-		//computer3,
+		//memorizer2,
+		//memorizer3,
 		// ...
 	}
 
-	return Computers
+	return memorizers
 }
-
-func New_OMACO_Memorizer() *OMACO_Memorizer {
-	return &OMACO_Memorizer{}
-}
-
-//func New_plan2_Memorizer() *Memorizer2 {
-//	return
-//}
-
-//func New_plan3_Memorizer() *Memorizer3 {
-//	return
-//}

@@ -1,28 +1,14 @@
 package topology
 
 func (topology *Topology) AddS2S(fromNodeID int, toNodeID int, cost float64) {
-	connection1 := &Connection{
-		FromNodeID: fromNodeID,
-		ToNodeID:   toNodeID,
-		Cost:       cost,
-	}
-	connection2 := &Connection{
-		FromNodeID: toNodeID,
-		ToNodeID:   fromNodeID,
-		Cost:       cost,
-	}
-
+	connection1 := new_Connection(fromNodeID, toNodeID, cost)
+	connection2 := new_Connection(toNodeID, fromNodeID, cost)
 	topology.Switch[fromNodeID].Connections = append(topology.Switch[fromNodeID].Connections, connection1)
 	topology.Switch[toNodeID].Connections = append(topology.Switch[toNodeID].Connections, connection2)
 }
 
 func (topology *Topology) AddnullN2S(fromNodeID int, toNodeID int, cost float64) {
-	connection1 := &Connection{
-		FromNodeID: fromNodeID,
-		ToNodeID:   toNodeID,
-		Cost:       cost,
-	}
-
+	connection1 := new_Connection(fromNodeID, toNodeID, cost)
 	topology.Nodes[fromNodeID%1000].Connections = append(topology.Nodes[fromNodeID%1000].Connections, connection1)
 }
 
@@ -35,11 +21,8 @@ func (topology *Topology) AddN2S2N(source int, destinations []int, cost float64)
 	topology.Talker = append(topology.Talker, fromNode)
 
 	toNodeID := fromNode.Connections[0].ToNodeID
-	connection2 := &Connection{
-		FromNodeID: toNodeID,
-		ToNodeID:   source,
-		Cost:       cost,
-	}
+	connection2 := new_Connection(toNodeID, source, cost)
+
 	topology.Switch[toNodeID].Connections = append(topology.Switch[toNodeID].Connections, connection2)
 
 	for i := 0; i < len(destinations); i++ {
@@ -50,11 +33,7 @@ func (topology *Topology) AddN2S2N(source int, destinations []int, cost float64)
 		topology.Listener = append(topology.Listener, fromNode)
 
 		toNodeID := fromNode.Connections[0].ToNodeID
-		connection1 := &Connection{
-			FromNodeID: toNodeID,
-			ToNodeID:   destinations[i],
-			Cost:       cost,
-		}
+		connection1 := new_Connection(toNodeID, destinations[i], cost)
 		topology.Switch[toNodeID].Connections = append(topology.Switch[toNodeID].Connections, connection1)
 	}
 }
@@ -78,11 +57,7 @@ func (topology *Topology) AddS2L(destinations []int, cost float64) {
 		topology.Listener = append(topology.Listener, toNode)
 
 		fromNodeID := toNode.Connections[0].ToNodeID
-		connection := &Connection{
-			FromNodeID: fromNodeID,
-			ToNodeID:   destinations[i],
-			Cost:       cost,
-		}
+		connection := new_Connection(fromNodeID, destinations[i], cost)
 		topology.Switch[fromNodeID].Connections = append(topology.Switch[fromNodeID].Connections, connection)
 	}
 }

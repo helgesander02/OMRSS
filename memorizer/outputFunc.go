@@ -18,10 +18,10 @@ func (OC *OMACO_Memorizer) M_Output_Results() {
 	fmt.Println()
 }
 
-//func (cpt2 *Computer2) M_Output_Results()(test_case int) {
+//func (mm2 *Memorizer2) M_Output_Results()(test_case int) {
 //
 //}
 
-//func (cpt3 *Computer2) M_Output_Results()(test_case int) {
+//func (mmt3 *Memorizer2) M_Output_Results()(test_case int) {
 //
 //}

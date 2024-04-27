@@ -34,6 +34,7 @@ More options:
 | --avb | Number of AVB flows |
 | --HyperPeriod | Greatest Common Divisor of Simulated Time LCM |
 | --bandwidth | 1 Gbps |
+| --plan_name | The plan comprises OMSACO |
 | --osaco_timeout | Timeout in milliseconds |
 | --osaco_K | Select K trees with different weights |
 | --osaco_P | The pheromone value of each routing path starts to evaporate, where P is the given evaporation coefficient (0 <= p <= 1)|

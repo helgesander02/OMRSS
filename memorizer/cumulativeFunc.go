@@ -14,10 +14,10 @@ func (OC *OMACO_Memorizer) M_Cumulative(p plan.Plans) {
 	}
 }
 
-//func (cpt2 *Computer2) M_Cumulative(p plan.Plans) {
+//func (mm2 *Memorizer2) M_Cumulative(p plan.Plans) {
 //
 //}
 
-//func (cpt3 *Computer3) M_Cumulative(p plan.Plans) {
+//func (mm3 *Memorizer3) M_Cumulative(p plan.Plans) {
 //
 //}

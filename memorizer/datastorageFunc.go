@@ -85,10 +85,10 @@ func Fary2Sary(Fary [4]float64) []string {
 	return Sary
 }
 
-//func (cpt2 *Computer2) M_Store_Data(test_case int) {
+//func (mm2 *Memorizer2) M_Store_Data(test_case int) {
 //
 //}
 
-//func (cpt3 *Computer2) M_Store_Data(test_case int) {
+//func (mm3 *Memorizer2) M_Store_Data(test_case int) {
 //
 //}

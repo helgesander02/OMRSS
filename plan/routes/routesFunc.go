@@ -23,17 +23,9 @@ func (tree *Tree) IntoTree(P []int, cost float64) {
 			}
 		}
 		if b3 {
-			connection1 := &Connection{
-				FromNodeID: P[l],
-				ToNodeID:   P[l-1],
-				Cost:       cost,
-			}
+			connection1 := new_Connection(P[l], P[l-1], cost)
 			node1.Connections = append(node1.Connections, connection1)
-			connection2 := &Connection{
-				FromNodeID: P[l-1],
-				ToNodeID:   P[l],
-				Cost:       cost,
-			}
+			connection2 := new_Connection(P[l-1], P[l], cost)
 			node2.Connections = append(node2.Connections, connection2)
 		}
 	}
@@ -193,7 +185,7 @@ func (tree1 *Tree) TreeDeepCopy() *Tree {
 	if buf, err := json.Marshal(tree1); err != nil {
 		return nil
 	} else {
-		tree2 := &Tree{}
+		tree2 := new_Tree()
 		if err = json.Unmarshal(buf, tree2); err != nil {
 			return nil
 		}

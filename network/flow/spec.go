@@ -7,32 +7,16 @@ import (
 
 func TSN_stream() *TSN {
 	t_period, t_datasize := tsn_random()
-	tsn := newTSN(t_period, t_datasize)
+	tsn := new_TSN(t_period, t_datasize)
 
 	return tsn
 }
 
 func AVB_stream() *AVB {
 	a_datasize := avb_random()
-	avb := newAVB(a_datasize)
+	avb := new_AVB(a_datasize)
 
 	return avb
-}
-
-func newTSN(t_period int, t_datasize float64) *TSN {
-	return &TSN{
-		Period:   t_period,   // 100~2000us up 500us
-		Deadline: t_period,   // Period = Deadline
-		DataSize: t_datasize, // 30~100bytes up 10bytes
-	}
-}
-
-func newAVB(a_datasize float64) *AVB {
-	return &AVB{
-		Period:   125,        // 125us
-		Deadline: 2000,       // 2000us
-		DataSize: a_datasize, // 1000~1500bytes  up 100bytes
-	}
 }
 
 func tsn_random() (int, float64) {

@@ -8,8 +8,8 @@ import (
 
 // Amal P M, Ajish Kumar K S, "An Algorithm for kth Minimum Spanning Tree"
 func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations []int, cost float64) *KTrees {
-	K_MSTS := &KTrees{}        // An array(K MSTS) of length k, which contain k minimum spanning trees
-	list_of_trees := &KTrees{} // stores a list of trees
+	K_MSTS := new_KTrees()        // An array(K MSTS) of length k, which contain k minimum spanning trees
+	list_of_trees := new_KTrees() // stores a list of trees
 
 	// first step of the algorithm finds the minimum spanning tree using Prims algorithm,
 	// But this step using MST-Steiner algorithm finds the steiner tree

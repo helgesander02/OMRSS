@@ -7,7 +7,7 @@ import (
 
 func Generate_Graphs(topology *topology.Topology, flows *flow.Flows, bytes_rate float64) *Graphs {
 	// Constructing Graph structures
-	graphs := newGraphs()
+	graphs := new_Graphs()
 
 	// Generating TSN Graphs
 	for _, flow := range flows.TSNFlows {
@@ -24,8 +24,4 @@ func Generate_Graphs(topology *topology.Topology, flows *flow.Flows, bytes_rate 
 	}
 
 	return graphs
-}
-
-func newGraphs() *Graphs {
-	return &Graphs{}
 }

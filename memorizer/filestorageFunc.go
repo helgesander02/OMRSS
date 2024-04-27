@@ -69,10 +69,10 @@ func (OC *OMACO_Memorizer) M_Store_Files(topology_name string, test_case int, ts
 	}
 }
 
-//func (cpt2 *Computer2) M_Store_Files(test_case int) {
+//func (mm2 *Memorizer2) M_Store_Files(test_case int) {
 //
 //}
 
-//func (cpt3 *Computer2) M_Store_Files(test_case int) {
+//func (mm3 *Memorizer2) M_Store_Files(test_case int) {
 //
 //}

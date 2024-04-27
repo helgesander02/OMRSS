@@ -6,7 +6,7 @@ import (
 
 func Generate_Flows(Nnode int, tsn int, avb int, HyperPeriod int) *Flows {
 	// Constructing Flows structures
-	flow_set := newFlows()
+	flow_set := new_Flows()
 	for round := 0; round < 2; round++ {
 		Generate_TSNFlow(flow_set, Nnode, tsn, HyperPeriod)
 		Generate_AVBFlow(flow_set, Nnode, avb, HyperPeriod)
@@ -57,14 +57,14 @@ func Generate_stream(period int, deadline int, datasize float64, HyperPeriod int
 		number      int = 0
 	)
 
-	flow := newFlow(period, deadline, datasize, HyperPeriod)
+	flow := new_Flow(period, deadline, datasize, HyperPeriod)
 
 	for FinishTime < HyperPeriod {
 		Deadline += deadline
 		FinishTime += period
 		name := fmt.Sprint("stream", number)
 
-		stream := newStream(name, ArrivalTime, datasize, deadline, FinishTime)
+		stream := new_Stream(name, ArrivalTime, datasize, deadline, FinishTime)
 
 		flow.Streams = append(flow.Streams, stream)
 		ArrivalTime += period

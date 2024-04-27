@@ -22,7 +22,7 @@ func Generate_Topology(topology_name string, cost float64) *Topology {
 	}
 
 	// 1. Constructing Topology structures
-	topology := newTopology()
+	topology := new_Topology()
 
 	// 2. Create Switch Node
 	// 2.1 Switchs (Bridges) number
@@ -43,10 +43,6 @@ func Generate_Topology(topology_name string, cost float64) *Topology {
 	define_nodes_connection(topology, d.EndStationEdges, cost)
 
 	return topology
-}
-
-func newTopology() *Topology {
-	return &Topology{}
 }
 
 // Define a topology where switches are interconnected with each other

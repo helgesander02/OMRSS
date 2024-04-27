@@ -2,7 +2,6 @@ package plan
 
 import (
 	"src/network"
-	"src/plan/algo"
 )
 
 type Plans interface {
@@ -24,18 +23,3 @@ func New_Plans(network *network.Network, osaco_timeout int, osaco_K int, osaco_P
 
 	return Plans
 }
-
-// Developing the OMACO plan
-func New_OMACO_Plan(network *network.Network, osaco_timeout int, osaco_K int, osaco_P float64) *OMACO {
-	OMACO := &OMACO{Network: network}
-
-	OMACO.SMT = &algo.SMT{}
-	OMACO.MDTC = &algo.MDTC{}
-	OMACO.OSACO = &algo.OSACO{Timeout: osaco_timeout, K: osaco_K, P: osaco_P}
-
-	return OMACO
-}
-
-// Plan2
-// Plan3
-// ...

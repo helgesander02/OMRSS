@@ -1,12 +1,16 @@
 package algo
 
-import "src/plan/routes"
+import (
+	"src/plan/algo_timer"
+	"src/plan/routes"
+)
 
 type SMT struct {
 	Trees      *routes.Trees_set
 	InputTrees *routes.Trees_set
 	BGTrees    *routes.Trees_set
 	Objs_smt   [4]float64
+	timer      *algo_timer.Timer
 }
 
 type MDTC struct {
@@ -14,6 +18,7 @@ type MDTC struct {
 	InputTrees *routes.Trees_set
 	BGTrees    *routes.Trees_set
 	Objs_mdtc  [4]float64
+	timer      *algo_timer.Timer
 }
 
 type OSACO struct {
@@ -26,6 +31,7 @@ type OSACO struct {
 	InputTrees *routes.Trees_set
 	BGTrees    *routes.Trees_set
 	Objs_osaco [5][4]float64 // 1000ms{o1, o2, o3, o4} 800ms{o1, o2, o3, o4} 600ms{o1, o2, o3, o4}, 400ms{o1, o2, o3, o4}, 200ms{o1, o2, o3, o4}
+	timer      *algo_timer.Timer
 }
 
 type Visibility struct {
