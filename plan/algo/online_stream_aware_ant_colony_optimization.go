@@ -7,21 +7,31 @@ import (
 	"math/big"
 	"src/network"
 	"src/network/flow"
+	"src/plan/algo_timer"
 	"src/plan/routes"
 	"src/plan/schedule"
 	"time"
 )
 
 // Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"
-func (osaco *OSACO) OSACO_Run(network *network.Network, firsttime int) [4]float64 {
+func (osaco *OSACO) OSACO_Run(network *network.Network, SMT *routes.Trees_set, firsttime int) [4]float64 {
 	// 6. OSACO
 	if firsttime == 0 {
+		osaco.Timer = algo_timer.NewTimer()
+		//// OSACO computing time: Estimate the time it takes to compute routing information
+		osaco.Timer.TimerStart()
+		osaco.KTrees = routes.Get_OSACO_Routing(network, SMT, osaco.K)
+		osaco.Timer.TimerStop()
+
+		osaco.InputTrees = SMT.Input_Tree_set()
+		osaco.BGTrees = SMT.BG_Tree_set()
 		osaco.PRM = compute_prm(osaco.KTrees)
 		osaco.VB = compute_vb(osaco.KTrees, network.Flow_Set)
 	}
 
 	// Repeat the execution of epochs within the timeout
-	initialobj, initialcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees)
+	initialobj, initialcost, _ := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees)
+
 	fmt.Println()
 	fmt.Printf("initial value: %d \n", initialcost)
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", initialobj[0], initialobj[1], initialobj[3])
@@ -32,8 +42,9 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, firsttime int) [4]float6
 	for {
 		fmt.Printf("\nepoch%d:\n", i)
 		II := epoch(network, osaco)
-		_, cost1 := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees)               // new
-		_, cost2 := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees) // old
+		_, cost1, _ := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees)               // new
+		_, cost2, _ := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees) // old
+
 		if cost1 < cost2 {
 			osaco.InputTrees = II
 			fmt.Println("Change the selected routing !!")
@@ -45,7 +56,7 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, firsttime int) [4]float6
 		}
 	}
 
-	resultobj, resultcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees)
+	resultobj, resultcost, _ := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees)
 	fmt.Println()
 	fmt.Printf("result value: %d \n", resultcost)
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
@@ -216,8 +227,11 @@ func epoch(network *network.Network, osaco *OSACO) *routes.Trees_set {
 	fmt.Printf("Select input routing %v \n", input_k_location)
 	//fmt.Printf("Select background routing %v \n", bg_k_location) // BG ... pass
 
-	_, cost := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees)
+	_, cost, osaco_timer_2 := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees)
 	//obj, cost := Obj(network, X, II, II_prime) // BG ... pass
+	osaco.Timer.TimerExportData()
+	osaco.Timer.TimerMerge(osaco_timer_2)
+	osaco.Timer.TimerExportData()
 
 	for nth, ktree := range osaco.KTrees.TSNTrees {
 		for kth := range ktree.Trees {

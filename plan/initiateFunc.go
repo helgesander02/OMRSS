@@ -2,7 +2,6 @@ package plan
 
 import (
 	"fmt"
-	"src/plan/routes"
 	"src/plan/schedule"
 )
 
@@ -16,20 +15,25 @@ func (plan *OMACO) Initiate_Plan() {
 	fmt.Println("----------------------------------------")
 	plan.MDTC.MDTC_Run(plan.Network)
 
-	// The timeout of each run is set as 100~1000 ms
 	fmt.Println()
 	fmt.Println("OSACO")
 	fmt.Println("----------------------------------------")
-	plan.OSACO.KTrees = routes.Get_OSACO_Routing(plan.Network, plan.SMT.Trees, plan.OSACO.K)
-	plan.OSACO.InputTrees = plan.SMT.Trees.Input_Tree_set()
-	plan.OSACO.BGTrees = plan.SMT.Trees.BG_Tree_set()
+	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
 	for i := 0; i < 5; i++ {
-		plan.OSACO.Objs_osaco[i] = plan.OSACO.OSACO_Run(plan.Network, i)
+		plan.OSACO.Objs_osaco[i] = plan.OSACO.OSACO_Run(plan.Network, plan.SMT.Trees, i)
 	}
-	obj_smt, _ := schedule.OBJ(plan.Network, plan.OSACO.KTrees, plan.SMT.Trees.Input_Tree_set(), plan.SMT.Trees.BG_Tree_set())
+
+	plan.SMT.Timer.TimerExportData()
+	obj_smt, _, smt_timer_2 := schedule.OBJ(plan.Network, plan.OSACO.KTrees, plan.SMT.Trees.Input_Tree_set(), plan.SMT.Trees.BG_Tree_set())
 	plan.SMT.Objs_smt = obj_smt
-	obj_mdt, _ := schedule.OBJ(plan.Network, plan.OSACO.KTrees, plan.MDTC.Trees.Input_Tree_set(), plan.MDTC.Trees.BG_Tree_set())
+	plan.SMT.Timer.TimerMerge(smt_timer_2)
+	plan.SMT.Timer.TimerExportData()
+
+	plan.MDTC.Timer.TimerExportData()
+	obj_mdt, _, mdtc_timer_2 := schedule.OBJ(plan.Network, plan.OSACO.KTrees, plan.MDTC.Trees.Input_Tree_set(), plan.MDTC.Trees.BG_Tree_set())
 	plan.MDTC.Objs_mdtc = obj_mdt
+	plan.MDTC.Timer.TimerMerge(mdtc_timer_2)
+	plan.MDTC.Timer.TimerExportData()
 }
 
 //func (plan *plan2) Initiate_Plan() {

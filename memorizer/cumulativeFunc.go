@@ -3,6 +3,10 @@ package memorizer
 import "src/plan"
 
 func (OC *OMACO_Memorizer) M_Cumulative(p plan.Plans) {
+	OC.average_time_smt += p.(*plan.OMACO).SMT.Timer.TimerOutputData()
+	OC.average_time_mdt += p.(*plan.OMACO).MDTC.Timer.TimerOutputData()
+	OC.average_time_osaco += p.(*plan.OMACO).OSACO.Timer.TimerOutputData()
+
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 4; j++ {
 			if i == 0 {

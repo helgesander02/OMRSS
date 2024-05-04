@@ -23,24 +23,38 @@ func (t *Timer) TimerOpen() {
 
 // Start the timer
 func (t *Timer) TimerStart() {
-	t.start = time.Duration(time.Now().UnixMicro())
+	if t.mission {
+		t.start = time.Duration(time.Now().UnixMicro())
+	}
 }
 
 // Stop the timer
 func (t *Timer) TimerStop() {
-	t.end = time.Duration(time.Now().UnixMicro())
-	t.total += t.end - t.start
+	if t.mission {
+		t.end = time.Duration(time.Now().UnixMicro())
+		t.total += t.end - t.start
+	}
 }
 
 // Stop the timer
 func (t *Timer) TimerEnd() {
-	t.end = time.Duration(time.Now().UnixMicro())
-	t.total += t.end - t.start
+	if t.mission {
+		t.end = time.Duration(time.Now().UnixMicro())
+		t.total += t.end - t.start
+
+		// Mix limit 1000ms
+		if t.total >= time.Duration(1000)*time.Millisecond {
+			t.total = time.Duration(1000) * time.Millisecond
+		}
+	}
+	t.mission = false
 }
 
-// Mix limit 1000ms
-func (t *Timer) Exceededlimit() {
-	t.total = time.Duration(1000) * time.Millisecond
+func (t *Timer) TimerMax() {
+	if t.mission {
+		t.total = time.Duration(1000) * time.Millisecond
+		t.mission = false
+	}
 }
 
 // Export data
@@ -48,7 +62,21 @@ func (t *Timer) TimerExportData() {
 	fmt.Printf(" %v \n", t.total)
 }
 
+// Output data
+func (t *Timer) TimerOutputData() time.Duration {
+	return t.total
+}
+
 // Merge the timer
 func (t1 *Timer) TimerMerge(t2 *Timer) {
-	fmt.Printf(" %v \n", t1.total+t2.total)
+	if t1.mission {
+		t1.total = t1.total + t2.total
+		t1.mission = false
+
+		// Mix limit 1000ms
+		if t1.total >= time.Duration(1000)*time.Millisecond {
+			t1.total = time.Duration(1000) * time.Millisecond
+		}
+	}
+
 }
