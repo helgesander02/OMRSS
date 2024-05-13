@@ -175,6 +175,7 @@ func probability(osaco *OSACO) (*routes.Trees_set, *routes.Trees_set, [2][]int, 
 		for kth := range ktree.Trees {
 			probability := (osaco.VB.TSN_VB[nth][kth] * osaco.PRM.TSN_PRM[nth][kth]) / Denominator
 			for j := 0; j < int(probability*100); j++ {
+				// if kth == 5 => arr[0,0,0,0,0,0,...,1,1,1,...,2,2,2,2,..,3,3,3,...,4,4,4,4,...] len(arr) ~ 100
 				arr = append(arr, kth)
 			}
 		}
@@ -202,6 +203,7 @@ func probability(osaco *OSACO) (*routes.Trees_set, *routes.Trees_set, [2][]int, 
 		for kth := range ktree.Trees {
 			probability := (osaco.VB.AVB_VB[nth][kth] * osaco.PRM.AVB_PRM[nth][kth]) / Denominator
 			for j := 0; j < int(probability*100); j++ {
+				// if kth == 5 => arr[0,0,0,0,0,0,...,1,1,1,...,2,2,2,2,..,3,3,3,...,4,4,4,4,...] len(arr) ~ 100
 				arr = append(arr, kth)
 			}
 		}
@@ -229,9 +231,7 @@ func epoch(network *network.Network, osaco *OSACO) *routes.Trees_set {
 
 	_, cost, osaco_timer_2 := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees)
 	//obj, cost := Obj(network, X, II, II_prime) // BG ... pass
-	osaco.Timer.TimerExportData()
 	osaco.Timer.TimerMerge(osaco_timer_2)
-	osaco.Timer.TimerExportData()
 
 	for nth, ktree := range osaco.KTrees.TSNTrees {
 		for kth := range ktree.Trees {
