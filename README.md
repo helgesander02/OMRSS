@@ -7,8 +7,8 @@ System design from: https://miro.com/welcomeonboard/ZDI1dEJWWGtsTEhCbWMwSm9oTTVh
 
 ## Installation
 * Clone this repo by `git clone https://github.com/helgesander02/OMRSS`
-* Env setting `cd OMRSS` 
-    * Install yaml.v2 by `go get gopkg.in/yaml.v2`
+* Env setting `docker build -t 'omrss' .`  `docker run omrss`
+
 
 ## Simulation Settings
 We consider a typical topology for TSN-based industrial factories <br />
