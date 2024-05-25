@@ -7,9 +7,9 @@ import (
 	"src/network/topology"
 )
 
-func Generate_Network(topology_name string, tsn int, avb int, hyperperiod int, bandwidth float64) *Network {
+func Generate_Network(topology_name string, bg_tsn int, bg_avb int, input_tsn int, input_avb int, hyperperiod int, bandwidth float64) *Network {
 	// 1. Define network parameters
-	Network := new_Network(topology_name, tsn, avb, hyperperiod, bandwidth)
+	Network := new_Network(topology_name, bg_tsn, bg_avb, input_tsn, input_avb, hyperperiod, bandwidth)
 
 	// 2. Generate topology
 	fmt.Println("Generate Topology")
@@ -35,7 +35,7 @@ func Generate_Network(topology_name string, tsn int, avb int, hyperperiod int, b
 	return Network
 }
 
-func new_Network(topology_name string, tsn int, avb int, hyperperiod int, bandwidth float64) *Network {
+func new_Network(topology_name string, bg_tsn int, bg_avb int, input_tsn int, input_avb int, hyperperiod int, bandwidth float64) *Network {
 	bw := (bandwidth / 8) * 1e-6 // bytes/us ==> 125 bytes
 	bytes_rate := 1. / bw        // The number of bytes that can be transmitted in 1us ==> 1/125
 	bw *= float64(hyperperiod)   // The bytes that can be transmitted in 6000us (bytes/us * hyperperiod) ==> 750000 bytes
@@ -45,10 +45,10 @@ func new_Network(topology_name string, tsn int, avb int, hyperperiod int, bandwi
 		BytesRate:    bytes_rate,
 		Bandwidth:    bw,
 		TopologyName: topology_name,
-		BG_TSN:       35,
-		BG_AVB:       15,
-		Input_TSN:    tsn,
-		Input_AVB:    avb,
+		BG_TSN:       bg_tsn,
+		BG_AVB:       bg_avb,
+		Input_TSN:    input_tsn,
+		Input_AVB:    input_avb,
 	}
 
 	fmt.Println("Define network parameters")

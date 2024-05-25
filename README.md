@@ -30,8 +30,10 @@ More options:
 | -------- | ---- | 
 | --test_case | Conducting n experiments |
 | --topology_name | Topology architecture has typical_complex, typical_simple, ring and layered_ring |
-| --tsn | Number of TSN flows |
-| --avb | Number of AVB flows |
+| --bg_tsn | Number of TSN BG flows |
+| --bg_avb | Number of AVB BG flows |
+| --input_tsn | Number of TSN Input flows |
+| --input_avb | Number of AVB Input flows |
 | --HyperPeriod | Greatest Common Divisor of Simulated Time LCM |
 | --bandwidth | 1 Gbps |
 | --plan_name | The plan comprises OMSACO |

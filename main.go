@@ -12,8 +12,10 @@ var (
 	// network parameters
 	test_case     int
 	topology_name string
-	tsn           int
-	avb           int
+	input_tsn     int
+	input_avb     int
+	bg_tsn        int
+	bg_avb        int
 	hyperperiod   int
 	bandwidth     float64
 
@@ -33,8 +35,10 @@ func init() {
 	// Define Parameters
 	flag.IntVar(&test_case, "test_case", 100, "Conducting 50 experiments.")
 	flag.StringVar(&topology_name, "topology_name", "typical_complex", "Topology architecture has typical_complex, typical_simple, ring and layered_ring.")
-	flag.IntVar(&tsn, "tsn", 35, "Number of TSN input flows.")
-	flag.IntVar(&avb, "avb", 15, "Number of AVB input flows.")
+	flag.IntVar(&input_tsn, "input_tsn", 35, "Number of TSN input flows.")
+	flag.IntVar(&input_avb, "input_avb", 15, "Number of AVB input flows.")
+	flag.IntVar(&bg_tsn, "bg_tsn", 35, "Number of TSN bg flows.")
+	flag.IntVar(&bg_avb, "bg_avb", 15, "Number of AVB bg flows.")
 	flag.IntVar(&hyperperiod, "hyperperiod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
 	flag.Float64Var(&bandwidth, "bandwidth", 1e9, "1 Gbps.")
 
@@ -63,7 +67,7 @@ func main() {
 		fmt.Printf("\nTestCase%d\n", ts+1)
 		fmt.Println("****************************************")
 		// 1. Network (a.Topology b.Flows c.Graphs)
-		Network := network.Generate_Network(topology_name, tsn, avb, hyperperiod, bandwidth)
+		Network := network.Generate_Network(topology_name, bg_tsn, bg_avb, input_tsn, input_avb, hyperperiod, bandwidth)
 		if show_network {
 			Network.Show_Network()
 		}
@@ -93,7 +97,7 @@ func main() {
 	Memorizer.M_Output_Results()
 
 	// 8. Save as TXT
-	Memorizer.M_Store_Files(topology_name, test_case, tsn, avb)
+	Memorizer.M_Store_Files(topology_name, test_case, input_tsn, input_avb)
 	// --------------------------------------------------------------------------------
 
 	// 9. Save as CSV
