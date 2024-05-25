@@ -11,8 +11,10 @@ type Network struct {
 	BytesRate    float64
 	Bandwidth    float64
 	TopologyName string
-	TSN          int
-	AVB          int
+	BG_TSN       int
+	BG_AVB       int
+	Input_TSN    int
+	Input_AVB    int
 	Topology     *topology.Topology
 	Flow_Set     *flow.Flows
 	Graph_Set    *graph.Graphs

@@ -34,10 +34,8 @@ func (OC *OMACO_Memorizer) M_Store_Files(topology_name string, test_case int, ts
 	text := "--- The experimental results are as follows --- \n"
 	text += "The average objective result for the Steiner Tree:\n"
 	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", OC.average_obj_smt[0], OC.average_obj_smt[1], OC.average_obj_smt[3])
-	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_smt)
 	text += "The average objective result for the MDTC:\n"
 	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", OC.average_obj_mdt[0], OC.average_obj_mdt[1], OC.average_obj_mdt[3])
-	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_mdt)
 	text += "The average objective result for OSACO:\n"
 	text += fmt.Sprintf("1000ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco[4][0], OC.average_objs_osaco[4][1], OC.average_objs_osaco[4][3])
 	text += fmt.Sprintf("800ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco[3][0], OC.average_objs_osaco[3][1], OC.average_objs_osaco[3][3])

@@ -33,8 +33,8 @@ func init() {
 	// Define Parameters
 	flag.IntVar(&test_case, "test_case", 100, "Conducting 50 experiments.")
 	flag.StringVar(&topology_name, "topology_name", "typical_complex", "Topology architecture has typical_complex, typical_simple, ring and layered_ring.")
-	flag.IntVar(&tsn, "tsn", 70, "Number of TSN flows.")
-	flag.IntVar(&avb, "avb", 30, "Number of AVB flows.")
+	flag.IntVar(&tsn, "tsn", 35, "Number of TSN input flows.")
+	flag.IntVar(&avb, "avb", 15, "Number of AVB input flows.")
 	flag.IntVar(&hyperperiod, "hyperperiod", 6000, "Greatest Common Divisor of Simulated Time LCM.")
 	flag.Float64Var(&bandwidth, "bandwidth", 1e9, "1 Gbps.")
 

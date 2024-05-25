@@ -13,18 +13,25 @@ import (
 	"time"
 )
 
+var (
+	bg_tsn int
+	bg_avb int
+)
+
 // Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"
 func (osaco *OSACO) OSACO_Run(network *network.Network, SMT *routes.Trees_set, firsttime int) [4]float64 {
 	// 6. OSACO
 	if firsttime == 0 {
 		osaco.Timer = algo_timer.NewTimer()
+		bg_tsn = network.BG_TSN
+		bg_avb = network.BG_AVB
 		//// OSACO computing time: Estimate the time it takes to compute routing information
 		osaco.Timer.TimerStart()
 		osaco.KTrees = routes.Get_OSACO_Routing(network, SMT, osaco.K)
 		osaco.Timer.TimerStop()
 
-		osaco.InputTrees = SMT.Input_Tree_set()
-		osaco.BGTrees = SMT.BG_Tree_set()
+		osaco.InputTrees = SMT.Input_Tree_set(bg_tsn, bg_avb)
+		osaco.BGTrees = SMT.BG_Tree_set(bg_tsn, bg_avb)
 		osaco.PRM = compute_prm(osaco.KTrees)
 		osaco.VB = compute_vb(osaco.KTrees, network.Flow_Set)
 	}
@@ -66,16 +73,12 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, SMT *routes.Trees_set, f
 }
 
 func compute_prm(X *routes.KTrees_set) *Pheromone {
-	var (
-		bg_tsn_start int = len(X.TSNTrees) / 2
-		bg_avb_start int = len(X.AVBTrees) / 2
-	)
-
 	pheromone := &Pheromone{}
+
 	for nth, ktree := range X.TSNTrees {
 		var prm []float64
 		for i := 0; i < len(ktree.Trees); i++ {
-			if nth >= bg_tsn_start {
+			if nth < bg_tsn {
 				prm = append(prm, 0.5)
 			} else {
 				prm = append(prm, 1.)
@@ -87,7 +90,7 @@ func compute_prm(X *routes.KTrees_set) *Pheromone {
 	for nth, ktree := range X.AVBTrees {
 		var prm []float64
 		for i := 0; i < len(ktree.Trees); i++ {
-			if nth >= bg_avb_start {
+			if nth < bg_avb {
 				prm = append(prm, 0.5)
 			} else {
 				prm = append(prm, 1.)
@@ -100,14 +103,9 @@ func compute_prm(X *routes.KTrees_set) *Pheromone {
 }
 
 func compute_vb(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
+	var preference float64 = 2.
 	Input_flow_set := flow_set.Input_flow_set()
 	BG_flow_set := flow_set.BG_flow_set()
-
-	var (
-		preference   float64 = 2.
-		bg_tsn_start int     = len(X.TSNTrees) / 2
-		bg_avb_start int     = len(X.AVBTrees) / 2
-	)
 
 	visibility := &Visibility{}
 	// OSACO CompVB
@@ -116,7 +114,7 @@ func compute_vb(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 		var v []float64
 		for kth := range tsn_ktree.Trees {
 			mult := 1.
-			if nth >= bg_tsn_start && kth == 0 {
+			if nth < bg_tsn && kth == 0 {
 				mult = preference
 			}
 
@@ -133,18 +131,18 @@ func compute_vb(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 		var v []float64
 		for kth, z := range avb_ktree.Trees {
 			mult := 1.
-			if nth >= bg_avb_start && kth == 0 {
+			if nth < bg_avb && kth == 0 {
 				mult = preference
 			}
 
-			if nth < bg_avb_start {
+			if nth >= bg_avb {
 				//fmt.Printf("Input flow%d tree%d \n", nth, kth)
-				value := mult / float64(schedule.WCD(z, X, Input_flow_set.AVBFlows[nth], flow_set))
+				value := mult / float64(schedule.WCD(z, X, Input_flow_set.AVBFlows[nth-bg_avb], flow_set))
 				v = append(v, value)
 
 			} else {
 				//fmt.Printf("Backgourd flow%d tree%d \n", nth, kth)
-				value := mult / float64(schedule.WCD(z, X, BG_flow_set.AVBFlows[nth-bg_avb_start], flow_set))
+				value := mult / float64(schedule.WCD(z, X, BG_flow_set.AVBFlows[nth], flow_set))
 				v = append(v, value)
 			}
 		}
@@ -156,10 +154,8 @@ func compute_vb(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
 
 func probability(osaco *OSACO) (*routes.Trees_set, *routes.Trees_set, [2][]int, [2][]int) {
 	var (
-		input_k_location [2][]int
-		bg_k_location    [2][]int
-		bg_tsn_start     int = len(osaco.KTrees.TSNTrees) / 2
-		bg_avb_start     int = len(osaco.KTrees.AVBTrees) / 2
+		input_k_location [2][]int // (tsn k index, avb k index)
+		bg_k_location    [2][]int // (tsn k index, avb k index)
 	)
 
 	II := &routes.Trees_set{}
@@ -183,7 +179,7 @@ func probability(osaco *OSACO) (*routes.Trees_set, *routes.Trees_set, [2][]int, 
 		n = arr[int(randomIndex.Int64())]
 		t := ktree.Trees[n]
 
-		if nth >= bg_tsn_start {
+		if nth < bg_tsn {
 			bg_k_location[0] = append(bg_k_location[0], n)
 			II_prime.TSNTrees = append(II_prime.TSNTrees, t)
 		} else {
@@ -211,7 +207,7 @@ func probability(osaco *OSACO) (*routes.Trees_set, *routes.Trees_set, [2][]int, 
 		n = arr[int(randomIndex.Int64())]
 		t := ktree.Trees[n]
 
-		if nth >= bg_avb_start {
+		if nth < bg_avb {
 			bg_k_location[1] = append(bg_k_location[1], n)
 			II_prime.AVBTrees = append(II_prime.AVBTrees, t)
 		} else {
@@ -235,14 +231,14 @@ func epoch(network *network.Network, osaco *OSACO) *routes.Trees_set {
 
 	for nth, ktree := range osaco.KTrees.TSNTrees {
 		for kth := range ktree.Trees {
-			if nth >= (len(osaco.KTrees.TSNTrees) / 2) { // BG ... pass
+			if nth < bg_tsn { // BG ... pass
 				//osaco.PRM.TSN_PRM[nth][kth] *= osaco.P
 				//if kth == bg_k_location[0][nth] {
 				//	osaco.PRM.TSN_PRM[nth][kth] += (1 / cost[3])
 				//}
 			} else { // Input
 				osaco.PRM.TSN_PRM[nth][kth] *= osaco.P
-				if kth == input_k_location[0][nth] {
+				if kth == input_k_location[0][nth-bg_tsn] {
 					osaco.PRM.TSN_PRM[nth][kth] += float64(1 / cost)
 				}
 			}
@@ -251,14 +247,14 @@ func epoch(network *network.Network, osaco *OSACO) *routes.Trees_set {
 
 	for nth, ktree := range osaco.KTrees.AVBTrees {
 		for kth := range ktree.Trees {
-			if nth >= (len(osaco.KTrees.AVBTrees) / 2) { // BG ... pass
+			if nth < bg_avb { // BG ... pass
 				//osaco.PRM.AVB_PRM[nth][kth] *= osaco.P
 				//if kth == bg_k_location[1][nth] {
 				//	osaco.PRM.AVB_PRM[nth][kth] += (1 / cost[3])
 				//}
 			} else { // Input
 				osaco.PRM.AVB_PRM[nth][kth] *= osaco.P
-				if kth == input_k_location[1][nth] {
+				if kth == input_k_location[1][nth-bg_avb] {
 					osaco.PRM.AVB_PRM[nth][kth] += float64(1 / cost)
 				}
 			}

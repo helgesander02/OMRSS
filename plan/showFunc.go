@@ -6,12 +6,10 @@ func (plan *OMACO) Show_Plan() {
 	fmt.Println()
 	fmt.Println("--- The Steiner Tree final selected routing---")
 	plan.SMT.Trees.Show_Trees_Set()
-	plan.SMT.Timer.TimerExportData()
 
 	fmt.Println()
 	fmt.Println("--- The Distance Tree final selected routing---")
 	plan.MDTC.Trees.Show_Trees_Set()
-	plan.MDTC.Timer.TimerExportData()
 
 	fmt.Println()
 	fmt.Println("--- 5th Spanning Tree ---")
