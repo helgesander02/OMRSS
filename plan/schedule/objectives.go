@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"src/network"
 	"src/network/flow"
-	"src/plan/algo_timer"
 	"src/plan/routes"
 
 	"time"
 )
 
 // Objectives
-func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set) ([4]float64, int, *algo_timer.Timer) {
+func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set) ([4]float64, int) {
 	S := network.Flow_Set.Input_flow_set()
 	S_prime := network.Flow_Set.BG_flow_set()
 	var (
@@ -42,24 +41,14 @@ func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, I
 	}
 	// O3 ... pass
 
-	//
-	Timer := algo_timer.NewTimer()
-	Timer.TimerStart()
 	// Round2: Schedule Input flow
 	// O1
 	for nth, route := range II.TSNTrees {
-		Timer.TimerStop()
 		schedulability := schedulability(0, S.TSNFlows[nth], route, linkmap, network.Bandwidth, network.HyperPeriod)
-		Timer.TimerStart()
-		if schedulability == 1 {
-			Timer.TimerEnd()
-		}
-
 		tsn_failed_count += 1 - schedulability
 		//fmt.Printf("Input TSN route%d: %b \n", nth, schedulability)
 	}
 
-	Timer.TimerStop()
 	// O2 and O4
 	for nth, route := range II.AVBTrees {
 		wcd := WCD(route, X, S.AVBFlows[nth], network.Flow_Set)
@@ -69,7 +58,6 @@ func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, I
 		//fmt.Printf("Input AVB route%d: %b \n", nth, schedulability)
 	}
 	// O3 ... pass
-	Timer.TimerMax()
 
 	obj[0] = float64(tsn_failed_count)               // O1
 	obj[1] = float64(avb_failed_count)               // O2
@@ -80,7 +68,7 @@ func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, I
 	cost += avb_failed_count * 1000 //100 ~ 500
 	cost += tsn_failed_count * 100000
 
-	return obj, cost, Timer
+	return obj, cost
 }
 
 func schedulability(wcd time.Duration, flow *flow.Flow, route *routes.Tree, linkmap map[string]float64, bandwidth float64, hyperPeriod int) int {

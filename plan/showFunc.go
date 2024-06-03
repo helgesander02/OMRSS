@@ -14,7 +14,11 @@ func (plan *OMACO) Show_Plan() {
 	fmt.Println()
 	fmt.Println("--- 5th Spanning Tree ---")
 	plan.OSACO.KTrees.Show_kTrees_Set()
-	plan.OSACO.Timer.TimerExportData()
+	plan.OSACO.Timer[0].TimerExportData()
+	plan.OSACO.Timer[1].TimerExportData()
+	plan.OSACO.Timer[2].TimerExportData()
+	plan.OSACO.Timer[3].TimerExportData()
+	plan.OSACO.Timer[4].TimerExportData()
 
 	fmt.Println()
 	fmt.Println("--- The OSACO final selected routing ---")
