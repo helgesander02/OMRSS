@@ -7,7 +7,7 @@ import (
 )
 
 // Amal P M, Ajish Kumar K S, "An Algorithm for kth Minimum Spanning Tree"
-func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations []int, cost float64) *KTrees {
+func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations []int, cost float64, Method_Number int) *KTrees {
 	K_MSTS := new_KTrees()        // An array(K MSTS) of length k, which contain k minimum spanning trees
 	list_of_trees := new_KTrees() // stores a list of trees
 
@@ -51,9 +51,17 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 			}
 		}
 	}
-	K_MSTS.Select_Min_Weight(list_of_trees, K)
-	//K_MSTS.Select_Increasing_Arithmetic_Sequence_Weight(list_of_trees, K)
-	//K_MSTS.Select_Average_Arithmetic_Sequence_Weight(list_of_trees, K)
+
+	if Method_Number == 0 {
+		K_MSTS.Select_Min_Weight(list_of_trees, K)
+
+	} else if Method_Number == 1 {
+		K_MSTS.Select_Increasing_Arithmetic_Sequence_Weight(list_of_trees, K)
+
+	} else {
+		K_MSTS.Select_Average_Arithmetic_Sequence_Weight(list_of_trees, K)
+
+	}
 	//K_MSTS.Select_High_Dissimilarity(list_of_trees, K)
 
 	return K_MSTS

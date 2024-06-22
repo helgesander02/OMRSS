@@ -7,7 +7,7 @@ type Memorizers interface {
 	M_Average(int)
 	M_Store_Data()
 	M_Output_Results()
-	M_Store_Files(string, int, int, int)
+	M_Store_Files(string, int, int, int, int, float64)
 }
 
 func New_Memorizers() map[string]Memorizers {

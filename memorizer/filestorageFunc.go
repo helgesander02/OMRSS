@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func (OC *OMACO_Memorizer) M_Store_Files(topology_name string, test_case int, tsn int, avb int) {
+func (OC *OMACO_Memorizer) M_Store_Files(topology_name string, test_case int, tsn int, avb int, K int, P float64) {
 	// Check if the directory exists
 	dirName := "result"
 	_, err := os.Stat(dirName)
@@ -48,9 +48,31 @@ func (OC *OMACO_Memorizer) M_Store_Files(topology_name string, test_case int, ts
 	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco[1])
 	text += fmt.Sprintf("200ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco[0][0], OC.average_objs_osaco[0][1], OC.average_objs_osaco[0][3])
 	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco[0])
+	text += "The average objective result for OSACO_IAS:\n"
+	text += fmt.Sprintf("1000ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco_ias[4][0], OC.average_objs_osaco_ias[4][1], OC.average_objs_osaco_ias[4][3])
+	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco_ias[4])
+	text += fmt.Sprintf("800ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco_ias[3][0], OC.average_objs_osaco_ias[3][1], OC.average_objs_osaco_ias[3][3])
+	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco_ias[3])
+	text += fmt.Sprintf("600ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco_ias[2][0], OC.average_objs_osaco_ias[2][1], OC.average_objs_osaco_ias[2][3])
+	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco_ias[2])
+	text += fmt.Sprintf("400ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco_ias[1][0], OC.average_objs_osaco_ias[1][1], OC.average_objs_osaco_ias[1][3])
+	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco_ias[1])
+	text += fmt.Sprintf("200ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco_ias[0][0], OC.average_objs_osaco_ias[0][1], OC.average_objs_osaco_ias[0][3])
+	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco_ias[0])
+	text += "The average objective result for OSACO_AAS:\n"
+	text += fmt.Sprintf("1000ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco_aas[4][0], OC.average_objs_osaco_aas[4][1], OC.average_objs_osaco_aas[4][3])
+	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco_aas[4])
+	text += fmt.Sprintf("800ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco_aas[3][0], OC.average_objs_osaco_aas[3][1], OC.average_objs_osaco_aas[3][3])
+	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco_aas[3])
+	text += fmt.Sprintf("600ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco_aas[2][0], OC.average_objs_osaco_aas[2][1], OC.average_objs_osaco_aas[2][3])
+	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco_aas[2])
+	text += fmt.Sprintf("400ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco_aas[1][0], OC.average_objs_osaco_aas[1][1], OC.average_objs_osaco_aas[1][3])
+	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco_aas[1])
+	text += fmt.Sprintf("200ms: O1: %f O2: %f O3: pass O4: %f \n", OC.average_objs_osaco_aas[0][0], OC.average_objs_osaco_aas[0][1], OC.average_objs_osaco_aas[0][3])
+	text += fmt.Sprintf("Computering time: %v\n", OC.average_time_osaco_aas[0])
 
 	// Try to open the file in append mode first
-	name := fmt.Sprintf("%s_testcase%d_tsn%d_avb%d.txt", topology_name, test_case, tsn, avb)
+	name := fmt.Sprintf("%s_testcase%d_tsn%d_avb%d_K%d_P%.1f.txt", topology_name, test_case, tsn, avb, K, P)
 	log.Printf("Opening file %s in append mode\n", name)
 	file, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {

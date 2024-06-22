@@ -61,17 +61,17 @@ func (trees_set *Trees_set) BG_Tree_set(bg_tsn_end int, bg_avb_end int) *Trees_s
 	return BG_tree_set
 }
 
-func Get_OSACO_Routing(network *network.Network, SMT *Trees_set, K int) *KTrees_set {
+func Get_OSACO_Routing(network *network.Network, SMT *Trees_set, K int, Method_Number int) *KTrees_set {
 	ktrees_set := new_KTrees_Set()
 
 	for nth, flow := range network.Flow_Set.TSNFlows {
-		Ktrees := KSpanningTree(v2v, SMT.TSNTrees[nth], K, flow.Source, flow.Destinations, network.BytesRate)
+		Ktrees := KSpanningTree(v2v, SMT.TSNTrees[nth], K, flow.Source, flow.Destinations, network.BytesRate, Method_Number)
 		ktrees_set.TSNTrees = append(ktrees_set.TSNTrees, Ktrees)
 	}
 	fmt.Printf("Finish OSACO %d TSN streams routing\n", len(ktrees_set.TSNTrees))
 
 	for nth, flow := range network.Flow_Set.AVBFlows {
-		Ktrees := KSpanningTree(v2v, SMT.AVBTrees[nth], K, flow.Source, flow.Destinations, network.BytesRate)
+		Ktrees := KSpanningTree(v2v, SMT.AVBTrees[nth], K, flow.Source, flow.Destinations, network.BytesRate, Method_Number)
 		ktrees_set.AVBTrees = append(ktrees_set.AVBTrees, Ktrees)
 	}
 	fmt.Printf("Finish OSACO %d AVB streams routing\n", len(ktrees_set.AVBTrees))

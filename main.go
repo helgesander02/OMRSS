@@ -97,7 +97,7 @@ func main() {
 	Memorizer.M_Output_Results()
 
 	// 8. Save as TXT
-	Memorizer.M_Store_Files(topology_name, test_case, input_tsn, input_avb)
+	Memorizer.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, osaco_P)
 	// --------------------------------------------------------------------------------
 
 	// 9. Save as CSV

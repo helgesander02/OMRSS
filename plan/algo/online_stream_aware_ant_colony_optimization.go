@@ -25,7 +25,7 @@ func (osaco *OSACO) OSACO_Initial_Settings(network *network.Network, SMT *routes
 
 	timer := algo_timer.NewTimer()
 	timer.TimerStart()
-	osaco.KTrees = routes.Get_OSACO_Routing(network, SMT, osaco.K)
+	osaco.KTrees = routes.Get_OSACO_Routing(network, SMT, osaco.K, osaco.Method_Number)
 	timer.TimerEnd()
 
 	osaco.InputTrees = SMT.Input_Tree_set(bg_tsn, bg_avb)
