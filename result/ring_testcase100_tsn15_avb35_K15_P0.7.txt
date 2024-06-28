@@ -1,0 +1,160 @@
+--- The experimental results are as follows --- 
+The average objective result for the Steiner Tree:
+O1: 0.000000 O2: 23.170000 O3: pass O4: 1510.260000 
+The average objective result for the MDTC:
+O1: 0.000000 O2: 25.800000 O3: pass O4: 1278.840000 
+Computering time: 1s
+The average objective result for OSACO:
+1000ms: O1: 0.000000 O2: 22.840000 O3: pass O4: 1538.050000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.870000 O3: pass O4: 1533.850000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.950000 O3: pass O4: 1529.740000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 22.980000 O3: pass O4: 1527.230000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.070000 O3: pass O4: 1521.610000 
+Computering time: 1s
+The average objective result for OSACO_IAS:
+1000ms: O1: 0.000000 O2: 22.800000 O3: pass O4: 1551.500000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.880000 O3: pass O4: 1539.640000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.930000 O3: pass O4: 1534.050000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 22.980000 O3: pass O4: 1528.280000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.050000 O3: pass O4: 1523.760000 
+Computering time: 1s
+The average objective result for OSACO_AAS:
+1000ms: O1: 0.000000 O2: 22.810000 O3: pass O4: 1544.420000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.840000 O3: pass O4: 1542.160000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.870000 O3: pass O4: 1539.410000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 22.900000 O3: pass O4: 1537.940000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.020000 O3: pass O4: 1522.990000 
+Computering time: 1s
+
+--- The experimental results are as follows --- 
+The average objective result for the Steiner Tree:
+O1: 0.000000 O2: 23.250000 O3: pass O4: 1521.140000 
+The average objective result for the MDTC:
+O1: 0.020000 O2: 25.690000 O3: pass O4: 1284.400000 
+Computering time: 1s
+The average objective result for OSACO:
+1000ms: O1: 0.000000 O2: 22.670000 O3: pass O4: 1559.500000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.720000 O3: pass O4: 1559.520000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.790000 O3: pass O4: 1555.380000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 22.870000 O3: pass O4: 1553.080000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.040000 O3: pass O4: 1535.350000 
+Computering time: 1s
+The average objective result for OSACO_IAS:
+1000ms: O1: 0.000000 O2: 22.680000 O3: pass O4: 1558.980000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.750000 O3: pass O4: 1550.150000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.810000 O3: pass O4: 1548.480000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 22.810000 O3: pass O4: 1549.190000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 22.950000 O3: pass O4: 1539.520000 
+Computering time: 1s
+The average objective result for OSACO_AAS:
+1000ms: O1: 0.000000 O2: 22.810000 O3: pass O4: 1558.590000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.830000 O3: pass O4: 1556.460000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.850000 O3: pass O4: 1555.310000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 22.940000 O3: pass O4: 1546.990000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.080000 O3: pass O4: 1538.020000 
+Computering time: 1s
+
+--- The experimental results are as follows --- 
+The average objective result for the Steiner Tree:
+O1: 0.000000 O2: 23.360000 O3: pass O4: 1517.060000 
+The average objective result for the MDTC:
+O1: 0.090000 O2: 26.030000 O3: pass O4: 1286.440000 
+Computering time: 1s
+The average objective result for OSACO:
+1000ms: O1: 0.000000 O2: 22.900000 O3: pass O4: 1560.820000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.940000 O3: pass O4: 1556.960000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.970000 O3: pass O4: 1556.500000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 23.050000 O3: pass O4: 1550.420000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.140000 O3: pass O4: 1540.580000 
+Computering time: 1s
+The average objective result for OSACO_IAS:
+1000ms: O1: 0.000000 O2: 22.880000 O3: pass O4: 1564.840000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.930000 O3: pass O4: 1559.120000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.980000 O3: pass O4: 1556.650000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 23.040000 O3: pass O4: 1548.140000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.130000 O3: pass O4: 1545.240000 
+Computering time: 1s
+The average objective result for OSACO_AAS:
+1000ms: O1: 0.000000 O2: 22.910000 O3: pass O4: 1560.050000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.960000 O3: pass O4: 1559.990000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.990000 O3: pass O4: 1557.390000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 23.060000 O3: pass O4: 1553.150000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.180000 O3: pass O4: 1535.570000 
+Computering time: 1s
+
+--- The experimental results are as follows --- 
+The average objective result for the Steiner Tree:
+O1: 0.000000 O2: 23.260000 O3: pass O4: 1523.910000 
+The average objective result for the MDTC:
+O1: 0.230000 O2: 25.620000 O3: pass O4: 1286.630000 
+Computering time: 1s
+The average objective result for OSACO:
+1000ms: O1: 0.000000 O2: 22.770000 O3: pass O4: 1564.990000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.820000 O3: pass O4: 1565.510000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.930000 O3: pass O4: 1562.710000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 22.960000 O3: pass O4: 1560.280000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.080000 O3: pass O4: 1545.830000 
+Computering time: 1s
+The average objective result for OSACO_IAS:
+1000ms: O1: 0.000000 O2: 22.870000 O3: pass O4: 1557.250000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.900000 O3: pass O4: 1556.550000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.940000 O3: pass O4: 1550.940000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 23.010000 O3: pass O4: 1549.200000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.100000 O3: pass O4: 1541.700000 
+Computering time: 1s
+The average objective result for OSACO_AAS:
+1000ms: O1: 0.000000 O2: 22.740000 O3: pass O4: 1575.240000 
+Computering time: 1s
+800ms: O1: 0.000000 O2: 22.800000 O3: pass O4: 1573.080000 
+Computering time: 1s
+600ms: O1: 0.000000 O2: 22.870000 O3: pass O4: 1566.600000 
+Computering time: 1s
+400ms: O1: 0.000000 O2: 23.000000 O3: pass O4: 1551.930000 
+Computering time: 1s
+200ms: O1: 0.000000 O2: 23.130000 O3: pass O4: 1541.100000 
+Computering time: 1s
+
