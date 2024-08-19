@@ -34,15 +34,6 @@ func (plan *OMACO) Initiate_Plan() {
 		plan.OSACO_IAS.Objs_osaco[i] = plan.OSACO_IAS.OSACO_Run(plan.Network, i)
 	}
 
-	fmt.Println()
-	fmt.Println("OSACO_AAS")
-	fmt.Println("----------------------------------------")
-	plan.OSACO_AAS.OSACO_Initial_Settings(plan.Network, plan.SMT.Trees)
-	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
-	for i := 0; i < 5; i++ {
-		plan.OSACO_AAS.Objs_osaco[i] = plan.OSACO_AAS.OSACO_Run(plan.Network, i)
-	}
-
 	obj_smt, _ := schedule.OBJ(
 		plan.Network,
 		plan.OSACO.KTrees,
