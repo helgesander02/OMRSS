@@ -2,6 +2,7 @@ package routes
 
 import (
 	"crypto/rand"
+	"fmt"
 	"math/big"
 	"sort"
 )
@@ -38,14 +39,13 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 					AddE2MST := MST.TreeDeepCopy()
 					AddE2MST.IntoTree(E, cost)
 					// Determine whether a cycle exists within the tree (MSTHasCycle bool, cyclelist int[])
-					MSTHasCycle, cyclelist := AddE2MST.FindCyCle()
-					// Select edges E’ from the cycle
-					E_prime := AddE2MST.GetFeedbackEdgeSet(cyclelist, E)
-
-					if MSTHasCycle {
+					if MSTHasCycle, cyclelist := AddE2MST.FindCyCle(); MSTHasCycle {
+						// Select edges E’ from the cycle
 						MST_prime := AddE2MST.TreeDeepCopy()
+						E_prime := MST_prime.GetFeedbackEdgeSet(cyclelist, E)
+
 						// After removing E' from the AddE2MST, add it to the list_of_trees
-						Traverse_MST(MST_prime, list_of_trees, AddE2MST, E_prime, E, Terminal, cost, K)
+						Traverse_MST(MST_prime, list_of_trees, E_prime, E, Terminal, cost, K)
 					}
 				}
 			}
@@ -63,6 +63,7 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 
 	}
 	//K_MSTS.Select_High_Dissimilarity(list_of_trees, K)
+	fmt.Printf("list_of_trees: %d\n", len(list_of_trees.Trees))
 
 	return K_MSTS
 }
@@ -74,31 +75,38 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 // 4-1. then, Restore all of them
 // 4-2. else, Restore the removed edge E’
 // 5. Check if it's a tree and then add it to the list of trees
-func Traverse_MST(MST_prime *Tree, list_of_trees *KTrees, AddE2MST *Tree, E_prime [][2]int, E []int, Terminal []int, cost float64, K int) {
+func Traverse_MST(MST_prime *Tree, list_of_trees *KTrees, E_prime [][2]int, E []int, Terminal []int, cost float64, K int) {
+	MST_prime_copy := MST_prime.TreeDeepCopy()
 	for _, e_prime := range E_prime {
 		MST_prime.RemoveEdge(e_prime)
 		if MSTHasCycle, cyclelist := MST_prime.FindCyCle(); MSTHasCycle {
 			notree := len(list_of_trees.Trees)
-			E_prime := MST_prime.GetFeedbackEdgeSet(cyclelist, E)
-			Traverse_MST(MST_prime, list_of_trees, MST_prime, E_prime, E, Terminal, cost, K)
+			new_E_prime := MST_prime.GetFeedbackEdgeSet(cyclelist, E)
+			Traverse_MST(MST_prime, list_of_trees, new_E_prime, E, Terminal, cost, K)
+
 			// Determine whether the quantity of trees in list_of_trees has increased
 			if notree < len(list_of_trees.Trees) {
 				// Restore all of them
-				MST_prime = AddE2MST.TreeDeepCopy()
+				*MST_prime = *MST_prime_copy.TreeDeepCopy()
+
 			} else {
 				// Restore the removed edge
-				for _, P := range E_prime {
+				for _, P := range new_E_prime {
 					p := make([]int, len(P))
 					copy(p, P[:])
 					MST_prime.IntoTree(p, cost)
 				}
 			}
-		}
-		// Confirm if it is a tree after removing E'
-		if MST_prime.CheckIsTree(Terminal) {
-			MST_prime.Weight = len(MST_prime.Nodes) - 1
-			Add_ListOfTrees(list_of_trees, MST_prime, K)
-			MST_prime = AddE2MST.TreeDeepCopy()
+
+		} else {
+			// Confirm if it is a tree after removing E'
+			if MST_prime.CheckIsTree(Terminal) {
+				MST_prime.Weight = len(MST_prime.Nodes) - 1
+				Add_ListOfTrees(list_of_trees, MST_prime, K)
+
+				// Restore the removed edge
+				*MST_prime = *MST_prime_copy.TreeDeepCopy()
+			}
 		}
 	}
 }
@@ -106,17 +114,9 @@ func Traverse_MST(MST_prime *Tree, list_of_trees *KTrees, AddE2MST *Tree, E_prim
 // Adds tree t into the list, only if tree t is not in the list_of_trees
 // If the list contain more than k trees then it removes the tree which have largest weight among them
 func Add_ListOfTrees(list_of_trees *KTrees, MST *Tree, K int) {
-	if len(list_of_trees.Trees) < K {
-		if !(In_ListOfTrees(list_of_trees, MST)) {
-			list_of_trees.Trees = append(list_of_trees.Trees, MST)
-		}
-
-	} else {
-		if list_of_trees.Trees[K-1].Weight > MST.Weight {
-			if !(In_ListOfTrees(list_of_trees, MST)) {
-				list_of_trees.Trees = append(list_of_trees.Trees, MST)
-			}
-		}
+	MST_copy := MST.TreeDeepCopy()
+	if !(In_ListOfTrees(list_of_trees, MST_copy)) {
+		list_of_trees.Trees = append(list_of_trees.Trees, MST_copy)
 	}
 
 	sort.Slice(list_of_trees.Trees, func(p, q int) bool {

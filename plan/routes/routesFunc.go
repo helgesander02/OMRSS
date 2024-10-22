@@ -1,6 +1,8 @@
 package routes
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 // Add to the tree based on the given path
 func (tree *Tree) IntoTree(P []int, cost float64) {
@@ -65,9 +67,12 @@ func (MST_prime *Tree) RemoveEdge(e_prime [2]int) {
 
 // Determine if it is a tree
 func (MST_prime *Tree) CheckIsTree(Terminal []int) bool {
+	if MSTHasCycle, _ := MST_prime.FindCyCle(); MSTHasCycle {
+		return false
+	}
+
 	root := MST_prime.Nodes[0]
 	visited := make(map[*Node]bool)
-
 	return DFSTree(MST_prime, root, nil, visited, Terminal) && len(visited) == len(MST_prime.Nodes)
 }
 

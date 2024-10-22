@@ -1,0 +1,42 @@
+name: industrial
+
+scale:
+  end_stations: 13
+  bridges: 16
+
+end_station_edges:
+- ends: [3000, 0]
+- ends: [3001, 4]
+- ends: [3002, 6]
+- ends: [3003, 8]
+- ends: [3004, 5]
+- ends: [3005, 7]
+- ends: [3006, 9]
+- ends: [3007, 10]
+- ends: [3008, 12]
+- ends: [3009, 14]
+- ends: [3010, 11]
+- ends: [3011, 13]
+- ends: [3012, 15]
+
+bridge_edges:
+- ends: [0, 1]
+- ends: [0, 2]
+- ends: [1, 3]
+- ends: [2, 3]
+- ends: [2, 4]
+- ends: [2, 10]
+- ends: [3, 5]
+- ends: [3, 11]
+- ends: [4, 5]
+- ends: [4, 6]
+- ends: [5, 7]
+- ends: [6, 8]
+- ends: [7, 9]
+- ends: [8, 9]
+- ends: [10, 11]
+- ends: [10, 12]
+- ends: [11, 13]
+- ends: [12, 14]
+- ends: [13, 15]
+- ends: [14, 15]

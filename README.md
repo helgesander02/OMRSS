@@ -21,6 +21,10 @@ We consider a typical topology for TSN-based industrial factories <br />
 | --- | --- |
 |![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/layeredring.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/ring.png)|
 
+| industrial(IN) | |
+| --- | --- |
+|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/industrial.png)||
+
 
 ## Running
 Quickstart: `sh output.sh` <br />
@@ -29,7 +33,7 @@ More options:
 | Option | Description |
 | -------- | ---- | 
 | --test_case | Conducting n experiments |
-| --topology_name | Topology architecture has typical_complex, typical_simple, ring and layered_ring |
+| --topology_name | Topology architecture has typical_complex, typical_simple, ring, layered_ring and industrial |
 | --bg_tsn | Number of TSN BG flows |
 | --bg_avb | Number of AVB BG flows |
 | --input_tsn | Number of TSN Input flows |
@@ -52,6 +56,7 @@ More options:
 * [Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"](https://www.researchgate.net/publication/347154804_Online_Stream-Aware_Routing_for_TSN-Based_Industrial_Control_Systems)
 * [QINGHAN YU et al., "Online Scheduling for Dynamic VM Migration in Multicast Time-Sensitive Networks"](https://ieeexplore.ieee.org/document/8747398)
 * [Jiachen Wen  et al., "Online Updating in Multicast Time-Sensitive Networking"](https://ieeexplore.ieee.org/document/10258186)
+* [Xingbo Feng  et al., "Advancing TSN flow scheduling: An efficient framework without flow isolation constraint"](https://www.sciencedirect.com/science/article/pii/S1389128624005206#:~:text=Central%20to%20our%20approach%20is%20a)
 
 ## TODO
 * UnitTesting

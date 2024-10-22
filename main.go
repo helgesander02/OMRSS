@@ -34,7 +34,7 @@ var (
 func init() {
 	// Define Parameters
 	flag.IntVar(&test_case, "test_case", 100, "Conducting 50 experiments.")
-	flag.StringVar(&topology_name, "topology_name", "typical_complex", "Topology architecture has typical_complex, typical_simple, ring and layered_ring.")
+	flag.StringVar(&topology_name, "topology_name", "typical_complex", "Topology architecture has typical_complex, typical_simple, ring, layered_ring and industrial.")
 	flag.IntVar(&input_tsn, "input_tsn", 35, "Number of TSN input flows.")
 	flag.IntVar(&input_avb, "input_avb", 15, "Number of AVB input flows.")
 	flag.IntVar(&bg_tsn, "bg_tsn", 35, "Number of TSN bg flows.")
