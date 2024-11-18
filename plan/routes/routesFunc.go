@@ -67,10 +67,6 @@ func (MST_prime *Tree) RemoveEdge(e_prime [2]int) {
 
 // Determine if it is a tree
 func (MST_prime *Tree) CheckIsTree(Terminal []int) bool {
-	if MSTHasCycle, _ := MST_prime.FindCyCle(); MSTHasCycle {
-		return false
-	}
-
 	root := MST_prime.Nodes[0]
 	visited := make(map[*Node]bool)
 	return DFSTree(MST_prime, root, nil, visited, Terminal) && len(visited) == len(MST_prime.Nodes)
@@ -159,13 +155,7 @@ func (node1 *Node) Compare_Nodes(node2 *Node) bool {
 		return false
 	}
 
-	for i := 0; i < len(node1.Connections); i++ {
-		if !Compare_Connections(node1.Connections, node2.Connections) {
-			return false
-		}
-	}
-
-	return true
+	return Compare_Connections(node1.Connections, node2.Connections)
 }
 
 func Compare_Connections(conn1, conn2 []*Connection) bool {

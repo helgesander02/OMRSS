@@ -13,17 +13,14 @@ System design from: https://miro.com/welcomeonboard/ZDI1dEJWWGtsTEhCbWMwSm9oTTVh
 ## Simulation Settings
 We consider a typical topology for TSN-based industrial factories <br />
 
-| typical_complex | typical_simple |
-| --- | --- |
-|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/typical1.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/typical2.png)|
+| typical_complex | typical_simple | industrial(IN) |
+| --- | --- | --- |
+|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/typical1.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/typical2.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/industrial.png)|
 
 | layered_ring | ring |
 | --- | --- |
 |![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/layeredring.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/ring.png)|
 
-| industrial(IN) | |
-| --- | --- |
-|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/industrial.png)||
 
 
 ## Running

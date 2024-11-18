@@ -5,7 +5,7 @@ import (
 	"src/network"
 )
 
-var v2v *V2V = &V2V{}
+var v2v *V2V = &V2V{} // v2v is all paths connecting multiple terminals to terminals.
 
 func Get_SteninerTree_Routing(network *network.Network) *Trees_set {
 	Trees_set := new_Trees_Set()

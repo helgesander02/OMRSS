@@ -8,7 +8,6 @@ func (tree *Tree) FindCyCle() (bool, []int) {
 		visited := make(map[int]bool)
 		if DFSCyCle(tree, node, visited, -1, node.ID) {
 			cyclelist = append(cyclelist, node.ID)
-
 		}
 	}
 	if len(cyclelist) != 0 {

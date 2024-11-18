@@ -59,8 +59,14 @@ func main() {
 	flag.Parse()
 
 	// Data storage architecture
-	Memorizers := memorizer.New_Memorizers()
-	Memorizer := Memorizers[plan_name]
+	Memorizers5 := memorizer.New_Memorizers()
+	Memorizer5 := Memorizers5[plan_name]
+	Memorizers10 := memorizer.New_Memorizers()
+	Memorizer10 := Memorizers10[plan_name]
+	Memorizers15 := memorizer.New_Memorizers()
+	Memorizer15 := Memorizers15[plan_name]
+	Memorizers20 := memorizer.New_Memorizers()
+	Memorizer20 := Memorizers20[plan_name]
 
 	// Run Test-Case
 	for ts := 0; ts < test_case; ts++ {
@@ -73,36 +79,59 @@ func main() {
 		}
 
 		// 2. Create new plans (a.OMACO ... )
-		Plans := plan.New_Plans(Network, osaco_timeout, osaco_K, osaco_P) // TODO: To process parameters with a dictionary structure
+		Plans5 := plan.New_Plans(Network, osaco_timeout, osaco_K, 0.8) // TODO: To process parameters with a dictionary structure
+		Plans10 := plan.New_Plans(Network, osaco_timeout, osaco_K, 0.7)
+		Plans15 := plan.New_Plans(Network, osaco_timeout, osaco_K, 0.6)
+		Plans20 := plan.New_Plans(Network, osaco_timeout, osaco_K, 0.5)
 
 		// 3. Select plan
-		Plan := Plans[plan_name]
+		Plan5 := Plans5[plan_name]
+		Plan10 := Plans10[plan_name]
+		Plan15 := Plans15[plan_name]
+		Plan20 := Plans20[plan_name]
 
 		// 4. Initiate plan
-		Plan.Initiate_Plan()
+		Plan5.Initiate_Plan()
+		Plan10.Initiate_Plan()
+		Plan15.Initiate_Plan()
+		Plan20.Initiate_Plan()
 		if show_plan {
-			Plan.Show_Plan()
+			Plan5.Show_Plan()
+			Plan10.Show_Plan()
+			Plan15.Show_Plan()
+			Plan20.Show_Plan()
 		}
 
 		// 5. Cumulative quantity
-		Memorizer.M_Cumulative(Plan)
+		Memorizer5.M_Cumulative(Plan5)
+		Memorizer10.M_Cumulative(Plan10)
+		Memorizer15.M_Cumulative(Plan15)
+		Memorizer20.M_Cumulative(Plan20)
 
 		fmt.Println("****************************************")
 	}
 
 	// 6. Average statistical results
-	Memorizer.M_Average(test_case)
+	Memorizer5.M_Average(test_case)
+	Memorizer10.M_Average(test_case)
+	Memorizer15.M_Average(test_case)
+	Memorizer20.M_Average(test_case)
 
 	// 7. Output results
-	Memorizer.M_Output_Results()
+	Memorizer5.M_Output_Results()
+	Memorizer10.M_Output_Results()
+	Memorizer15.M_Output_Results()
+	Memorizer20.M_Output_Results()
 
 	// 8. Save as TXT
-	Memorizer.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, osaco_P)
+	Memorizer5.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, 0.8)
+	Memorizer10.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, 0.7)
+	Memorizer15.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, 0.6)
+	Memorizer20.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, 0.5)
 	// --------------------------------------------------------------------------------
 
 	// 9. Save as CSV
 	if store_data {
-		Memorizer.M_Store_Data()
+		Memorizer5.M_Store_Data()
 	}
-
 }

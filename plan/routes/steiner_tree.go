@@ -23,36 +23,12 @@ func SteninerTree(v2v *V2V, t *topology.Topology, Source int, Destinations []int
 	for len(used_tmal) != len(Terminal) {
 		if len(tree.Nodes) == 0 {
 			// Find the set of all shortest paths from Vertex to Vertexs
-			var BP []int
-			for _, terminal := range Terminal {
-				v2vedge, firstget := v2v.GetV2VEdge(terminal) //Define a function to get the v2vedge form v2v
-				for _, tmal := range Terminal {
-					if terminal == tmal {
-						continue
-
-					} else if !(v2vedge.InV2VEdge(tmal)) {
-						graph := GetGarph(t)
-						graph.ToVertex = tmal
-						graph = Dijkstra(graph, terminal, tmal)
-						v2vedge.Graphs = append(v2vedge.Graphs, graph)
-						// Choose the path that is the shortest and least expensive from Vertex to Vertexs in BP
-						if len(BP) == 0 {
-							BP = graph.Path[0]
-						} else {
-							if len(BP) > len(graph.Path[0]) {
-								BP = graph.Path[0]
-							}
-						}
-
-					} else {
-						path := v2vedge.GetV2VPath(tmal)
-						if len(BP) == 0 {
-							BP = path[0]
-						} else {
-							if len(BP) > len(path[0]) {
-								BP = path[0]
-							}
-						}
+			BP := make(map[int][][]int)
+			for _, terminal1 := range Terminal {
+				v2vedge, firstget := v2v.GetV2VEdge(terminal1) //Define a function to get the v2vedge form v2v
+				for _, terminal2 := range Terminal {
+					if terminal1 != terminal2 {
+						saveShortestPathsToBP(BP, v2vedge, terminal2, terminal1, t)
 					}
 				}
 				if firstget {
@@ -61,58 +37,98 @@ func SteninerTree(v2v *V2V, t *topology.Topology, Source int, Destinations []int
 			}
 
 			// Add the shortest path with the minimum cost to the tree in sequence
-			tree.IntoTree(BP, cost)
-			used_tmal = append(used_tmal, BP[0])
-			used_tmal = append(used_tmal, BP[len(BP)-1])
+			bp := chooseBestPath(BP, tree, cost)
+			used_tmal = append(used_tmal, bp[0])
+			used_tmal = append(used_tmal, bp[len(bp)-1])
 
 		} else {
-			var BP []int
-			for _, terminal := range Terminal {
-				if terminal_been_used(used_tmal, terminal) {
+			BP := make(map[int][][]int)
+			for _, terminal1 := range Terminal {
+				if terminal_been_used(used_tmal, terminal1) {
 					continue
 				}
 				// Find the set of all shortest paths from Vertex to Vertexs
 				for _, node := range tree.Nodes {
 					v2vedge, firstget := v2v.GetV2VEdge(node.ID)
-					if terminal == node.ID {
-						continue
-
-					} else if !(v2vedge.InV2VEdge(node.ID)) {
-						graph := GetGarph(t)
-						graph.ToVertex = terminal
-						graph = Dijkstra(graph, node.ID, terminal)
-						v2vedge.Graphs = append(v2vedge.Graphs, graph)
-						// Choose the path that is the shortest and least expensive from Vertex to Vertexs in BP
-						if len(BP) == 0 {
-							BP = graph.Path[0]
-						} else {
-							if len(BP) > len(graph.Path[0]) {
-								BP = graph.Path[0]
-							}
-						}
-
-					} else {
-						path := v2vedge.GetV2VPath(terminal)
-						if len(BP) == 0 {
-							BP = path[0]
-						} else {
-							if len(BP) > len(path[0]) {
-								BP = path[0]
-							}
-						}
+					if terminal1 != node.ID {
+						saveShortestPathsToBP(BP, v2vedge, terminal1, node.ID, t)
 					}
-
 					if firstget {
 						v2v.V2VEdges = append(v2v.V2VEdges, v2vedge)
 					}
 				}
 			}
 			// Add the shortest path with the minimum cost to the tree in sequence
-			tree.IntoTree(BP, cost)
-			used_tmal = append(used_tmal, BP[0])
+			bp := chooseBestPath(BP, tree, cost)
+			used_tmal = append(used_tmal, bp[0])
 		}
 	}
 	return tree
+}
+
+func chooseBestPath(BP map[int][][]int, tree *Tree, cost float64) []int {
+	var (
+		minPaths [][]int
+		minPath  []int
+	)
+	minW := 0
+
+	// Choosing shortest paths
+	for key, val := range BP {
+		if minW == 0 {
+			minW = key
+			minPaths = val
+		}
+		if minW > key {
+			minW = key
+			minPaths = val
+		}
+	}
+
+	// Choosing to join the shortest path with the minimum weight in the tree
+	if len(tree.Nodes) == 0 {
+		tree.IntoTree(minPaths[0], cost)
+		return minPaths[0]
+
+	} else {
+		for _, path := range minPaths {
+			tree_copy := tree.TreeDeepCopy()
+			tree_copy.IntoTree(path, cost)
+			if len(minPath) == 0 {
+				minPath = path
+				minW = len(tree_copy.Nodes)
+			} else {
+				if minW > len(tree_copy.Nodes) {
+					minPath = path
+					minW = len(tree_copy.Nodes)
+				}
+			}
+		}
+		tree.IntoTree(minPath, cost)
+		return minPath
+	}
+}
+
+func saveShortestPathsToBP(BP map[int][][]int, v2vedge *V2VEdge, vertex1 int, vertex2 int, t *topology.Topology) {
+	// Check if this path has already been taken
+	if !(v2vedge.InV2VEdge(vertex2)) {
+		graph := GetGarph(t)
+		graph.ToVertex = vertex1
+		graph = Dijkstra(graph, vertex2, vertex1)
+		v2vedge.Graphs = append(v2vedge.Graphs, graph)
+		addShortestPaths(BP, graph.Path)
+
+	} else {
+		path := v2vedge.GetV2VPath(vertex1)
+		addShortestPaths(BP, path)
+
+	}
+}
+
+func addShortestPaths(BP map[int][][]int, paths [][]int) {
+	for _, path := range paths {
+		BP[len(path)] = append(BP[len(path)], path)
+	}
 }
 
 func terminal_been_used(A []int, b int) bool {
@@ -173,19 +189,19 @@ func (v2v *V2V) GetV2VEdge(terminal int) (*V2VEdge, bool) {
 	return &V2VEdge{FromVertex: terminal}, true
 }
 
-func (v2vedge *V2VEdge) InV2VEdge(tmal int) bool {
+func (v2vedge *V2VEdge) InV2VEdge(terminal int) bool {
 	for _, graph := range v2vedge.Graphs {
-		if graph.ToVertex == tmal {
+		if graph.ToVertex == terminal {
 			return true
 		}
 	}
 	return false
 }
 
-func (v2vedge *V2VEdge) GetV2VPath(tmal int) [][]int {
+func (v2vedge *V2VEdge) GetV2VPath(terminal int) [][]int {
 	var path [][]int
 	for _, graph := range v2vedge.Graphs {
-		if graph.ToVertex == tmal {
+		if graph.ToVertex == terminal {
 			path = graph.Path
 		}
 	}
