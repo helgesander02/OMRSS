@@ -30,9 +30,20 @@ func (network *Network) Generate_Network() {
 	fmt.Println()
 }
 
-//func (network *Network) Generate_Network() *Network {
-//
-//}
+func (network *OSRO_Network) Generate_Network() {
+	// 2. Generate topology
+	fmt.Println("Generate Topology")
+	fmt.Println("----------------------------------------")
+	network.Topology = topology.Generate_Topology(network.TopologyName, network.BytesRate)
+	fmt.Println("Complete Generating Topology.")
+	fmt.Println()
+
+	// select CAN node
+	CAN_Node_Set := network.Topology.Select_CAN_Node_Set()
+	fmt.Printf("CAN nodes: %v", CAN_Node_Set)
+	fmt.Println()
+
+}
 
 //func (network *Network) Generate_Network() *Network {
 //

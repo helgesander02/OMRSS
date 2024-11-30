@@ -9,3 +9,7 @@ func (network *Network) Show_Network() {
 
 	network.Graph_Set.Show_Graphs()
 }
+
+func (network *OSRO_Network) Show_Network() {
+
+}
