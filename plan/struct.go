@@ -14,7 +14,7 @@ type OMACO struct {
 }
 
 // Developing the OMACO plan
-func New_OMACO_Plan(network *network.Network, osaco_timeout int, osaco_K int, osaco_P float64) *OMACO {
+func new_OMACO_Plan(network *network.Network, osaco_timeout int, osaco_K int, osaco_P float64) *OMACO {
 	OMACO := &OMACO{Network: network}
 
 	OMACO.SMT = &algo.SMT{}

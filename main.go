@@ -49,7 +49,7 @@ func init() {
 
 	flag.BoolVar(&show_network, "show_network", false, "Present all network information comprehensively.")
 	flag.BoolVar(&show_plan, "show_plan", false, "Provide a comprehensive display of all plan information.")
-	flag.BoolVar(&store_data, "store_data", false, "Store all statistical data")
+	flag.BoolVar(&store_data, "store_data", true, "Store all statistical data")
 }
 
 func main() {
@@ -59,79 +59,51 @@ func main() {
 	flag.Parse()
 
 	// Data storage architecture
-	Memorizers5 := memorizer.New_Memorizers()
-	Memorizer5 := Memorizers5[plan_name]
-	Memorizers10 := memorizer.New_Memorizers()
-	Memorizer10 := Memorizers10[plan_name]
-	Memorizers15 := memorizer.New_Memorizers()
-	Memorizer15 := Memorizers15[plan_name]
-	Memorizers20 := memorizer.New_Memorizers()
-	Memorizer20 := Memorizers20[plan_name]
+	Memorizers := memorizer.New_Memorizers()
+	Memorizer := Memorizers[plan_name]
 
 	// Run Test-Case
 	for ts := 0; ts < test_case; ts++ {
 		fmt.Printf("\nTestCase%d\n", ts+1)
 		fmt.Println("****************************************")
-		// 1. Network (a.Topology b.Flows c.Graphs)
-		Network := network.Generate_Network(topology_name, bg_tsn, bg_avb, input_tsn, input_avb, hyperperiod, bandwidth)
+		// 1. Network (a.OMACO ... )
+		Networks := network.New_Networks(topology_name, bg_tsn, bg_avb, input_tsn, input_avb, hyperperiod, bandwidth)
+		Network := Networks[plan_name]
+		Network.Generate_Network() // Generate a.Topology b.Flows c.Graphs
+
+		// 2. Create new plans (a.OMACO ... )
+		Plans := plan.New_Plans(Network, osaco_timeout, osaco_K, osaco_P) // TODO: To process parameters with a dictionary structure
 		if show_network {
 			Network.Show_Network()
 		}
 
-		// 2. Create new plans (a.OMACO ... )
-		Plans5 := plan.New_Plans(Network, osaco_timeout, osaco_K, 0.8) // TODO: To process parameters with a dictionary structure
-		Plans10 := plan.New_Plans(Network, osaco_timeout, osaco_K, 0.7)
-		Plans15 := plan.New_Plans(Network, osaco_timeout, osaco_K, 0.6)
-		Plans20 := plan.New_Plans(Network, osaco_timeout, osaco_K, 0.5)
-
 		// 3. Select plan
-		Plan5 := Plans5[plan_name]
-		Plan10 := Plans10[plan_name]
-		Plan15 := Plans15[plan_name]
-		Plan20 := Plans20[plan_name]
+		Plan := Plans[plan_name]
 
 		// 4. Initiate plan
-		Plan5.Initiate_Plan()
-		Plan10.Initiate_Plan()
-		Plan15.Initiate_Plan()
-		Plan20.Initiate_Plan()
+		Plan.Initiate_Plan()
 		if show_plan {
-			Plan5.Show_Plan()
-			Plan10.Show_Plan()
-			Plan15.Show_Plan()
-			Plan20.Show_Plan()
+			Plan.Show_Plan()
 		}
 
 		// 5. Cumulative quantity
-		Memorizer5.M_Cumulative(Plan5)
-		Memorizer10.M_Cumulative(Plan10)
-		Memorizer15.M_Cumulative(Plan15)
-		Memorizer20.M_Cumulative(Plan20)
+		Memorizer.M_Cumulative(Plan)
 
 		fmt.Println("****************************************")
 	}
 
 	// 6. Average statistical results
-	Memorizer5.M_Average(test_case)
-	Memorizer10.M_Average(test_case)
-	Memorizer15.M_Average(test_case)
-	Memorizer20.M_Average(test_case)
+	Memorizer.M_Average(test_case)
 
 	// 7. Output results
-	Memorizer5.M_Output_Results()
-	Memorizer10.M_Output_Results()
-	Memorizer15.M_Output_Results()
-	Memorizer20.M_Output_Results()
+	Memorizer.M_Output_Results()
 
 	// 8. Save as TXT
-	Memorizer5.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, 0.8)
-	Memorizer10.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, 0.7)
-	Memorizer15.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, 0.6)
-	Memorizer20.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, 0.5)
+	Memorizer.M_Store_Files(topology_name, test_case, input_tsn, input_avb, osaco_K, osaco_P)
 	// --------------------------------------------------------------------------------
 
 	// 9. Save as CSV
 	if store_data {
-		Memorizer5.M_Store_Data()
+		Memorizer.M_Store_Data()
 	}
 }

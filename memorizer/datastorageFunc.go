@@ -43,11 +43,11 @@ func (OC *OMACO_Memorizer) M_Store_Data() {
 	StoreCSV("OSACO400ms.csv", OC.average_objs_osaco[1])
 	StoreCSV("OSACO200ms.csv", OC.average_objs_osaco[0])
 	log.Printf("Storing OSACO_IAS data to CSV...\n")
-	StoreCSV("OSACO1000ms.csv", OC.average_objs_osaco_ias[4])
-	StoreCSV("OSACO800ms.csv", OC.average_objs_osaco_ias[3])
-	StoreCSV("OSACO600ms.csv", OC.average_objs_osaco_ias[2])
-	StoreCSV("OSACO400ms.csv", OC.average_objs_osaco_ias[1])
-	StoreCSV("OSACO200ms.csv", OC.average_objs_osaco_ias[0])
+	StoreCSV("OSACO_IAS1000ms.csv", OC.average_objs_osaco_ias[4])
+	StoreCSV("OSACO_IAS800ms.csv", OC.average_objs_osaco_ias[3])
+	StoreCSV("OSACO_IAS600ms.csv", OC.average_objs_osaco_ias[2])
+	StoreCSV("OSACO_IAS400ms.csv", OC.average_objs_osaco_ias[1])
+	StoreCSV("OSACO_IAS200ms.csv", OC.average_objs_osaco_ias[0])
 
 	// Change the working directory back
 	log.Printf("Switching back to parent directory\n")
