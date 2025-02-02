@@ -10,7 +10,7 @@ import (
 )
 
 // Objectives
-func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set) ([4]float64, int) {
+func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set, cost_setting [4]int) ([4]float64, int) {
 	S := network.Flow_Set.Input_flow_set()
 	S_prime := network.Flow_Set.BG_flow_set()
 	var (
@@ -64,9 +64,9 @@ func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, I
 	obj[2] = float64(all_rerouted_count)             // O3 ... pass
 	obj[3] = float64(avb_wcd_sum / time.Microsecond) // O4
 
-	cost += int(avb_wcd_sum/time.Microsecond) * 1
-	cost += avb_failed_count * 1000000
-	cost += tsn_failed_count * 100000000
+	cost += tsn_failed_count * cost_setting[0]                  // O1
+	cost += avb_failed_count * cost_setting[1]                  // O2
+	cost += int(avb_wcd_sum/time.Microsecond) * cost_setting[3] // O4
 
 	return obj, cost
 }

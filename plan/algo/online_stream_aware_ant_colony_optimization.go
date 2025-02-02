@@ -46,10 +46,10 @@ func (osaco *OSACO) OSACO_Initial_Settings(network *network.Network, SMT *routes
 }
 
 // Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"
-func (osaco *OSACO) OSACO_Run(network *network.Network, timeout_index int) [4]float64 {
+func (osaco *OSACO) OSACO_Run(network *network.Network, timeout_index int, cost_setting [4]int) [4]float64 {
 	// 6. OSACO
 	// Repeat the execution of epochs within the timeout
-	initialobj, initialcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees)
+	initialobj, initialcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, cost_setting)
 	fmt.Println()
 	fmt.Printf("initial value: %d \n", initialcost)
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", initialobj[0], initialobj[1], initialobj[3])
@@ -60,11 +60,11 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, timeout_index int) [4]fl
 	for {
 		fmt.Printf("\nepoch%d:\n", i)
 		osaco.Timer[timeout_index].TimerStart()
-		II := epoch(network, osaco, timeout_index)
+		II := epoch(network, osaco, timeout_index, cost_setting)
 		osaco.Timer[timeout_index].TimerStop()
 
-		_, cost1 := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees)               // new
-		_, cost2 := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees) // old
+		_, cost1 := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees, cost_setting)               // new
+		_, cost2 := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, cost_setting) // old
 
 		if cost1 < cost2 {
 			osaco.InputTrees = II
@@ -77,7 +77,7 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, timeout_index int) [4]fl
 		}
 	}
 
-	resultobj, resultcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees)
+	resultobj, resultcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, cost_setting)
 	fmt.Println()
 	fmt.Printf("result value: %d \n", resultcost)
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
@@ -237,13 +237,13 @@ func probability(osaco *OSACO) (*routes.Trees_set, *routes.Trees_set, [2][]int, 
 	return II, II_prime, input_k_location, bg_k_location
 }
 
-func epoch(network *network.Network, osaco *OSACO, timeout_index int) *routes.Trees_set {
+func epoch(network *network.Network, osaco *OSACO, timeout_index int, cost_setting [4]int) *routes.Trees_set {
 	II, _, input_k_location, _ := probability(osaco)
 	//II, II_prime, input_k_location, bg_k_location := Probability(osaco.KTrees, osaco.VB, osaco.PRM) // BG ... pass
 	fmt.Printf("Select input routing %v \n", input_k_location)
 	//fmt.Printf("Select background routing %v \n", bg_k_location) // BG ... pass
 	osaco.Timer[timeout_index].TimerStop()
-	obj_list, cost := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees)
+	obj_list, cost := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees, cost_setting)
 	//obj, cost := Obj(network, X, II, II_prime) // BG ... pass
 	osaco.Timer[timeout_index].TimerStart()
 

@@ -5,7 +5,7 @@ import (
 )
 
 type Plans interface {
-	Initiate_Plan()
+	Initiate_Plan([4]int)
 	Show_Plan()
 }
 

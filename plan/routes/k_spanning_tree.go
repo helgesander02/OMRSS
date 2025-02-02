@@ -57,9 +57,11 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 	} else if Method_Number == 1 {
 		K_MSTS.Select_Increasing_Arithmetic_Sequence_Weight(list_of_trees, K)
 
-	} else {
+	} else if Method_Number == 2 {
 		K_MSTS.Select_Average_Arithmetic_Sequence_Weight(list_of_trees, K)
 
+	} else {
+		K_MSTS.Select_Edit_Distance(list_of_trees, K)
 	}
 	//K_MSTS.Select_High_Dissimilarity(list_of_trees, K)
 	fmt.Printf("list_of_trees: %d\n", len(list_of_trees.Trees))
@@ -212,7 +214,8 @@ func (K_MSTS *KTrees) Select_Average_Arithmetic_Sequence_Weight(list_of_trees *K
 
 }
 
-// 4. Select high dissimilarity KTrees
-func (K_MSTS *KTrees) Select_High_Dissimilarity(list_of_trees *KTrees, K int) {
+// 4. Select Edit_Distance
+// Shyan Akmal, Ce Jin, "Faster Algorithms for Bounded Tree Edit Distance"
+func (K_MSTS *KTrees) Select_Edit_Distance(list_of_trees *KTrees, K int) {
 
 }
