@@ -13,13 +13,17 @@ System design from: https://miro.com/welcomeonboard/ZDI1dEJWWGtsTEhCbWMwSm9oTTVh
 ## Simulation Settings
 We consider a typical topology for TSN-based industrial factories <br />
 
-| typical_complex | typical_simple | industrial(IN) |
-| --- | --- | --- |
-|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/typical1.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/typical2.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/industrial.png)|
+| typical_complex | typical_simple | 
+| --- | --- |
+|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/typical1.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/typical2.png)|
 
 | layered_ring | ring |
 | --- | --- |
 |![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/layeredring.png)|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/ring.png)|
+
+industrial(IN) |  |
+| --- | --- |
+|![alt text](https://github.com/helgesander02/OMRSS/blob/main/img/industrial.png)||
 
 
 
@@ -54,6 +58,7 @@ More options:
 * [QINGHAN YU et al., "Online Scheduling for Dynamic VM Migration in Multicast Time-Sensitive Networks"](https://ieeexplore.ieee.org/document/8747398)
 * [Jiachen Wen  et al., "Online Updating in Multicast Time-Sensitive Networking"](https://ieeexplore.ieee.org/document/10258186)
 * [Xingbo Feng  et al., "Advancing TSN flow scheduling: An efficient framework without flow isolation constraint"](https://www.sciencedirect.com/science/article/pii/S1389128624005206#:~:text=Central%20to%20our%20approach%20is%20a)
+* [Mateusz Pawlik, Nikolaus Augsten, "Tree edit distance: Robust and memory-efficient"](https://www.sciencedirect.com/science/article/abs/pii/S0306437915001611)
 
 ## TODO
 * UnitTesting

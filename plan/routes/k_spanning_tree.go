@@ -61,7 +61,7 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 		K_MSTS.Select_Average_Arithmetic_Sequence_Weight(list_of_trees, K)
 
 	} else {
-		K_MSTS.Select_Edit_Distance(list_of_trees, K)
+		K_MSTS.Select_Tree_Edit_Distance(list_of_trees, K)
 	}
 	//K_MSTS.Select_High_Dissimilarity(list_of_trees, K)
 	fmt.Printf("list_of_trees: %d\n", len(list_of_trees.Trees))
@@ -215,7 +215,51 @@ func (K_MSTS *KTrees) Select_Average_Arithmetic_Sequence_Weight(list_of_trees *K
 }
 
 // 4. Select Edit_Distance
-// Shyan Akmal, Ce Jin, "Faster Algorithms for Bounded Tree Edit Distance"
-func (K_MSTS *KTrees) Select_Edit_Distance(list_of_trees *KTrees, K int) {
+// Mateusz Pawlik, Nikolaus Augsten, "APTED: Tree edit distance: Robust and memory-efficient"
+func (K_MSTS *KTrees) Select_Tree_Edit_Distance(list_of_trees *KTrees, K int) {
+	// matrix = len(list_of_trees.Trees) * K
+	numCandidates := len(list_of_trees.Trees)
+	distances := make([][]float64, numCandidates)
+	for i := 0; i < numCandidates; i++ {
+		distances[i] = make([]float64, K)
+	}
 
+	cumulative := make([]float64, numCandidates)
+	selectedIndices := make(map[int]bool)
+
+	// Start from the 1st round since seed tree is already selected
+	// Iterate K-1 times to select remaining trees
+	for round := 1; round < K; round++ {
+		newTree := K_MSTS.Trees[round-1]
+
+		// For each candidate tree (not yet selected), calculate new distance and accumulate
+		for i, candidate := range list_of_trees.Trees {
+			if selectedIndices[i] {
+				continue
+			}
+			d := APTED(newTree, candidate)
+			distances[i][round] = d
+			cumulative[i] += d
+		}
+
+		// Find the candidate with the highest cumulative distance among unselected trees
+		maxScore := -1.0
+		maxIdx := -1
+		for i, score := range cumulative {
+			if !selectedIndices[i] && score > maxScore {
+				maxScore = score
+				maxIdx = i
+			}
+		}
+
+		// If a candidate is found, add to K_MSTS
+		if maxIdx != -1 {
+			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees[maxIdx])
+			selectedIndices[maxIdx] = true
+			//fmt.Println(cumulative)
+			//fmt.Print("Selected: ", maxIdx, " ", maxScore, "\n")
+		} else {
+			break
+		}
+	}
 }
