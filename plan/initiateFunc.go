@@ -40,6 +40,7 @@ func (plan *OMACO) Initiate_Plan(cost_setting [4]int) {
 		plan.SMT.Trees.Input_Tree_set(plan.Network.BG_TSN, plan.Network.BG_AVB),
 		plan.SMT.Trees.BG_Tree_set(plan.Network.BG_TSN, plan.Network.BG_AVB),
 		cost_setting,
+		true,
 	)
 
 	obj_mdt, _ := schedule.OBJ(
@@ -48,6 +49,7 @@ func (plan *OMACO) Initiate_Plan(cost_setting [4]int) {
 		plan.MDTC.Trees.Input_Tree_set(plan.Network.BG_TSN, plan.Network.BG_AVB),
 		plan.MDTC.Trees.BG_Tree_set(plan.Network.BG_TSN, plan.Network.BG_AVB),
 		cost_setting,
+		true,
 	)
 
 	plan.SMT.Objs_smt = obj_smt

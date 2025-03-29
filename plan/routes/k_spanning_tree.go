@@ -52,19 +52,23 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 	}
 
 	if Method_Number == 0 {
-		K_MSTS.Select_Min_Weight(list_of_trees, K)
+		K_MSTS.Select_Min_Weight(list_of_trees.Trees, K)
 
 	} else if Method_Number == 1 {
-		K_MSTS.Select_Increasing_Arithmetic_Sequence_Weight(list_of_trees, K)
+		K_MSTS.Select_Increasing_Arithmetic_Sequence_Weight(list_of_trees.Trees, K)
 
 	} else if Method_Number == 2 {
-		K_MSTS.Select_Average_Arithmetic_Sequence_Weight(list_of_trees, K)
+		K_MSTS.Select_Average_Arithmetic_Sequence_Weight(list_of_trees.Trees, K)
+
+	} else if Method_Number == 3 {
+		K_MSTS.Select_Tree_Edit_Distance(list_of_trees.Trees, K)
 
 	} else {
-		K_MSTS.Select_Tree_Edit_Distance(list_of_trees, K)
+		K_MSTS.Select_Min_Weight_and_Tree_Edit_Distance(list_of_trees.Trees, K)
 	}
-	//K_MSTS.Select_High_Dissimilarity(list_of_trees, K)
+
 	fmt.Printf("list_of_trees: %d\n", len(list_of_trees.Trees))
+	//K_MSTS.Show_KTrees()
 
 	return K_MSTS
 }
@@ -145,12 +149,12 @@ func In_ListOfTrees(list_of_trees *KTrees, MST *Tree) bool {
 }
 
 // 1. Select the minimum weight KTrees [0, 1, 2, 3]
-func (K_MSTS *KTrees) Select_Min_Weight(list_of_trees *KTrees, K int) {
+func (K_MSTS *KTrees) Select_Min_Weight(list_of_trees []*Tree, K int) {
 	//fmt.Printf("list_of_trees: %d  K: %d\n", len(list_of_trees.Trees), K)
-	if len(list_of_trees.Trees) >= K {
+	if len(list_of_trees) >= K {
 		treesmap := make(map[int][]*Tree)
-		w := list_of_trees.Trees[0].Weight
-		for _, tree := range list_of_trees.Trees {
+		w := list_of_trees[0].Weight
+		for _, tree := range list_of_trees {
 			treesmap[tree.Weight] = append(treesmap[tree.Weight], tree)
 			//fmt.Printf("Tree Weight %d \n", tree.Weight)
 		}
@@ -179,46 +183,46 @@ func (K_MSTS *KTrees) Select_Min_Weight(list_of_trees *KTrees, K int) {
 			w += 1
 		}
 	} else {
-		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees...)
+		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees...)
 	}
 }
 
 // 2. Select Increasing Arithmetic Sequence Weight KTrees [1, 3 ,5 ,7] or [0, 2, 4, 6], up=2
-func (K_MSTS *KTrees) Select_Increasing_Arithmetic_Sequence_Weight(list_of_trees *KTrees, K int) {
+func (K_MSTS *KTrees) Select_Increasing_Arithmetic_Sequence_Weight(list_of_trees []*Tree, K int) {
 	//fmt.Printf("list_of_trees: %d  K: %d\n", len(list_of_trees.Trees), K)
 	var ArithmeticSequence int = 2
-	if len(list_of_trees.Trees) >= K {
-		if len(list_of_trees.Trees) >= ArithmeticSequence*(K-1) {
+	if len(list_of_trees) >= K {
+		if len(list_of_trees) >= ArithmeticSequence*(K-1) {
 			for idx := 0; idx < ArithmeticSequence*(K-1); idx += ArithmeticSequence {
-				K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees[idx])
+				K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees[idx])
 			}
 		} else {
-			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees[:K-1]...)
+			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees[:K-1]...)
 		}
 	} else {
-		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees...)
+		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees...)
 	}
 
 }
 
 // 3. Select Average Arithmetic Sequence Weight KTrees  [0, up, 2up, 3up], up=len(list_of_trees)/K
-func (K_MSTS *KTrees) Select_Average_Arithmetic_Sequence_Weight(list_of_trees *KTrees, K int) {
-	var ArithmeticSequence int = int(float64(len(list_of_trees.Trees)) / float64(K-1))
-	if len(list_of_trees.Trees) >= K {
-		for idx := 0; idx < len(list_of_trees.Trees); idx += ArithmeticSequence {
-			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees[idx])
+func (K_MSTS *KTrees) Select_Average_Arithmetic_Sequence_Weight(list_of_trees []*Tree, K int) {
+	var ArithmeticSequence int = int(float64(len(list_of_trees)) / float64(K-1))
+	if len(list_of_trees) >= K {
+		for idx := 0; idx < len(list_of_trees); idx += ArithmeticSequence {
+			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees[idx])
 		}
 	} else {
-		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees...)
+		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees...)
 	}
 
 }
 
 // 4. Select Edit_Distance
 // Mateusz Pawlik, Nikolaus Augsten, "APTED: Tree edit distance: Robust and memory-efficient"
-func (K_MSTS *KTrees) Select_Tree_Edit_Distance(list_of_trees *KTrees, K int) {
+func (K_MSTS *KTrees) Select_Tree_Edit_Distance(list_of_trees []*Tree, K int) {
 	// matrix = len(list_of_trees.Trees) * K
-	numCandidates := len(list_of_trees.Trees)
+	numCandidates := len(list_of_trees)
 	distances := make([][]float64, numCandidates)
 	for i := 0; i < numCandidates; i++ {
 		distances[i] = make([]float64, K)
@@ -233,7 +237,7 @@ func (K_MSTS *KTrees) Select_Tree_Edit_Distance(list_of_trees *KTrees, K int) {
 		newTree := K_MSTS.Trees[round-1]
 
 		// For each candidate tree (not yet selected), calculate new distance and accumulate
-		for i, candidate := range list_of_trees.Trees {
+		for i, candidate := range list_of_trees {
 			if selectedIndices[i] {
 				continue
 			}
@@ -254,12 +258,34 @@ func (K_MSTS *KTrees) Select_Tree_Edit_Distance(list_of_trees *KTrees, K int) {
 
 		// If a candidate is found, add to K_MSTS
 		if maxIdx != -1 {
-			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees.Trees[maxIdx])
+			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees[maxIdx])
 			selectedIndices[maxIdx] = true
 			//fmt.Println(cumulative)
 			//fmt.Print("Selected: ", maxIdx, " ", maxScore, "\n")
 		} else {
 			break
 		}
+	}
+}
+
+func (K_MSTS *KTrees) Select_Min_Weight_and_Tree_Edit_Distance(list_of_trees []*Tree, K int) {
+	if len(list_of_trees) > K-1 {
+		treesmap := make(map[int][]*Tree)
+		w := list_of_trees[0].Weight
+		for _, tree := range list_of_trees {
+			treesmap[tree.Weight] = append(treesmap[tree.Weight], tree)
+		}
+
+		minweight_trees := []*Tree{}
+		for len(minweight_trees) < K {
+			if value, exists := treesmap[w]; exists {
+				minweight_trees = append(minweight_trees, value...)
+			}
+			w += 1
+		}
+		K_MSTS.Select_Tree_Edit_Distance(minweight_trees, K)
+
+	} else {
+		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees...)
 	}
 }

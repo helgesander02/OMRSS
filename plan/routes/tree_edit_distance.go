@@ -4,19 +4,18 @@ import (
 	"fmt"
 	"math"
 	"strconv"
-	"strings"
 )
 
 // -------------------------
 // Operation Cost Functions
 // -------------------------
 // Cost of deleting a node
-func costDelete(n *Node) float64 {
-	return 1.0
+func costDelete() float64 {
+	return 3.0
 }
 
 // Cost of inserting a node
-func costInsert(n *Node) float64 {
+func costInsert() float64 {
 	return 1.0
 }
 
@@ -66,7 +65,7 @@ func getChildren(node *Node, t *Tree, parentID int) []*Node {
 // Recursively Calculate Deletion Cost of Entire Subtree
 // -------------------------
 func treeCostDelete(n *Node, t *Tree, parentID int) float64 {
-	c := costDelete(n)
+	c := costDelete()
 	children := getChildren(n, t, parentID)
 	for _, child := range children {
 		c += treeCostDelete(child, t, n.ID)
@@ -78,7 +77,7 @@ func treeCostDelete(n *Node, t *Tree, parentID int) float64 {
 // Recursively Calculate Insertion Cost of Entire Subtree
 // -------------------------
 func treeCostInsert(n *Node, t *Tree, parentID int) float64 {
-	c := costInsert(n)
+	c := costInsert()
 	children := getChildren(n, t, parentID)
 	for _, child := range children {
 		c += treeCostInsert(child, t, n.ID)
@@ -145,13 +144,13 @@ func treeEditDistance(n1, n2 *Node, t1, t2 *Tree, parent1, parent2 int, memo map
 func APTED(t1, t2 *Tree) float64 {
 	var root1, root2 *Node
 	for _, n := range t1.Nodes {
-		if strings.HasPrefix(strconv.Itoa(n.ID), "100") {
+		if n.ID >= 1000 && n.ID <= 1999 {
 			root1 = n
 			break
 		}
 	}
 	for _, n := range t2.Nodes {
-		if strings.HasPrefix(strconv.Itoa(n.ID), "100") {
+		if n.ID >= 1000 && n.ID <= 1999 {
 			root2 = n
 			break
 		}

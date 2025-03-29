@@ -49,7 +49,7 @@ func (osaco *OSACO) OSACO_Initial_Settings(network *network.Network, SMT *routes
 func (osaco *OSACO) OSACO_Run(network *network.Network, timeout_index int, cost_setting [4]int) [4]float64 {
 	// 6. OSACO
 	// Repeat the execution of epochs within the timeout
-	initialobj, initialcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, cost_setting)
+	initialobj, initialcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, cost_setting, false)
 	fmt.Println()
 	fmt.Printf("initial value: %d \n", initialcost)
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", initialobj[0], initialobj[1], initialobj[3])
@@ -63,8 +63,8 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, timeout_index int, cost_
 		II := epoch(network, osaco, timeout_index, cost_setting)
 		osaco.Timer[timeout_index].TimerStop()
 
-		_, cost1 := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees, cost_setting)               // new
-		_, cost2 := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, cost_setting) // old
+		_, cost1 := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees, cost_setting, false)               // new
+		_, cost2 := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, cost_setting, false) // old
 
 		if cost1 < cost2 {
 			osaco.InputTrees = II
@@ -77,7 +77,7 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, timeout_index int, cost_
 		}
 	}
 
-	resultobj, resultcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, cost_setting)
+	resultobj, resultcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, cost_setting, true)
 	fmt.Println()
 	fmt.Printf("result value: %d \n", resultcost)
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
@@ -243,7 +243,7 @@ func epoch(network *network.Network, osaco *OSACO, timeout_index int, cost_setti
 	fmt.Printf("Select input routing %v \n", input_k_location)
 	//fmt.Printf("Select background routing %v \n", bg_k_location) // BG ... pass
 	osaco.Timer[timeout_index].TimerStop()
-	obj_list, cost := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees, cost_setting)
+	obj_list, cost := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees, cost_setting, false)
 	//obj, cost := Obj(network, X, II, II_prime) // BG ... pass
 	osaco.Timer[timeout_index].TimerStart()
 
