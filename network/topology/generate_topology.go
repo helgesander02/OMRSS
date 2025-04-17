@@ -1,8 +1,8 @@
 package topology
 
 import (
-	"io/ioutil"
 	"log"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -11,7 +11,7 @@ func Generate_Topology(topology_name string, cost float64) *Topology {
 	// 1. Read YAML file
 	// 2. Create Data
 	// 3. Parse YAML into the Data
-	data, err := ioutil.ReadFile("yaml/" + topology_name + ".yaml")
+	data, err := os.ReadFile("yaml/" + topology_name + ".yaml")
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}

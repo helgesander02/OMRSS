@@ -5,21 +5,21 @@ import (
 	"math/big"
 )
 
-func TSN_stream() *TSN {
-	t_period, t_datasize := tsn_random()
+func config_TSN_Stream() *TSN {
+	t_period, t_datasize := random_TSN()
 	tsn := new_TSN(t_period, t_datasize)
 
 	return tsn
 }
 
-func AVB_stream() *AVB {
-	a_datasize := avb_random()
+func config_AVB_Stream() *AVB {
+	a_datasize := random_AVB()
 	avb := new_AVB(a_datasize)
 
 	return avb
 }
 
-func tsn_random() (int, float64) {
+func random_TSN() (int, float64) {
 	tsn_period_arr := []int{100, 500, 1000, 1500, 2000}
 	tsn_datasize_arr := []float64{30., 40., 50., 60., 70., 80., 90., 100.}
 	period_rng, _ := rand.Int(rand.Reader, big.NewInt(int64(len(tsn_period_arr))))
@@ -28,14 +28,14 @@ func tsn_random() (int, float64) {
 	return tsn_period_arr[period_rng.Int64()], tsn_datasize_arr[datasize_rng.Int64()]
 }
 
-func avb_random() float64 {
+func random_AVB() float64 {
 	avb_datasize_arr := []float64{1000., 1100., 1200., 1300., 1400., 1500.}
 	datasize_rng, _ := rand.Int(rand.Reader, big.NewInt(int64(len(avb_datasize_arr))))
 
 	return avb_datasize_arr[datasize_rng.Int64()]
 }
 
-func Random_Devices(Nnode int) (int, []int) {
+func random_TT_Devices_For_Tree(Nnode int) (int, []int) {
 	// Talker
 	source, _ := rand.Int(rand.Reader, big.NewInt(int64(Nnode)))
 
