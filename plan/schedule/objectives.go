@@ -97,6 +97,7 @@ func schedulable(node *routes.Node, parentID int, flow *flow.Flow, route *routes
 				key := fmt.Sprintf("%d>%d", link.FromNodeID, link.ToNodeID)
 				linkmap[key] += flow.DataSize * float64((hyperPeriod / flow.Period))
 				if linkmap[key] > bandwidth {
+					linkmap[key] -= flow.DataSize * float64((hyperPeriod / flow.Period))
 					return false, linkmap
 				}
 			}

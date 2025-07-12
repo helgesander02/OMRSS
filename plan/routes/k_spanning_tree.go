@@ -62,8 +62,10 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 
 	} else if Method_Number == 3 {
 		K_MSTS.Select_Tree_Edit_Distance(list_of_trees.Trees, K)
+		//K_MSTS.Select_Min_Weight_and_Tree_Edit_Distance(list_of_trees.Trees, K)
 
 	} else {
+		//K_MSTS.Select_Tree_Edit_Distance(list_of_trees.Trees, K)
 		K_MSTS.Select_Min_Weight_and_Tree_Edit_Distance(list_of_trees.Trees, K)
 	}
 
@@ -269,7 +271,8 @@ func (K_MSTS *KTrees) Select_Tree_Edit_Distance(list_of_trees []*Tree, K int) {
 }
 
 func (K_MSTS *KTrees) Select_Min_Weight_and_Tree_Edit_Distance(list_of_trees []*Tree, K int) {
-	if len(list_of_trees) > K-1 {
+	limit := (K - 1) * 1
+	if len(list_of_trees) > limit {
 		treesmap := make(map[int][]*Tree)
 		w := list_of_trees[0].Weight
 		for _, tree := range list_of_trees {
@@ -277,7 +280,7 @@ func (K_MSTS *KTrees) Select_Min_Weight_and_Tree_Edit_Distance(list_of_trees []*
 		}
 
 		minweight_trees := []*Tree{}
-		for len(minweight_trees) < K {
+		for len(minweight_trees) < limit {
 			if value, exists := treesmap[w]; exists {
 				minweight_trees = append(minweight_trees, value...)
 			}
@@ -286,6 +289,11 @@ func (K_MSTS *KTrees) Select_Min_Weight_and_Tree_Edit_Distance(list_of_trees []*
 		K_MSTS.Select_Tree_Edit_Distance(minweight_trees, K)
 
 	} else {
-		K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees...)
+		if len(list_of_trees) >= K {
+			K_MSTS.Select_Tree_Edit_Distance(list_of_trees, K)
+
+		} else {
+			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees...)
+		}
 	}
 }
