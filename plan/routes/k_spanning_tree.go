@@ -61,12 +61,12 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 		K_MSTS.Select_Average_Arithmetic_Sequence_Weight(list_of_trees.Trees, K)
 
 	} else if Method_Number == 3 {
-		K_MSTS.Select_Tree_Edit_Distance(list_of_trees.Trees, K)
-		//K_MSTS.Select_Min_Weight_and_Tree_Edit_Distance(list_of_trees.Trees, K)
-
-	} else {
 		//K_MSTS.Select_Tree_Edit_Distance(list_of_trees.Trees, K)
 		K_MSTS.Select_Min_Weight_and_Tree_Edit_Distance(list_of_trees.Trees, K)
+
+	} else {
+		K_MSTS.Select_Tree_Edit_Distance(list_of_trees.Trees, K)
+		//K_MSTS.Select_Min_Weight_and_Tree_Edit_Distance(list_of_trees.Trees, K)
 	}
 
 	fmt.Printf("list_of_trees: %d\n", len(list_of_trees.Trees))

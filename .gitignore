@@ -1,0 +1,34 @@
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+*.o
+*.a
+
+# Temporary or backup files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# IDE / Editor settings
+.vscode/
+.idea/
+.DS_Store
+
+# Go module dependencies (if using go mod)
+vendor/
+go.work
+go.work.sum
+
+# Docker (optional local override)
+docker-compose.override.yml
+
+# Temporary directories
+tmp/
+
+data/
+result/
