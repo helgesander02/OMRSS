@@ -36,6 +36,10 @@ func (OC *OMACO_Memorizer) M_Store_File(file_name string) {
 	switchWorkingPath("..")
 }
 
+func (OS *OSRO_Memorizer) M_Store_File(file_name string) {
+
+}
+
 func average_data_to_result(file_name string) string {
 	data, testcase_numbers := get_average_data(file_name)
 
@@ -193,11 +197,3 @@ func get_average_data(file_name string) (map[string]float64, int) {
 
 	return data, testcase_numbers
 }
-
-//func (mm2 *Memorizer2) M_Store_Files(test_case int) {
-//
-//}
-
-//func (mm3 *Memorizer2) M_Store_Files(test_case int) {
-//
-//}

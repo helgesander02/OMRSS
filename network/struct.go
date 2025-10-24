@@ -7,7 +7,7 @@ import (
 	"src/network/topology"
 )
 
-type Network struct {
+type OMACO_Network struct {
 	HyperPeriod  int
 	BytesRate    float64
 	Bandwidth    float64
@@ -21,13 +21,13 @@ type Network struct {
 	Graph_Set    *graph.Graphs
 }
 
-func new_OMACO_Network(topology_name string, bg_tsn int, bg_avb int, input_tsn int, input_avb int, hyperperiod int, bandwidth float64) *Network {
+func new_OMACO_Network(topology_name string, bg_tsn int, bg_avb int, input_tsn int, input_avb int, hyperperiod int, bandwidth float64) *OMACO_Network {
 	// 1. Define network parameters
 	bw := (bandwidth / 8) * 1e-6 // bytes/us ==> 125 bytes
 	bytes_rate := 1. / bw        // The number of bytes that can be transmitted in 1us ==> 1/125
 	bw *= float64(hyperperiod)   // The bytes that can be transmitted in 6000us (bytes/us * hyperperiod) ==> 750000 bytes
 
-	Network := &Network{
+	Network := &OMACO_Network{
 		HyperPeriod:  hyperperiod,
 		BytesRate:    bytes_rate,
 		Bandwidth:    bw,

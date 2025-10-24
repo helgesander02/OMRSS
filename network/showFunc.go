@@ -1,6 +1,6 @@
 package network
 
-func (network *Network) Show_Network() {
+func (network *OMACO_Network) Show_Network() {
 	network.Topology.Show_Topology()
 
 	network.Flow_Set.Show_Flows()

@@ -6,7 +6,7 @@ import (
 	"src/plan/routes"
 )
 
-func (mtdc *MDTC) MDTC_Run(network *network.Network) {
+func (mtdc *MDTC) MDTC_Run(network *network.OMACO_Network) {
 	// 5. DistanceTree
 	mtdc.Timer = algo_timer.NewTimer()
 	mtdc.Timer.TimerStart()

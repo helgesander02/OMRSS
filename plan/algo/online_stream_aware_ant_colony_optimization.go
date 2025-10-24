@@ -18,7 +18,7 @@ var (
 	bg_avb int
 )
 
-func (osaco *OSACO) OSACO_Initial_Settings(network *network.Network, SMT *routes.Trees_set) {
+func (osaco *OSACO) OSACO_Initial_Settings(network *network.OMACO_Network, SMT *routes.Trees_set) {
 	//// OSACO computing time: Estimate the time it takes to compute routing information
 	bg_tsn = network.BG_TSN
 	bg_avb = network.BG_AVB
@@ -46,7 +46,7 @@ func (osaco *OSACO) OSACO_Initial_Settings(network *network.Network, SMT *routes
 }
 
 // Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"
-func (osaco *OSACO) OSACO_Run(network *network.Network, timeout_index int, cost_setting [4]int) [4]float64 {
+func (osaco *OSACO) OSACO_Run(network *network.OMACO_Network, timeout_index int, cost_setting [4]int) [4]float64 {
 	// 6. OSACO
 	// Repeat the execution of epochs within the timeout
 	initialobj, initialcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, cost_setting, false)
@@ -237,7 +237,7 @@ func probability(osaco *OSACO) (*routes.Trees_set, *routes.Trees_set, [2][]int, 
 	return II, II_prime, input_k_location, bg_k_location
 }
 
-func epoch(network *network.Network, osaco *OSACO, timeout_index int, cost_setting [4]int) *routes.Trees_set {
+func epoch(network *network.OMACO_Network, osaco *OSACO, timeout_index int, cost_setting [4]int) *routes.Trees_set {
 	II, _, input_k_location, _ := probability(osaco)
 	//II, II_prime, input_k_location, bg_k_location := Probability(osaco.KTrees, osaco.VB, osaco.PRM) // BG ... pass
 	fmt.Printf("Select input routing %v \n", input_k_location)

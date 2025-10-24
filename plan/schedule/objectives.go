@@ -10,7 +10,7 @@ import (
 )
 
 // Objectives
-func OBJ(network *network.Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set, cost_setting [4]int, showflow bool) ([4]float64, int) {
+func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set, cost_setting [4]int, showflow bool) ([4]float64, int) {
 	S := network.Flow_Set.Input_flow_set()
 	S_prime := network.Flow_Set.BG_flow_set()
 	var (

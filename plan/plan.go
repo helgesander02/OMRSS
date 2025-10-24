@@ -9,17 +9,15 @@ type Plans interface {
 	Show_Plan()
 }
 
-func New_Plans(networks network.Networks, osaco_timeout int, osaco_K int, osaco_P float64) map[string]Plans {
-	// plan1 ...
-	OMACO := new_OMACO_Plan(networks.(*network.Network), osaco_timeout, osaco_K, osaco_P)
+func New_Plans(plan_name string, networks network.Networks, osaco_timeout int, osaco_K int, osaco_P float64) Plans {
+	switch plan_name {
+	case "omaco":
+		return new_OMACO_Plan(networks.(*network.OMACO_Network), osaco_timeout, osaco_K, osaco_P)
 
-	// Look-up table method
-	Plans := map[string]Plans{
-		"omaco": OMACO,
-		//plan2,
-		//plan3,
-		// ...
+	case "osro":
+		return new_OSRO_Plan(networks.(*network.OSRO_Network), osaco_timeout, osaco_K, osaco_P)
+
+	default:
+		return nil
 	}
-
-	return Plans
 }

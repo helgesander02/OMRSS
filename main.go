@@ -90,8 +90,7 @@ func main() {
 
 		// 2. Create new plans (a.OMACO ... )
 		// -----------------------------------------------------------
-		Plans := plan.New_Plans(Network, osaco_timeout, osaco_K, osaco_P)
-		Plan := Plans[plan_name]
+		Plan := plan.New_Plans(plan_name, Network, osaco_timeout, osaco_K, osaco_P)
 
 		// 3. Initiate plan
 		// ----------------------------------------------------------

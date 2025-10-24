@@ -27,10 +27,6 @@ func (OC *OMACO_Memorizer) M_Output_Results() {
 	fmt.Println()
 }
 
-//func (mm2 *Memorizer2) M_Output_Results()(test_case int) {
-//
-//}
+func (OS *OSRO_Memorizer) M_Output_Results() {
 
-//func (mmt3 *Memorizer2) M_Output_Results()(test_case int) {
-//
-//}
+}

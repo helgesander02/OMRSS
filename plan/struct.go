@@ -6,7 +6,7 @@ import (
 )
 
 type OMACO struct {
-	Network   *network.Network
+	Network   *network.OMACO_Network
 	SMT       *algo.SMT
 	MDTC      *algo.MDTC
 	OSACO     *algo.OSACO
@@ -14,7 +14,7 @@ type OMACO struct {
 }
 
 // Developing the OMACO plan
-func new_OMACO_Plan(network *network.Network, osaco_timeout int, osaco_K int, osaco_P float64) *OMACO {
+func new_OMACO_Plan(network *network.OMACO_Network, osaco_timeout int, osaco_K int, osaco_P float64) *OMACO {
 	OMACO := &OMACO{Network: network}
 
 	OMACO.SMT = &algo.SMT{}
@@ -25,11 +25,15 @@ func new_OMACO_Plan(network *network.Network, osaco_timeout int, osaco_K int, os
 	return OMACO
 }
 
-//type plan2 struct {
-//	Network *network.Network
-//}
+type OSRO struct {
+	Network *network.OSRO_Network
+}
 
-// Plan2
+func new_OSRO_Plan(network *network.OSRO_Network, osaco_timeout int, osaco_K int, osaco_P float64) *OSRO {
+	OSRO := &OSRO{Network: network}
+
+	return OSRO
+}
 
 //type plan3 struct {
 //	Network *network.Network

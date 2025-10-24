@@ -7,7 +7,7 @@ import (
 
 var v2v *V2V = &V2V{} // v2v is all paths connecting multiple terminals to terminals.
 
-func Get_SteninerTree_Routing(network *network.Network) *Trees_set {
+func Get_SteninerTree_Routing(network *network.OMACO_Network) *Trees_set {
 	Trees_set := new_Trees_Set()
 
 	for nth, flow := range network.Flow_Set.TSNFlows {
@@ -25,7 +25,7 @@ func Get_SteninerTree_Routing(network *network.Network) *Trees_set {
 	return Trees_set
 }
 
-func Get_DistanceTree_Routing(network *network.Network) *Trees_set {
+func Get_DistanceTree_Routing(network *network.OMACO_Network) *Trees_set {
 	Trees_set := new_Trees_Set()
 
 	for nth, flow := range network.Flow_Set.TSNFlows {
@@ -61,7 +61,7 @@ func (trees_set *Trees_set) BG_Tree_set(bg_tsn_end int, bg_avb_end int) *Trees_s
 	return BG_tree_set
 }
 
-func Get_OSACO_Routing(network *network.Network, SMT *Trees_set, K int, Method_Number int) *KTrees_set {
+func Get_OSACO_Routing(network *network.OMACO_Network, SMT *Trees_set, K int, Method_Number int) *KTrees_set {
 	ktrees_set := new_KTrees_Set()
 
 	for nth, flow := range network.Flow_Set.TSNFlows {

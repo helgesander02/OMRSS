@@ -7,7 +7,7 @@ import (
 	"src/network/topology"
 )
 
-func (network *Network) Generate_Network() {
+func (network *OMACO_Network) Generate_Network() {
 	// 2. Generate topology
 	fmt.Println("Generate Topology")
 	fmt.Println("----------------------------------------")

@@ -37,6 +37,10 @@ func (OC *OMACO_Memorizer) M_Store_Data(fileName string, testcase int) {
 	switchWorkingPath("../..")
 }
 
+func (OS *OSRO_Memorizer) M_Store_Data(fileName string, testcase int) {
+
+}
+
 func StoreCSV(name string, data [4]float64, testcase int) {
 	log.Printf("Opening file %s in append mode\n", name)
 	csvFile, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY, 0644)
@@ -109,11 +113,3 @@ func Tary2Sary(average_time_mdt time.Duration, average_time_osaco time.Duration,
 
 	return Sary
 }
-
-//func (mm2 *Memorizer2) M_Store_Data(test_case int) {
-//
-//}
-
-//func (mm3 *Memorizer2) M_Store_Data(test_case int) {
-//
-//}

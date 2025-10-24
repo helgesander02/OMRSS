@@ -26,9 +26,9 @@ func (plan *OMACO) Show_Plan() {
 	plan.OSACO.BGTrees.Show_Trees_Set()
 }
 
-//func (plan *Plan2) Show_Plan() {
-//
-//}
+func (plan *OSRO) Show_Plan() {
+
+}
 
 //func (plan *Plan3) Show_Plan() {
 //

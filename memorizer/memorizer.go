@@ -17,11 +17,12 @@ type Memorizers interface {
 func New_Memorizers() map[string]Memorizers {
 	// memorizer1 ...
 	OMACO := new_OMACO_Memorizer()
+	OSRO := new_OSRO_Memorizer()
 
 	// Look-up table method
 	memorizers := map[string]Memorizers{
 		"omaco": OMACO,
-		//memorizer2,
+		"osro":  OSRO,
 		//memorizer3,
 		// ...
 	}
