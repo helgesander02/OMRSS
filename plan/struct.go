@@ -34,10 +34,3 @@ func new_OSRO_Plan(network *network.OSRO_Network, osaco_timeout int, osaco_K int
 
 	return OSRO
 }
-
-//type plan3 struct {
-//	Network *network.Network
-//}
-
-// Plan3
-// ...

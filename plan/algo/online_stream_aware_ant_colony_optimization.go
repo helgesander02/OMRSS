@@ -120,10 +120,10 @@ func compute_prm(X *routes.KTrees_set) *Pheromone {
 	return pheromone
 }
 
-func compute_vb(X *routes.KTrees_set, flow_set *flow.Flows) *Visibility {
+func compute_vb(X *routes.KTrees_set, flow_set *flow.Flow_Set) *Visibility {
 	var preference float64 = 2.
-	Input_flow_set := flow_set.Input_flow_set()
-	BG_flow_set := flow_set.BG_flow_set()
+	Input_flow_set := flow_set.Input_OMACO_Flow_Set()
+	BG_flow_set := flow_set.BG_OMACO_Flow_Set()
 
 	visibility := &Visibility{}
 	// OSACO CompVB

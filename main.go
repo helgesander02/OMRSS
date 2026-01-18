@@ -94,8 +94,8 @@ func main() {
 
 		// 3. Initiate plan
 		// ----------------------------------------------------------
-		cost_setting1 := [4]int{o1_cost, o2_cost, o3_cost, o4_cost}
-		Plan.Initiate_Plan(cost_setting1)
+		cost_setting := [4]int{o1_cost, o2_cost, o3_cost, o4_cost}
+		Plan.Initiate_Plan(cost_setting)
 		if show_plan {
 			Plan.Show_Plan()
 		}

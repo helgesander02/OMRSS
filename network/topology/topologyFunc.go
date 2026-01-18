@@ -65,3 +65,35 @@ func (t *Topology) GetNodeByID(id int) *Node {
 	}
 	return nil
 }
+
+func (t *Topology) RemoveEdge(u, v int) {
+	n := t.GetNodeByID(u)
+	if n == nil {
+		return
+	}
+	for i, connection := range n.Connections {
+		if connection.ToNodeID == v {
+			n.Connections = append(n.Connections[:i], n.Connections[i+1:]...)
+			return
+		}
+	}
+}
+
+func (t *Topology) GetListenerAndTalker(source int, destination int) bool {
+	if t.Talker[0].ID == source && t.Listener[0].ID == destination {
+		return true
+	}
+	return false
+}
+
+func (t *Topology) GetListenerAndTalkerSet(source int, destinations []int) bool {
+	if t.Talker[0].ID == source && len(t.Listener) == len(destinations) {
+		for _, desdestination := range destinations {
+			if t.GetNodeByID(desdestination) == nil {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}

@@ -1,4 +1,4 @@
-package flow
+package tt
 
 import (
 	"crypto/rand"
@@ -63,5 +63,5 @@ func random_TT_Devices_For_Tree(Nnode int) (int, []int) {
 		destinations = append(destinations[:selectedIndex], destinations[selectedIndex+1:]...)
 	}
 
-	return int(source.Int64()) + 1000, selectedDestinations
+	return int(source.Int64()) + 1000, selectedDestinations // source id: 1000+id  destination id: 2000+id
 }

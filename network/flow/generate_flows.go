@@ -1,74 +1,55 @@
 package flow
 
 import (
-	"fmt"
+	"src/network/flow/can"
+	"src/network/flow/tt"
 )
 
 var (
 	bg_tsnflows_end int
-	bg_avbflow_end  int
+	bg_avbflows_end int
 )
 
-func Generate_Flows(Nnode_length int, bg_tsn int, bg_avb int, input_tsn int, input_avb int, HyperPeriod int) *Flows {
-	// Constructing Flows structures
-	flow_set := new_Flows()
+func Generate_OMACO_Flows(Nnode_length int, bg_tsn int, bg_avb int, input_tsn int, input_avb int, HyperPeriod int) *Flow_Set {
 	bg_tsnflows_end = bg_tsn
-	bg_avbflow_end = bg_avb
+	bg_avbflows_end = bg_avb
 
-	// round 1
-	Generate_TSNFlow(flow_set, Nnode_length, bg_tsn, HyperPeriod)
-	Generate_AVBFlow(flow_set, Nnode_length, bg_avb, HyperPeriod)
-	fmt.Printf("Complete generating round%d streams.\n", 1)
+	tsn_flows, avb_flows := tt.Generate_TT_Flows(Nnode_length, bg_tsn, bg_avb, input_tsn, input_avb, HyperPeriod)
 
-	// round 2
-	Generate_TSNFlow(flow_set, Nnode_length, input_tsn, HyperPeriod)
-	Generate_AVBFlow(flow_set, Nnode_length, input_avb, HyperPeriod)
-	fmt.Printf("Complete generating round%d streams.\n", 2)
+	flow_set := new_Flow_Set()
+	flow_set.TSNFlows = tsn_flows
+	flow_set.AVBFlows = avb_flows
 
 	return flow_set
 }
 
-func Generate_TSNFlow(flows *Flows, Nnode_length int, TS int, HyperPeriod int) {
-	for flow := 0; flow < TS; flow++ {
-		tsn := config_TSN_Stream()
+func (flows *Flow_Set) Input_OMACO_Flow_Set() *Flow_Set {
+	Input_flow_set := new_Flow_Set()
+	Input_flow_set.TSNFlows = append(Input_flow_set.TSNFlows, flows.TSNFlows[bg_tsnflows_end:]...)
+	Input_flow_set.AVBFlows = append(Input_flow_set.AVBFlows, flows.AVBFlows[bg_avbflows_end:]...)
 
-		// Random End Devices 1. source(Talker) 2. destinations(listener)
-		source, destinations := random_TT_Devices_For_Tree(Nnode_length)
-
-		Flow := Generate_stream(tsn.Period, tsn.Deadline, tsn.DataSize, HyperPeriod)
-		Flow.Source = source
-		Flow.Destinations = destinations
-
-		flows.TSNFlows = append(flows.TSNFlows, Flow)
-	}
+	return Input_flow_set
 }
 
-func Generate_AVBFlow(flows *Flows, Nnode_length int, AS int, HyperPeriod int) {
-	for flow := 0; flow < AS; flow++ {
-		avb := config_AVB_Stream()
+func (flows *Flow_Set) BG_OMACO_Flow_Set() *Flow_Set {
+	BG_flow_set := new_Flow_Set()
+	BG_flow_set.TSNFlows = append(BG_flow_set.TSNFlows, flows.TSNFlows[:bg_tsnflows_end]...)
+	BG_flow_set.AVBFlows = append(BG_flow_set.AVBFlows, flows.AVBFlows[:bg_avbflows_end]...)
 
-		// Random End Devices 1. source(Talker) 2. destinations(listener)
-		source, destinations := random_TT_Devices_For_Tree(Nnode_length)
-
-		Flow := Generate_stream(avb.Period, avb.Deadline, avb.DataSize, HyperPeriod)
-		Flow.Source = source
-		Flow.Destinations = destinations
-
-		flows.AVBFlows = append(flows.AVBFlows, Flow)
-	}
+	return BG_flow_set
 }
 
-func Generate_stream(period int, deadline int, datasize float64, HyperPeriod int) *Flow {
-	var number int = 0
+func Generate_OSRO_Flows(CANnode []int, importantCAN int, unimportantCAN int, Nnode_length int, bg_tsn int, bg_avb int, input_tsn int, input_avb int, HyperPeriod int) *Flow_Set {
+	bg_tsnflows_end = bg_tsn
+	bg_avbflows_end = bg_avb
 
-	flow := new_Flow(period, deadline, datasize, HyperPeriod)
-	for ArrivalTime := 0; ArrivalTime < HyperPeriod; ArrivalTime += period {
-		FinishTime := ArrivalTime + deadline
-		name := fmt.Sprint("stream", number)
-		stream := new_Stream(name, ArrivalTime, datasize, deadline, FinishTime)
-		flow.Streams = append(flow.Streams, stream)
-		number += 1
-	}
+	tsn_flows, avb_flows := tt.Generate_TT_Flows(Nnode_length, bg_tsn, bg_avb, input_tsn, input_avb, HyperPeriod)
+	method_set := can.Generate_CAN2TT_Flows(CANnode, importantCAN, unimportantCAN, HyperPeriod)
 
-	return flow
+	flow_set := new_Flow_Set()
+	flow_set.TSNFlows = tsn_flows
+	flow_set.AVBFlows = avb_flows
+	flow_set.EncapsulateMethod = method_set
+
+	return flow_set
 }

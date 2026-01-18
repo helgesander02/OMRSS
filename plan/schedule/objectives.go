@@ -3,7 +3,7 @@ package schedule
 import (
 	"fmt"
 	"src/network"
-	"src/network/flow"
+	"src/network/flow/tt"
 	"src/plan/routes"
 
 	"time"
@@ -11,8 +11,8 @@ import (
 
 // Objectives
 func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set, cost_setting [4]int, showflow bool) ([4]float64, int) {
-	S := network.Flow_Set.Input_flow_set()
-	S_prime := network.Flow_Set.BG_flow_set()
+	S := network.Flow_Set.Input_OMACO_Flow_Set()
+	S_prime := network.Flow_Set.BG_OMACO_Flow_Set()
 	var (
 		obj                [4]float64
 		cost               int
@@ -75,7 +75,7 @@ func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_
 	return obj, cost
 }
 
-func schedulability(wcd time.Duration, flow *flow.Flow, route *routes.Tree, linkmap map[string]float64, bandwidth float64, hyperPeriod int) int {
+func schedulability(wcd time.Duration, flow *tt.Flow, route *routes.Tree, linkmap map[string]float64, bandwidth float64, hyperPeriod int) int {
 	r := wcd <= time.Duration(flow.Deadline)*time.Microsecond
 	node := route.GetNodeByID(flow.Source)
 	schedulable, _ := schedulable(node, -1, flow, route, linkmap, bandwidth, hyperPeriod)
@@ -86,7 +86,7 @@ func schedulability(wcd time.Duration, flow *flow.Flow, route *routes.Tree, link
 	return 0
 }
 
-func schedulable(node *routes.Node, parentID int, flow *flow.Flow, route *routes.Tree, linkmap map[string]float64, bandwidth float64, hyperPeriod int) (bool, map[string]float64) {
+func schedulable(node *routes.Node, parentID int, flow *tt.Flow, route *routes.Tree, linkmap map[string]float64, bandwidth float64, hyperPeriod int) (bool, map[string]float64) {
 	for _, link := range node.Connections {
 		if link.ToNodeID == parentID {
 			continue

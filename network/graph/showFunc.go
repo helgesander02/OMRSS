@@ -10,4 +10,9 @@ func (graphs *Graphs) Show_Graphs() {
 		graph.Show_Topology()
 		break
 	}
+
+	for _, graph := range graphs.CAN2TSNGraphs {
+		graph.Show_Topology()
+		break
+	}
 }
