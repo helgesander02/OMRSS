@@ -64,7 +64,3 @@ func (plan *OMACO) Initiate_Plan(cost_setting [4]int) {
 func (plan *OSRO) Initiate_Plan(cost_setting [4]int) {
 
 }
-
-//func (plan *plan3) Initiate_Plan() {
-//
-//}

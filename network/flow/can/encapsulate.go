@@ -187,7 +187,7 @@ func (method *Method) encap_wst(can2ttClusterPool *ClusterPool, encap_config *En
 }
 
 func (method *Method) encap_mao(can2ttClusterPool *ClusterPool, encap_config *Encapsulate_Config) {
-	// step1
+	// step1: MAO Aggregation (已實現)
 	MTU := 1500.0
 	for _, can_stream_cluster := range can2ttClusterPool.Clusters {
 		queue := new_Queue()
@@ -230,14 +230,8 @@ func (method *Method) encap_mao(can2ttClusterPool *ClusterPool, encap_config *En
 		}
 	}
 
-	// step2 Harmonic Merge
-	for _, can2ttflow := range method.CAN2TTFlows {
-		for _, tt_message := range can2ttflow.Streams {
-			if tt_message.DataSize < (MTU / 2) {
-
-			}
-		}
-	}
+	// step2: Harmonic Merge
+	method.harmonicMerge(MTU)
 }
 
 func (method *Method) flushStream(flow *Flow, now int, packedSize float64, dl int, Datasize_Least float64) {
