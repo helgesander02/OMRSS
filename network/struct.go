@@ -12,16 +12,16 @@ type OMACO_Network struct {
 	BytesRate    float64
 	Bandwidth    float64
 	TopologyName string
-	BG_TSN       int
-	BG_AVB       int
+	BGTSN        int
+	BGAVB        int
 	Input_TSN    int
 	Input_AVB    int
 	Topology     *topology.Topology
-	Flow_Set     *flow.Flow_Set
+	FlowSet      *flow.FlowSet
 	Graph_Set    *graph.Graphs
 }
 
-func new_OMACO_Network(topology_name string, bg_tsn int, bg_avb int, input_tsn int, input_avb int, hyperperiod int, bandwidth float64) *OMACO_Network {
+func new_OMACO_Network(topologyName string, bgTSN int, bgAVB int, inputTSN int, inputAVB int, hyperperiod int, bandwidth float64) *OMACO_Network {
 	// 1. Define network parameters
 	bw := (bandwidth / 8) * 1e-6 // bytes/us ==> 125 bytes
 	bytes_rate := 1. / bw        // The number of bytes that can be transmitted in 1us ==> 1/125
@@ -31,11 +31,11 @@ func new_OMACO_Network(topology_name string, bg_tsn int, bg_avb int, input_tsn i
 		HyperPeriod:  hyperperiod,
 		BytesRate:    bytes_rate,
 		Bandwidth:    bw,
-		TopologyName: topology_name,
-		BG_TSN:       bg_tsn,
-		BG_AVB:       bg_avb,
-		Input_TSN:    input_tsn,
-		Input_AVB:    input_avb,
+		TopologyName: topologyName,
+		BGTSN:        bgTSN,
+		BGAVB:        bgAVB,
+		Input_TSN:    inputTSN,
+		Input_AVB:    inputAVB,
 	}
 
 	fmt.Println("Define network parameters")
@@ -44,7 +44,7 @@ func new_OMACO_Network(topology_name string, bg_tsn int, bg_avb int, input_tsn i
 	fmt.Printf("Bandwidth:  %f bytes/6000us \n", Network.Bandwidth)
 	fmt.Printf("BytesRate:  %f BPS \n", Network.BytesRate)
 	fmt.Printf("Topology file name: %s \n", Network.TopologyName)
-	fmt.Printf("TSN flow: %d, AVB flow: %d \n", Network.Input_TSN+Network.BG_TSN, Network.Input_AVB+Network.BG_AVB)
+	fmt.Printf("TSN flow: %d, AVB flow: %d \n", Network.Input_TSN+Network.BGTSN, Network.Input_AVB+Network.BGAVB)
 	fmt.Println()
 
 	return Network
@@ -55,18 +55,18 @@ type OSRO_Network struct {
 	BytesRate       float64
 	Bandwidth       float64
 	TopologyName    string
-	BG_TSN          int
-	BG_AVB          int
+	BGTSN           int
+	BGAVB           int
 	Input_TSN       int
 	Input_AVB       int
 	Important_CAN   int
 	Unimportant_CAN int
 	Topology        *topology.Topology
-	Flow_Set        *flow.Flow_Set
+	FlowSet         *flow.FlowSet
 	Graph_Set       *graph.Graphs
 }
 
-func new_OSRO_Network(topology_name string, bg_tsn int, bg_avb int, input_tsn int, input_avb int, important_can int, unimportant_can int, hyperperiod int, bandwidth float64) *OSRO_Network {
+func new_OSRO_Network(topologyName string, bgTSN int, bgAVB int, inputTSN int, inputAVB int, importantCAN int, unimportantCAN int, hyperperiod int, bandwidth float64) *OSRO_Network {
 	// 1. Define network parameters
 	bw := (bandwidth / 8) * 1e-6 // bytes/us ==> 125 bytes
 	bytes_rate := 1. / bw        // The number of bytes that can be transmitted in 1us ==> 1/125
@@ -76,13 +76,13 @@ func new_OSRO_Network(topology_name string, bg_tsn int, bg_avb int, input_tsn in
 		HyperPeriod:     hyperperiod,
 		BytesRate:       bytes_rate,
 		Bandwidth:       bw,
-		TopologyName:    topology_name,
-		BG_TSN:          bg_tsn,
-		BG_AVB:          bg_avb,
-		Input_TSN:       input_tsn,
-		Input_AVB:       input_avb,
-		Important_CAN:   important_can,
-		Unimportant_CAN: unimportant_can,
+		TopologyName:    topologyName,
+		BGTSN:           bgTSN,
+		BGAVB:           bgAVB,
+		Input_TSN:       inputTSN,
+		Input_AVB:       inputAVB,
+		Important_CAN:   importantCAN,
+		Unimportant_CAN: unimportantCAN,
 	}
 
 	fmt.Println("Define network parameters")
@@ -91,7 +91,7 @@ func new_OSRO_Network(topology_name string, bg_tsn int, bg_avb int, input_tsn in
 	fmt.Printf("Bandwidth:  %f bytes/6000us \n", Network.Bandwidth)
 	fmt.Printf("BytesRate:  %f BPS \n", Network.BytesRate)
 	fmt.Printf("Topology file name: %s \n", Network.TopologyName)
-	fmt.Printf("TSN flow: %d, AVB flow: %d \n", Network.Input_TSN+Network.BG_TSN, Network.Input_AVB+Network.BG_AVB)
+	fmt.Printf("TSN flow: %d, AVB flow: %d \n", Network.Input_TSN+Network.BGTSN, Network.Input_AVB+Network.BGAVB)
 	fmt.Printf("CAN important flow: %d, CAN unimportant flow: %d \n", Network.Important_CAN, Network.Unimportant_CAN)
 	fmt.Println()
 

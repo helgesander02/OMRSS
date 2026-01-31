@@ -28,17 +28,19 @@ func DP_TSP(Graph *topology.Topology, source int, destination int) []int {
 	return path
 }
 
-// 1. List all possible paths from source to destination, without repeating any nodes
-// 2. Divide all combinations into subproblems
-//    ex: G(i, set{}) = min(Cij + G(j, set{}), Cik + G(k, set{}), ...)
-// 3. The shortest path is completed using the feedback from subproblems
-//    ex: G(S, {1}) = min(CS1 + G(1, {2,3,4})) <= G(1, {2,3,4}) = min(C12 + G(2, {4}), C13 + G(3, {4}), C14 + G(4, {D})) <= G(2, {4}) , G(3, {4})
+//  1. List all possible paths from source to destination, without repeating any nodes
 //
-//		  		    		- 2 - 4 - D  C12 + G(2, {4}) cost=3
-//    G(1, {2,3,4}) =  min{	- 3 - 4 - D  C13 + G(3, {4}) cost=3  }
-//				   			- 4 - D      C14 + G(4, {D}) cost=2
+//  2. Divide all combinations into subproblems
+//     ex: G(i, set{}) = min(Cij + G(j, set{}), Cik + G(k, set{}), ...)
 //
-//	  path = S - 1 - 4 - D
+//  3. The shortest path is completed using the feedback from subproblems
+//     ex: G(S, {1}) = min(CS1 + G(1, {2,3,4})) <= G(1, {2,3,4}) = min(C12 + G(2, {4}), C13 + G(3, {4}), C14 + G(4, {D})) <= G(2, {4}) , G(3, {4})
+//
+//     - 2 - 4 - D  C12 + G(2, {4}) cost=3
+//     G(1, {2,3,4}) =  min{	- 3 - 4 - D  C13 + G(3, {4}) cost=3  }
+//     - 4 - D      C14 + G(4, {D}) cost=2
+//
+//     path = S - 1 - 4 - D
 func get_tsp_shortestpath(Graph *topology.Topology, node *topology.Node, visited []int, end int) []int {
 	var (
 		paths [][]int

@@ -8,7 +8,7 @@ import (
 )
 
 // Worse-Case Delay
-func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *tt.Flow, flow_set *flow.Flow_Set) time.Duration {
+func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *tt.Flow, flow_set *flow.FlowSet) time.Duration {
 	end2end := time.Duration(0)
 	node := z.GetNodeByID(flow.Source)
 	wcd := end2end_delay(node, -1, end2end, z, KTrees_set, flow, flow_set)
@@ -19,7 +19,7 @@ func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *tt.Flow, flow_set 
 
 // Use DFS to find all dataflow paths in the Route
 // Calculate the End to End Delay for each dataflow path and select the maximum one
-func end2end_delay(node *routes.Node, parentID int, end2end time.Duration, z *routes.Tree, KTrees_set *routes.KTrees_set, flow *tt.Flow, flow_set *flow.Flow_Set) time.Duration {
+func end2end_delay(node *routes.Node, parentID int, end2end time.Duration, z *routes.Tree, KTrees_set *routes.KTrees_set, flow *tt.Flow, flow_set *flow.FlowSet) time.Duration {
 	//fmt.Printf("%d: %v \n", node.ID, end2end)
 	maxE2E := end2end
 	for _, link := range node.Connections {
@@ -90,7 +90,7 @@ func interfere_from_avb(link *routes.Connection, KTrees_set *routes.KTrees_set, 
 }
 
 // The known time occupied by TSN packets during transmission
-func interfere_from_tsn(link *routes.Connection, KTrees_set *routes.KTrees_set, flow_set *flow.Flow_Set) time.Duration {
+func interfere_from_tsn(link *routes.Connection, KTrees_set *routes.KTrees_set, flow_set *flow.FlowSet) time.Duration {
 	// Occupied bytes by TSN
 	var occupiedbytes float64
 	for nth, tsn_ktree := range KTrees_set.TSNTrees {

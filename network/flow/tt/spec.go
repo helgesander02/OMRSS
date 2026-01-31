@@ -1,67 +1,89 @@
 package tt
 
 import (
-	"crypto/rand"
-	"math/big"
+	"src/internal/random"
 )
 
+// Global RNG instance (will be set by network package)
+var rng *random.Generator
+
+// SetRNG sets the random number generator for this package
+func SetRNG(r *random.Generator) {
+	rng = r
+}
+
 func config_TSN_Stream() *TSN {
-	t_period, t_datasize := random_TSN()
-	tsn := new_TSN(t_period, t_datasize)
+	tPeriod, tDatasize := random_TSN()
+	tsn := new_TSN(tPeriod, tDatasize)
 
 	return tsn
 }
 
 func config_AVB_Stream() *AVB {
-	a_datasize := random_AVB()
-	avb := new_AVB(a_datasize)
+	aDatasize := random_AVB()
+	avb := new_AVB(aDatasize)
 
 	return avb
 }
 
 func random_TSN() (int, float64) {
-	tsn_period_arr := []int{100, 500, 1000, 1500, 2000}
-	tsn_datasize_arr := []float64{30., 40., 50., 60., 70., 80., 90., 100.}
-	period_rng, _ := rand.Int(rand.Reader, big.NewInt(int64(len(tsn_period_arr))))
-	datasize_rng, _ := rand.Int(rand.Reader, big.NewInt(int64((len(tsn_datasize_arr)))))
+	tsnPeriodArr := []int{100, 500, 1000, 1500, 2000}
+	tsnDatasizeArr := []float64{30., 40., 50., 60., 70., 80., 90., 100.}
 
-	return tsn_period_arr[period_rng.Int64()], tsn_datasize_arr[datasize_rng.Int64()]
+	periodIdx := rng.IntN(len(tsnPeriodArr))
+	datasizeIdx := rng.IntN(len(tsnDatasizeArr))
+
+	return tsnPeriodArr[periodIdx], tsnDatasizeArr[datasizeIdx]
 }
 
 func random_AVB() float64 {
-	avb_datasize_arr := []float64{1000., 1100., 1200., 1300., 1400., 1500.}
-	datasize_rng, _ := rand.Int(rand.Reader, big.NewInt(int64(len(avb_datasize_arr))))
+	avbDatasizeArr := []float64{1000., 1100., 1200., 1300., 1400., 1500.}
+	datasizeIdx := rng.IntN(len(avbDatasizeArr))
 
-	return avb_datasize_arr[datasize_rng.Int64()]
+	return avbDatasizeArr[datasizeIdx]
 }
 
 func random_TT_Devices_For_Tree(Nnode int) (int, []int) {
 	// Talker
-	source, _ := rand.Int(rand.Reader, big.NewInt(int64(Nnode)))
+	sourceIdx := rng.IntN(Nnode)
 
-	// Listener
+	// Listener - all nodes except source
 	destinations := []int{}
 	for i := 0; i < Nnode; i++ {
-		if i != int(source.Int64()) {
+		if i != sourceIdx {
 			destinations = append(destinations, i+2000)
 		}
 	}
 
-	numDestinations, _ := rand.Int(rand.Reader, big.NewInt(2))
-	max := big.NewInt(int64(Nnode - 1)) // 10 (0~9) - source = 9
-	num, _ := rand.Int(rand.Reader, max.Sub(max, big.NewInt(3)))
-	n := num.Add(num, big.NewInt(3)).Int64()
-	numDestinations = numDestinations.Add(numDestinations, big.NewInt(n-1))
+	// Calculate number of destinations: random(0, 1) + (Nnode-1-3) + 3 = random(Nnode-1, Nnode)
+	// This ensures at least Nnode-1 destinations and at most Nnode destinations
+	baseOffset := rng.IntN(2) // 0 or 1
+	maxRange := Nnode - 1 - 3 // Nnode - 4
+	if maxRange < 0 {
+		maxRange = 0
+	}
+	randomOffset := 0
+	if maxRange > 0 {
+		randomOffset = rng.IntN(maxRange + 1) // 0 to maxRange inclusive
+	}
+	numDestinations := baseOffset + randomOffset + 3
 
-	selectedDestinations := []int{}
-	for i := 0; i < int(numDestinations.Int64()); i++ {
-		// Randomly selects an element from the 'destinations' slice.
-		randIndex, _ := rand.Int(rand.Reader, big.NewInt(int64(len(destinations))))
-		selectedIndex := int(randIndex.Int64())
-		selectedDestinations = append(selectedDestinations, destinations[selectedIndex])
-		// To prevent repeated selection, remove the selected element from the 'destinations' slice.
-		destinations = append(destinations[:selectedIndex], destinations[selectedIndex+1:]...)
+	// Ensure numDestinations doesn't exceed available destinations
+	if numDestinations > len(destinations) {
+		numDestinations = len(destinations)
 	}
 
-	return int(source.Int64()) + 1000, selectedDestinations // source id: 1000+id  destination id: 2000+id
+	// Randomly select destinations without replacement
+	selectedDestinations := []int{}
+	destCopy := make([]int, len(destinations))
+	copy(destCopy, destinations)
+
+	for i := 0; i < numDestinations; i++ {
+		randIndex := rng.IntN(len(destCopy))
+		selectedDestinations = append(selectedDestinations, destCopy[randIndex])
+		// Remove selected element
+		destCopy = append(destCopy[:randIndex], destCopy[randIndex+1:]...)
+	}
+
+	return sourceIdx + 1000, selectedDestinations // source id: 1000+id  destination id: 2000+id
 }

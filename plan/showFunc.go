@@ -2,7 +2,7 @@ package plan
 
 import "fmt"
 
-func (plan *OMACO) Show_Plan() {
+func (plan *OMACO) ShowPlan() {
 	fmt.Println()
 	fmt.Println("--- The Steiner Tree final selected routing---")
 	plan.SMT.Trees.Show_Trees_Set()
@@ -26,10 +26,10 @@ func (plan *OMACO) Show_Plan() {
 	plan.OSACO.BGTrees.Show_Trees_Set()
 }
 
-func (plan *OSRO) Show_Plan() {
+func (plan *OSRO) ShowPlan() {
 
 }
 
-//func (plan *Plan3) Show_Plan() {
+//func (plan *Plan3) ShowPlan() {
 //
 //}

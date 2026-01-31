@@ -28,7 +28,7 @@ func (trees *KTrees_set) Show_kTrees_Set() {
 	tsn := 1
 	for _, ktrees := range trees.TSNTrees {
 		fmt.Printf("\nTSN Tree %d \n", tsn)
-		ktrees.Show_KTrees()
+		ktrees.ShowKTrees()
 		tsn++
 
 		break
@@ -36,7 +36,7 @@ func (trees *KTrees_set) Show_kTrees_Set() {
 	avb := 1
 	for _, ktrees := range trees.AVBTrees {
 		fmt.Printf("\nAVB Tree %d \n", avb)
-		ktrees.Show_KTrees()
+		ktrees.ShowKTrees()
 		avb++
 
 		break
@@ -62,7 +62,7 @@ func (trees *Trees_set) Show_Trees_Set() {
 	}
 }
 
-func (Ktrees *KTrees) Show_KTrees() {
+func (Ktrees *KTrees) ShowKTrees() {
 	for index, tree := range Ktrees.Trees {
 		fmt.Printf("tree%d \n", index)
 		fmt.Printf("tree weight: %d \n", tree.Weight)
@@ -80,7 +80,7 @@ func (tree *Tree) Show_Tree() {
 }
 
 func (tree *Tree) Show_Cycle() {
-	b, cyclelist := tree.FindCyCle()
+	b, cyclelist := tree.FindCycle()
 	if b {
 		fmt.Println("The MST has cycle")
 		fmt.Println(cyclelist)

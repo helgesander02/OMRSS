@@ -10,13 +10,13 @@ var v2v *V2V = &V2V{} // v2v is all paths connecting multiple terminals to termi
 func Get_SteninerTree_Routing(network *network.OMACO_Network) *Trees_set {
 	Trees_set := new_Trees_Set()
 
-	for nth, flow := range network.Flow_Set.TSNFlows {
+	for nth, flow := range network.FlowSet.TSNFlows {
 		tree := SteninerTree(v2v, network.Graph_Set.TSNGraphs[nth], flow.Source, flow.Destinations, network.BytesRate)
 		Trees_set.TSNTrees = append(Trees_set.TSNTrees, tree)
 	}
 	fmt.Printf("Finish Steniner Tree %d TSN streams routing\n", len(Trees_set.TSNTrees))
 
-	for nth, flow := range network.Flow_Set.AVBFlows {
+	for nth, flow := range network.FlowSet.AVBFlows {
 		tree := SteninerTree(v2v, network.Graph_Set.AVBGraphs[nth], flow.Source, flow.Destinations, network.BytesRate)
 		Trees_set.AVBTrees = append(Trees_set.AVBTrees, tree)
 	}
@@ -28,13 +28,13 @@ func Get_SteninerTree_Routing(network *network.OMACO_Network) *Trees_set {
 func Get_DistanceTree_Routing(network *network.OMACO_Network) *Trees_set {
 	Trees_set := new_Trees_Set()
 
-	for nth, flow := range network.Flow_Set.TSNFlows {
+	for nth, flow := range network.FlowSet.TSNFlows {
 		tree := DistanceTree(network.Graph_Set.TSNGraphs[nth], flow.Source, flow.Destinations, network.BytesRate)
 		Trees_set.TSNTrees = append(Trees_set.TSNTrees, tree)
 	}
 	fmt.Printf("Finish Distance Tree %d TSN streams routing\n", len(Trees_set.TSNTrees))
 
-	for nth, flow := range network.Flow_Set.AVBFlows {
+	for nth, flow := range network.FlowSet.AVBFlows {
 		tree := DistanceTree(network.Graph_Set.AVBGraphs[nth], flow.Source, flow.Destinations, network.BytesRate)
 		Trees_set.AVBTrees = append(Trees_set.AVBTrees, tree)
 	}
@@ -43,7 +43,7 @@ func Get_DistanceTree_Routing(network *network.OMACO_Network) *Trees_set {
 	return Trees_set
 }
 
-func (trees_set *Trees_set) Input_Tree_set(bg_tsn_end int, bg_avb_end int) *Trees_set {
+func (trees_set *Trees_set) InputTreeSet(bg_tsn_end int, bg_avb_end int) *Trees_set {
 	Input_tree_set := new_Trees_Set()
 
 	Input_tree_set.TSNTrees = append(Input_tree_set.TSNTrees, trees_set.TSNTrees[bg_tsn_end:]...)
@@ -52,7 +52,7 @@ func (trees_set *Trees_set) Input_Tree_set(bg_tsn_end int, bg_avb_end int) *Tree
 	return Input_tree_set
 }
 
-func (trees_set *Trees_set) BG_Tree_set(bg_tsn_end int, bg_avb_end int) *Trees_set {
+func (trees_set *Trees_set) BGTreeSet(bg_tsn_end int, bg_avb_end int) *Trees_set {
 	BG_tree_set := new_Trees_Set()
 
 	BG_tree_set.TSNTrees = append(BG_tree_set.TSNTrees, trees_set.TSNTrees[:bg_tsn_end]...)
@@ -64,13 +64,13 @@ func (trees_set *Trees_set) BG_Tree_set(bg_tsn_end int, bg_avb_end int) *Trees_s
 func Get_OSACO_Routing(network *network.OMACO_Network, SMT *Trees_set, K int, Method_Number int) *KTrees_set {
 	ktrees_set := new_KTrees_Set()
 
-	for nth, flow := range network.Flow_Set.TSNFlows {
+	for nth, flow := range network.FlowSet.TSNFlows {
 		Ktrees := KSpanningTree(v2v, SMT.TSNTrees[nth], K, flow.Source, flow.Destinations, network.BytesRate, Method_Number)
 		ktrees_set.TSNTrees = append(ktrees_set.TSNTrees, Ktrees)
 	}
 	fmt.Printf("Finish OSACO %d TSN streams routing\n", len(ktrees_set.TSNTrees))
 
-	for nth, flow := range network.Flow_Set.AVBFlows {
+	for nth, flow := range network.FlowSet.AVBFlows {
 		Ktrees := KSpanningTree(v2v, SMT.AVBTrees[nth], K, flow.Source, flow.Destinations, network.BytesRate, Method_Number)
 		ktrees_set.AVBTrees = append(ktrees_set.AVBTrees, Ktrees)
 	}

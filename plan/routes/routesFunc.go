@@ -121,7 +121,7 @@ func (tree *Tree) GetNodeByID(id int) *Node {
 }
 
 // Determine if the tree is the same
-func (tree1 *Tree) Compare_Trees(tree2 *Tree) bool {
+func (tree1 *Tree) CompareTrees(tree2 *Tree) bool {
 	if tree1.Weight != tree2.Weight {
 		return false
 	}

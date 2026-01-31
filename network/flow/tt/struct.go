@@ -6,11 +6,11 @@ type TSN struct {
 	DataSize float64 // 30~100bytes up 10bytes
 }
 
-func new_TSN(t_period int, t_datasize float64) *TSN {
+func new_TSN(tPeriod int, tDatasize float64) *TSN {
 	return &TSN{
-		Period:   t_period,
-		Deadline: t_period,
-		DataSize: t_datasize,
+		Period:   tPeriod,
+		Deadline: tPeriod,
+		DataSize: tDatasize,
 	}
 }
 
@@ -20,11 +20,11 @@ type AVB struct {
 	DataSize float64 // 1000~1500bytes  up 100bytes
 }
 
-func new_AVB(a_datasize float64) *AVB {
+func new_AVB(aDatasize float64) *AVB {
 	return &AVB{
 		Period:   125,
 		Deadline: 2000,
-		DataSize: a_datasize,
+		DataSize: aDatasize,
 	}
 }
 

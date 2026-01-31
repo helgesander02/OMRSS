@@ -10,9 +10,9 @@ import (
 )
 
 // Objectives
-func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set, cost_setting [4]int, showflow bool) ([4]float64, int) {
-	S := network.Flow_Set.Input_OMACO_Flow_Set()
-	S_prime := network.Flow_Set.BG_OMACO_Flow_Set()
+func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set, costSetting [4]int, showflow bool) ([4]float64, int) {
+	S := network.FlowSet.InputOMACOFlowSet()
+	S_prime := network.FlowSet.BGOMACOFlowSet()
 	var (
 		obj                [4]float64
 		cost               int
@@ -33,7 +33,7 @@ func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_
 
 	// O2 and O4
 	for nth, route := range II_prime.AVBTrees {
-		wcd := WCD(route, X, S_prime.AVBFlows[nth], network.Flow_Set)
+		wcd := WCD(route, X, S_prime.AVBFlows[nth], network.FlowSet)
 		avb_wcd_sum += wcd
 		schedulability := schedulability(wcd, S_prime.AVBFlows[nth], route, linkmap, network.Bandwidth, network.HyperPeriod)
 		avb_failed_count += 1 - schedulability
@@ -51,7 +51,7 @@ func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_
 
 	// O2 and O4
 	for nth, route := range II.AVBTrees {
-		wcd := WCD(route, X, S.AVBFlows[nth], network.Flow_Set)
+		wcd := WCD(route, X, S.AVBFlows[nth], network.FlowSet)
 		avb_wcd_sum += wcd
 		schedulability := schedulability(wcd, S.AVBFlows[nth], route, linkmap, network.Bandwidth, network.HyperPeriod)
 		avb_failed_count += 1 - schedulability
@@ -64,9 +64,9 @@ func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_
 	obj[2] = float64(all_rerouted_count)             // O3 ... pass
 	obj[3] = float64(avb_wcd_sum / time.Microsecond) // O4
 
-	cost += tsn_failed_count * cost_setting[0]                  // O1
-	cost += avb_failed_count * cost_setting[1]                  // O2
-	cost += int(avb_wcd_sum/time.Microsecond) * cost_setting[3] // O4
+	cost += tsn_failed_count * costSetting[0]                  // O1
+	cost += avb_failed_count * costSetting[1]                  // O2
+	cost += int(avb_wcd_sum/time.Microsecond) * costSetting[3] // O4
 
 	if showflow {
 		fmt.Println(linkmap)

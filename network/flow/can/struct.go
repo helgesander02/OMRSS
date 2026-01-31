@@ -24,11 +24,11 @@ type unimportantCAN struct {
 	DataSize float64
 }
 
-func new_unimportantCAN(uc_period int, uc_deadline int) *unimportantCAN {
+func new_unimportantCAN(ucPeriod int, ucDeadline int) *unimportantCAN {
 	return &unimportantCAN{
-		Period:   uc_period,   // 50000~150000us up 50000us
-		Deadline: uc_deadline, // 10000~20000us up 2000us
-		DataSize: 16,          // 16bytes
+		Period:   ucPeriod,   // 50000~150000us up 50000us
+		Deadline: ucDeadline, // 10000~20000us up 2000us
+		DataSize: 16,         // 16bytes
 	}
 }
 

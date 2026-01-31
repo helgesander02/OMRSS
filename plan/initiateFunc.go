@@ -5,7 +5,7 @@ import (
 	"src/plan/schedule"
 )
 
-func (plan *OMACO) Initiate_Plan(cost_setting [4]int) {
+func (plan *OMACO) InitiatePlan(costSetting [4]int) {
 	// algo run
 	fmt.Println("Steiner Tree")
 	fmt.Println("----------------------------------------")
@@ -22,7 +22,7 @@ func (plan *OMACO) Initiate_Plan(cost_setting [4]int) {
 	plan.OSACO.OSACO_Initial_Settings(plan.Network, plan.SMT.Trees)
 	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
 	for i := 0; i < 5; i++ {
-		plan.OSACO.Objs_osaco[i] = plan.OSACO.OSACO_Run(plan.Network, i, cost_setting)
+		plan.OSACO.Objs_osaco[i] = plan.OSACO.OSACO_Run(plan.Network, i, costSetting)
 	}
 
 	fmt.Println()
@@ -31,24 +31,24 @@ func (plan *OMACO) Initiate_Plan(cost_setting [4]int) {
 	plan.OSACO_IAS.OSACO_Initial_Settings(plan.Network, plan.SMT.Trees)
 	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
 	for i := 0; i < 5; i++ {
-		plan.OSACO_IAS.Objs_osaco[i] = plan.OSACO_IAS.OSACO_Run(plan.Network, i, cost_setting)
+		plan.OSACO_IAS.Objs_osaco[i] = plan.OSACO_IAS.OSACO_Run(plan.Network, i, costSetting)
 	}
 
 	obj_smt, _ := schedule.OBJ(
 		plan.Network,
 		plan.OSACO.KTrees,
-		plan.SMT.Trees.Input_Tree_set(plan.Network.BG_TSN, plan.Network.BG_AVB),
-		plan.SMT.Trees.BG_Tree_set(plan.Network.BG_TSN, plan.Network.BG_AVB),
-		cost_setting,
+		plan.SMT.Trees.InputTreeSet(plan.Network.BGTSN, plan.Network.BGAVB),
+		plan.SMT.Trees.BGTreeSet(plan.Network.BGTSN, plan.Network.BGAVB),
+		costSetting,
 		true,
 	)
 
 	obj_mdt, _ := schedule.OBJ(
 		plan.Network,
 		plan.OSACO.KTrees,
-		plan.MDTC.Trees.Input_Tree_set(plan.Network.BG_TSN, plan.Network.BG_AVB),
-		plan.MDTC.Trees.BG_Tree_set(plan.Network.BG_TSN, plan.Network.BG_AVB),
-		cost_setting,
+		plan.MDTC.Trees.InputTreeSet(plan.Network.BGTSN, plan.Network.BGAVB),
+		plan.MDTC.Trees.BGTreeSet(plan.Network.BGTSN, plan.Network.BGAVB),
+		costSetting,
 		true,
 	)
 
@@ -61,6 +61,6 @@ func (plan *OMACO) Initiate_Plan(cost_setting [4]int) {
 
 }
 
-func (plan *OSRO) Initiate_Plan(cost_setting [4]int) {
+func (plan *OSRO) InitiatePlan(costSetting [4]int) {
 
 }

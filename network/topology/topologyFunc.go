@@ -1,9 +1,8 @@
 package topology
 
 import (
-	"crypto/rand"
 	"encoding/json"
-	"math/big"
+	"src/internal/random"
 )
 
 // DeepCopy Topology
@@ -19,18 +18,21 @@ func (t1 *Topology) TopologyDeepCopy() *Topology {
 	}
 }
 
-func (t *Topology) Select_CAN_Node_Set() []int {
+// Global RNG instance (will be set by network package)
+var rng *random.Generator
+
+// SetRNG sets the random number generator for this package
+func SetRNG(r *random.Generator) {
+	rng = r
+}
+
+func (t *Topology) SelectCANNodeSet() []int {
 	const count = 5
 	result := make([]int, 0, count)
 	used := make(map[int]bool)
 
 	for len(result) < count {
-		randIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(t.Nodes))))
-		if err != nil {
-			return nil
-		}
-
-		index := int(randIndex.Int64())
+		index := rng.IntN(len(t.Nodes))
 		node := t.Nodes[index]
 
 		if !used[node.ID] {

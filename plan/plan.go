@@ -5,17 +5,17 @@ import (
 )
 
 type Plans interface {
-	Initiate_Plan([4]int)
-	Show_Plan()
+	InitiatePlan([4]int)
+	ShowPlan()
 }
 
-func New_Plans(plan_name string, networks network.Networks, osaco_timeout int, osaco_K int, osaco_P float64) Plans {
-	switch plan_name {
+func NewPlans(planName string, networks network.Networks, osacoTimeout int, osacoK int, osacoP float64) Plans {
+	switch planName {
 	case "omaco":
-		return new_OMACO_Plan(networks.(*network.OMACO_Network), osaco_timeout, osaco_K, osaco_P)
+		return new_OMACO_Plan(networks.(*network.OMACO_Network), osacoTimeout, osacoK, osacoP)
 
 	case "osro":
-		return new_OSRO_Plan(networks.(*network.OSRO_Network), osaco_timeout, osaco_K, osaco_P)
+		return new_OSRO_Plan(networks.(*network.OSRO_Network), osacoTimeout, osacoK, osacoP)
 
 	default:
 		return nil

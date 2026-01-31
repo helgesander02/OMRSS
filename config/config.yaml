@@ -1,0 +1,97 @@
+# OMRSS (Optimal Multi-hop Routing and Scheduling System) Configuration
+# ========================================================================
+
+# Network Parameters
+# ------------------
+network:
+  # Topology architecture options: 
+  # - typical_complex
+  # - typical_simple
+  # - ring
+  # - layered_ring
+  # - industrial
+  topology: "typical_complex"
+  
+  # Greatest Common Divisor of Simulated Time LCM (microseconds)
+  hyperperiod: 6000
+  
+  # Network bandwidth (bits per second)
+  # Default: 1e9 (1 Gbps)
+  bandwidth: 1000000000
+  
+  flows:
+    # TSN (Time-Sensitive Networking) flows
+    tsn:
+      input: 35       # Number of TSN input flows
+      background: 35  # Number of TSN background flows
+    
+    # AVB (Audio Video Bridging) flows
+    avb:
+      input: 15       # Number of AVB input flows
+      background: 15  # Number of AVB background flows
+    
+    # CAN (Controller Area Network) flows
+    can:
+      important: 5    # Number of CAN important flows
+      unimportant: 25 # Number of CAN unimportant flows
+
+# Algorithm Parameters
+# --------------------
+algorithm:
+  # Algorithm selection: omaco, osro
+  name: "omaco"
+  
+  # OSACO (Online Stream-Aware Ant Colony Optimization) parameters
+  osaco:
+    # Timeout in milliseconds
+    timeout: 200
+    
+    # Select K trees with different weights
+    k_trees: 5
+    
+    # Pheromone evaporation coefficient (0.0 - 1.0)
+    # The pheromone value of each routing path starts to evaporate
+    pheromone_evaporation: 0.7
+    
+    # Tree selection method number
+    # 0: Min Weight
+    # 1: Increasing Arithmetic Sequence Weight
+    # 2: Average Arithmetic Sequence Weight
+    # 3: Min Weight and Tree Edit Distance
+    # 4: Tree Edit Distance
+    method_number: 0
+
+# Schedule Cost Objectives
+# -------------------------
+schedule:
+  costs:
+    o1: 100000000  # Primary objective (highest priority)
+    o2: 100000     # Secondary objective
+    o3: 0          # Tertiary objective
+    o4: 1          # Quaternary objective
+
+# Experiment Parameters
+# ----------------------
+experiment:
+  # Number of test cases to run
+  test_cases: 100
+  
+  # Random seed for reproducibility
+  # Set to 42 (or any fixed value) for reproducible experiments
+  # Set to 0 to use current timestamp (random each run)
+  random_seed: 42
+
+# Output Control
+# --------------
+output:
+  # Display comprehensive network information
+  show_network: false
+  
+  # Display comprehensive plan information
+  show_plan: false
+  
+  # Directory to store results
+  results_dir: "./result"
+  
+  # Logging level: debug, info, warn, error
+  log_level: "info"

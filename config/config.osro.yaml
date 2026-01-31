@@ -1,0 +1,39 @@
+network:
+  topology: "typical_complex"
+  hyperperiod: 6000
+  bandwidth: 1e9
+  flows:
+    tsn:
+      input: 35
+      background: 35
+    avb:
+      input: 15
+      background: 15
+    can:
+      important: 5
+      unimportant: 25
+
+algorithm:
+  name: "osro"
+  osaco:
+    timeout: 200
+    k_trees: 5
+    pheromone_evaporation: 0.7
+    method_number: 0
+
+schedule:
+  costs:
+    o1: 100000000
+    o2: 100000
+    o3: 0
+    o4: 1
+
+experiment:
+  test_cases: 100
+  random_seed: 1
+
+output:
+  show_network: false
+  show_plan: false
+  results_dir: "./result"
+  log_level: "info"

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (OC *OMACO_Memorizer) M_Store_Data(fileName string, testcase int) {
+func (OC *OMACO_Memorizer) MStoreData(fileName string, testcase int) {
 	dirName := "data"
 	createFolder(dirName)
 	switchWorkingPath(dirName)
@@ -37,7 +37,7 @@ func (OC *OMACO_Memorizer) M_Store_Data(fileName string, testcase int) {
 	switchWorkingPath("../..")
 }
 
-func (OS *OSRO_Memorizer) M_Store_Data(fileName string, testcase int) {
+func (OS *OSRO_Memorizer) MStoreData(fileName string, testcase int) {
 
 }
 
@@ -64,7 +64,7 @@ func StoreCSV(name string, data [4]float64, testcase int) {
 	csvFile.Close()
 }
 
-func StoreComputeringTimeCSV(name string, average_time_mdt time.Duration, average_time_osaco time.Duration, average_time_osaco_ias time.Duration, test_case int) {
+func StoreComputeringTimeCSV(name string, average_time_mdt time.Duration, average_time_osaco time.Duration, average_time_osaco_ias time.Duration, testCase int) {
 	log.Printf("Opening file %s in append mode\n", name)
 	csvFile, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
@@ -77,7 +77,7 @@ func StoreComputeringTimeCSV(name string, average_time_mdt time.Duration, averag
 	defer csvFile.Close()
 
 	writer := csv.NewWriter(csvFile)
-	err = writer.Write(Tary2Sary(average_time_mdt, average_time_osaco, average_time_osaco_ias, test_case))
+	err = writer.Write(Tary2Sary(average_time_mdt, average_time_osaco, average_time_osaco_ias, testCase))
 	if err != nil {
 		log.Fatalf("Failed to writer %s.csv: %v\n", name, err)
 		return
@@ -99,7 +99,7 @@ func Fary2Sary(Fary [4]float64, testcase int) []string {
 	return Sary
 }
 
-func Tary2Sary(average_time_mdt time.Duration, average_time_osaco time.Duration, average_time_osaco_ias time.Duration, test_case int) []string {
+func Tary2Sary(average_time_mdt time.Duration, average_time_osaco time.Duration, average_time_osaco_ias time.Duration, testCase int) []string {
 	var (
 		Sary []string
 		Tary = []time.Duration{average_time_mdt, average_time_osaco, average_time_osaco_ias}
@@ -109,7 +109,7 @@ func Tary2Sary(average_time_mdt time.Duration, average_time_osaco time.Duration,
 		nanoseconds := float64(t.Milliseconds())
 		Sary = append(Sary, fmt.Sprintf("%.6f", nanoseconds))
 	}
-	Sary = append(Sary, fmt.Sprintf("%d", test_case))
+	Sary = append(Sary, fmt.Sprintf("%d", testCase))
 
 	return Sary
 }

@@ -5,12 +5,12 @@ import (
 	"src/network/flow/tt"
 )
 
-type Flow_Set struct {
+type FlowSet struct {
 	TSNFlows          []*tt.Flow
 	AVBFlows          []*tt.Flow
 	EncapsulateMethod []*can.Method
 }
 
-func new_Flow_Set() *Flow_Set {
-	return &Flow_Set{}
+func new_Flow_Set() *FlowSet {
+	return &FlowSet{}
 }

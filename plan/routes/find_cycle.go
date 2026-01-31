@@ -2,7 +2,7 @@ package routes
 
 // Detect Cycle in a an Undirected Graph
 // https://www.tutorialspoint.com/Detect-Cycle-in-a-an-Undirected-Graph
-func (tree *Tree) FindCyCle() (bool, []int) {
+func (tree *Tree) FindCycle() (bool, []int) {
 	var cyclelist []int
 	for _, node := range tree.Nodes {
 		visited := make(map[int]bool)

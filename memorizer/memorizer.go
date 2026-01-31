@@ -7,14 +7,14 @@ import (
 )
 
 type Memorizers interface {
-	M_Cumulative(plan.Plans)
-	M_Average(int)
-	M_Output_Results()
-	M_Store_Data(string, int)
-	M_Store_File(string)
+	MCumulative(plan.Plans)
+	MAverage(int)
+	MOutputResults()
+	MStoreData(string, int)
+	MStoreFile(string)
 }
 
-func New_Memorizers() map[string]Memorizers {
+func NewMemorizers() map[string]Memorizers {
 	// memorizer1 ...
 	OMACO := new_OMACO_Memorizer()
 	OSRO := new_OSRO_Memorizer()

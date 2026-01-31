@@ -4,18 +4,18 @@ import (
 	"fmt"
 )
 
-func Generate_TT_Flows(Nnode_length int, bg_tsn int, bg_avb int, input_tsn int, input_avb int, HyperPeriod int) ([]*Flow, []*Flow) {
+func Generate_TT_Flows(Nnode_length int, bgTSN int, bgAVB int, inputTSN int, inputAVB int, HyperPeriod int) ([]*Flow, []*Flow) {
 	tsn_flows := new_TSN_flows()
 	avb_flows := new_AVB_flows()
 
 	// Generate TT BG Flows, round 1
-	tsn_flows = Generate_TT_TSNFlow(tsn_flows, Nnode_length, bg_tsn, HyperPeriod)
-	avb_flows = Generate_TT_AVBFlow(avb_flows, Nnode_length, bg_avb, HyperPeriod)
+	tsn_flows = Generate_TT_TSNFlow(tsn_flows, Nnode_length, bgTSN, HyperPeriod)
+	avb_flows = Generate_TT_AVBFlow(avb_flows, Nnode_length, bgAVB, HyperPeriod)
 	fmt.Printf("Complete generating round%d bgstreams.\n", 1)
 
 	// Generate TT Input Flows,round 2
-	tsn_flows = Generate_TT_TSNFlow(tsn_flows, Nnode_length, input_tsn, HyperPeriod)
-	avb_flows = Generate_TT_AVBFlow(avb_flows, Nnode_length, input_avb, HyperPeriod)
+	tsn_flows = Generate_TT_TSNFlow(tsn_flows, Nnode_length, inputTSN, HyperPeriod)
+	avb_flows = Generate_TT_AVBFlow(avb_flows, Nnode_length, inputAVB, HyperPeriod)
 	fmt.Printf("Complete generating round%d tsnstreams.\n", 2)
 
 	fmt.Println("TSN:", len(tsn_flows), "AVB:", len(avb_flows), "Complete generating TT Flows.")

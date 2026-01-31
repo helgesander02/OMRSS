@@ -14,13 +14,13 @@ type OMACO struct {
 }
 
 // Developing the OMACO plan
-func new_OMACO_Plan(network *network.OMACO_Network, osaco_timeout int, osaco_K int, osaco_P float64) *OMACO {
+func new_OMACO_Plan(network *network.OMACO_Network, osacoTimeout int, osacoK int, osacoP float64) *OMACO {
 	OMACO := &OMACO{Network: network}
 
 	OMACO.SMT = &algo.SMT{}
 	OMACO.MDTC = &algo.MDTC{}
-	OMACO.OSACO = &algo.OSACO{Timeout: osaco_timeout, K: osaco_K, P: osaco_P, Method_Number: 0}
-	OMACO.OSACO_IAS = &algo.OSACO{Timeout: osaco_timeout, K: osaco_K, P: osaco_P, Method_Number: -1}
+	OMACO.OSACO = &algo.OSACO{Timeout: osacoTimeout, K: osacoK, P: osacoP, Method_Number: 0}
+	OMACO.OSACO_IAS = &algo.OSACO{Timeout: osacoTimeout, K: osacoK, P: osacoP, Method_Number: -1}
 
 	return OMACO
 }
@@ -29,7 +29,7 @@ type OSRO struct {
 	Network *network.OSRO_Network
 }
 
-func new_OSRO_Plan(network *network.OSRO_Network, osaco_timeout int, osaco_K int, osaco_P float64) *OSRO {
+func new_OSRO_Plan(network *network.OSRO_Network, osacoTimeout int, osacoK int, osacoP float64) *OSRO {
 	OSRO := &OSRO{Network: network}
 
 	return OSRO

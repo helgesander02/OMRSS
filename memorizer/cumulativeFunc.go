@@ -2,7 +2,7 @@ package memorizer
 
 import "src/plan"
 
-func (OC *OMACO_Memorizer) M_Cumulative(p plan.Plans) {
+func (OC *OMACO_Memorizer) MCumulative(p plan.Plans) {
 	OC.average_time_mdt += p.(*plan.OMACO).MDTC.Timer.TimerOutputData()
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 4; j++ {
@@ -18,6 +18,6 @@ func (OC *OMACO_Memorizer) M_Cumulative(p plan.Plans) {
 	}
 }
 
-func (OS *OSRO_Memorizer) M_Cumulative(p plan.Plans) {
+func (OS *OSRO_Memorizer) MCumulative(p plan.Plans) {
 
 }

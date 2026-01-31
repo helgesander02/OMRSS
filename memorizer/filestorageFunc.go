@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func (OC *OMACO_Memorizer) M_Store_File(file_name string) {
+func (OC *OMACO_Memorizer) MStoreFile(file_name string) {
 	text := average_data_to_result(file_name)
 
 	dirName := "result"
@@ -36,7 +36,7 @@ func (OC *OMACO_Memorizer) M_Store_File(file_name string) {
 	switchWorkingPath("..")
 }
 
-func (OS *OSRO_Memorizer) M_Store_File(file_name string) {
+func (OS *OSRO_Memorizer) MStoreFile(file_name string) {
 
 }
 

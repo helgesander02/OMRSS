@@ -2,7 +2,7 @@ package memorizer
 
 import "fmt"
 
-func (OC *OMACO_Memorizer) M_Output_Results() {
+func (OC *OMACO_Memorizer) MOutputResults() {
 	fmt.Println()
 	fmt.Println("--- The experimental results are as follows ---")
 	fmt.Println("The average objective result for the Steiner Tree:")
@@ -27,6 +27,6 @@ func (OC *OMACO_Memorizer) M_Output_Results() {
 	fmt.Println()
 }
 
-func (OS *OSRO_Memorizer) M_Output_Results() {
+func (OS *OSRO_Memorizer) MOutputResults() {
 
 }

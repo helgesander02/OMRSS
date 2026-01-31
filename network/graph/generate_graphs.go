@@ -6,7 +6,7 @@ import (
 	"src/network/topology"
 )
 
-func Generate_OMACO_Graphs(topology *topology.Topology, flows *flow.Flow_Set, bytes_rate float64) *Graphs {
+func Generate_OMACO_Graphs(topology *topology.Topology, flows *flow.FlowSet, bytes_rate float64) *Graphs {
 	// Constructing Graph structures
 	graphs := new_Graphs()
 
@@ -29,7 +29,7 @@ func Generate_OMACO_Graphs(topology *topology.Topology, flows *flow.Flow_Set, by
 	return graphs
 }
 
-func Generate_OSRO_Graphs(topology *topology.Topology, flows *flow.Flow_Set, bytes_rate float64) *Graphs {
+func Generate_OSRO_Graphs(topology *topology.Topology, flows *flow.FlowSet, bytes_rate float64) *Graphs {
 	// Constructing Graph structures
 	graphs := new_Graphs()
 
