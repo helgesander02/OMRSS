@@ -26,11 +26,16 @@ func new_OMACO_Plan(network *network.OMACO_Network, osacoTimeout int, osacoK int
 }
 
 type OSRO struct {
-	Network *network.OSRO_Network
+	Network    *network.OSRO_Network
+	SP         *algo.SP
+	OSACO_Path *algo.OSACO_Path
 }
 
 func new_OSRO_Plan(network *network.OSRO_Network, osacoTimeout int, osacoK int, osacoP float64) *OSRO {
 	OSRO := &OSRO{Network: network}
+
+	OSRO.SP = &algo.SP{}
+	OSRO.OSACO_Path = &algo.OSACO_Path{Timeout: osacoTimeout, K: osacoK, P: osacoP}
 
 	return OSRO
 }

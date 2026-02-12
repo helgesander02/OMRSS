@@ -82,3 +82,64 @@ type Edge struct {
 	End   int
 	Cost  int
 }
+
+// OSRO Path-based structures
+type KPaths_set struct {
+	TSNPaths     []*KPath
+	AVBPaths     []*KPath
+	CAN2TSNPaths []*KPath
+}
+
+func new_KPaths_Set() *KPaths_set {
+	return &KPaths_set{}
+}
+
+type KPath struct {
+	K      int
+	Source int
+	Target int
+	Paths  []*Path
+	Method string
+}
+
+func new_KPath(k int, source, target int) *KPath {
+	return &KPath{
+		K:      k,
+		Source: source,
+		Target: target,
+		Paths:  []*Path{},
+	}
+}
+
+type Paths_set struct {
+	TSNPaths     []*Path
+	AVBPaths     []*Path
+	CAN2TSNPaths []*Path
+}
+
+func new_Paths_Set() *Paths_set {
+	return &Paths_set{}
+}
+
+type Path struct {
+	Method string
+	IDs    []int
+	Nodes  []*PathNode
+	Weight float64
+}
+
+func new_Path() *Path {
+	return &Path{}
+}
+
+type PathNode struct {
+	ID          int
+	Shape       string
+	Connections []*PathConnection
+}
+
+type PathConnection struct {
+	FromNodeID int
+	ToNodeID   int
+	Cost       float64
+}

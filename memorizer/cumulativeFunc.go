@@ -19,5 +19,14 @@ func (OC *OMACO_Memorizer) MCumulative(p plan.Plans) {
 }
 
 func (OS *OSRO_Memorizer) MCumulative(p plan.Plans) {
-
+	OS.average_time_mdt += p.(*plan.OSRO).SP.Timer.TimerOutputData()
+	for i := 0; i < 5; i++ {
+		for j := 0; j < 4; j++ {
+			if i == 0 {
+				OS.average_obj_smt[j] += p.(*plan.OSRO).SP.Objs_sp[j]
+			}
+			OS.average_objs_osaco[i][j] += p.(*plan.OSRO).OSACO_Path.Objs_osaco[i][j]
+		}
+		OS.average_time_osaco[i] += p.(*plan.OSRO).OSACO_Path.Timer[i].TimerOutputData()
+	}
 }

@@ -27,7 +27,24 @@ func (plan *OMACO) ShowPlan() {
 }
 
 func (plan *OSRO) ShowPlan() {
+	fmt.Println()
+	fmt.Println("--- The Shortest Path final selected routing---")
+	plan.SP.Paths.Show_Paths_Set()
 
+	fmt.Println()
+	fmt.Println("--- 5th K-Paths ---")
+	plan.OSACO_Path.KPaths.Show_KPaths_Set()
+
+	plan.OSACO_Path.Timer[0].TimerExportData()
+	plan.OSACO_Path.Timer[1].TimerExportData()
+	plan.OSACO_Path.Timer[2].TimerExportData()
+	plan.OSACO_Path.Timer[3].TimerExportData()
+	plan.OSACO_Path.Timer[4].TimerExportData()
+
+	fmt.Println()
+	fmt.Println("--- The OSACO (Path) final selected routing ---")
+	plan.OSACO_Path.InputPaths.Show_Paths_Set()
+	plan.OSACO_Path.BGPaths.Show_Paths_Set()
 }
 
 //func (plan *Plan3) ShowPlan() {

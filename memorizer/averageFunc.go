@@ -18,8 +18,17 @@ func (OC *OMACO_Memorizer) MAverage(testCase int) {
 	}
 }
 
-func (mm2 *OSRO_Memorizer) MAverage(testCase int) {
-
+func (OS *OSRO_Memorizer) MAverage(testCase int) {
+	OS.average_time_mdt = time.Duration(int(OS.average_time_mdt/time.Nanosecond)/testCase) * time.Nanosecond
+	for i := 0; i < 5; i++ {
+		for j := 0; j < 4; j++ {
+			if i == 0 {
+				OS.average_obj_smt[j] = OS.average_obj_smt[j] / float64(testCase)
+			}
+			OS.average_objs_osaco[i][j] = OS.average_objs_osaco[i][j] / float64(testCase)
+		}
+		OS.average_time_osaco[i] = time.Duration(int(OS.average_time_osaco[i]/time.Nanosecond)/testCase) * time.Nanosecond
+	}
 }
 
 //func (mm3 *Memorizer3) MAverage(p plan.Plans) {

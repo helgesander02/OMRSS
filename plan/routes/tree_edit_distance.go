@@ -6,9 +6,6 @@ import (
 	"strconv"
 )
 
-// -------------------------
-// Operation Cost Functions
-// -------------------------
 // Cost of deleting a node
 func costDelete() float64 {
 	return 3.0
@@ -30,9 +27,6 @@ func costRename(n1, n2 *Node) float64 {
 	return 1.0
 }
 
-// -------------------------
-// Helper Functions
-// -------------------------
 // Find a Node in the Tree's Nodes by its ID
 func getNodeByID(t *Tree, id int) *Node {
 	for _, n := range t.Nodes {
@@ -61,9 +55,7 @@ func getChildren(node *Node, t *Tree, parentID int) []*Node {
 	return children
 }
 
-// -------------------------
 // Recursively Calculate Deletion Cost of Entire Subtree
-// -------------------------
 func treeCostDelete(n *Node, t *Tree, parentID int) float64 {
 	c := costDelete()
 	children := getChildren(n, t, parentID)
@@ -73,9 +65,7 @@ func treeCostDelete(n *Node, t *Tree, parentID int) float64 {
 	return c
 }
 
-// -------------------------
 // Recursively Calculate Insertion Cost of Entire Subtree
-// -------------------------
 func treeCostInsert(n *Node, t *Tree, parentID int) float64 {
 	c := costInsert()
 	children := getChildren(n, t, parentID)
@@ -85,9 +75,6 @@ func treeCostInsert(n *Node, t *Tree, parentID int) float64 {
 	return c
 }
 
-// -------------------------
-// Tree Edit Distance Calculation (Simplified Version Based on APTED Concept)
-// -------------------------
 // This function calculates the edit distance between subtrees rooted at n1 and n2,
 // and uses dynamic programming to calculate matching costs between two "forests".
 // parent1 and parent2 are the parent node IDs of n1 and n2 respectively,
@@ -135,9 +122,6 @@ func treeEditDistance(n1, n2 *Node, t1, t2 *Tree, parent1, parent2 int, memo map
 	return dist
 }
 
-// -------------------------
-// APTED Main Function
-// -------------------------
 // Assumes root node ID string has prefix "100".
 // This function searches for root nodes in t.Nodes that match this condition,
 // then calculates the edit distance for entire trees.
@@ -162,108 +146,4 @@ func APTED(t1, t2 *Tree) float64 {
 
 	memo := make(map[string]float64)
 	return treeEditDistance(root1, root2, t1, t2, -1, -1, memo)
-}
-
-// -------------------------
-// Example Testing
-// -------------------------
-func APTED_Testing() {
-	// -------------------------
-	// Define tree1
-	// Root node: ID starts with "100"
-	// Intermediate nodes: e.g., 0 and 2 (random non-repeating)
-	// Leaf nodes: ID starts with "200"
-	// Example structure:
-	//        1001
-	//       /    \
-	//      0      2
-	//      |      |
-	//    2003   2002
-	//
-	// Connection settings: conn1001_0 and conn1001_2 stored in 1001,
-	//                      conn0_1001 and conn0_2003 stored in 0,
-	//                      conn2_1001 and conn2_2002 stored in 2,
-	//                      conn2002_2 stored in 2002,
-	//                      conn2003_0 stored in 2003.
-	n1001 := &Node{ID: 1001}
-	n0 := &Node{ID: 0}
-	n2 := &Node{ID: 2}
-	n2002 := &Node{ID: 2002}
-	n2003 := &Node{ID: 2003}
-
-	conn1001_0 := &Connection{FromNodeID: n1001.ID, ToNodeID: n0.ID, Cost: 1.0}
-	conn1001_2 := &Connection{FromNodeID: n1001.ID, ToNodeID: n2.ID, Cost: 1.0}
-	conn2_1001 := &Connection{FromNodeID: n2.ID, ToNodeID: n1001.ID, Cost: 1.0}
-	conn2_2002 := &Connection{FromNodeID: n2.ID, ToNodeID: n2002.ID, Cost: 1.0}
-	conn0_1001 := &Connection{FromNodeID: n0.ID, ToNodeID: n1001.ID, Cost: 1.0}
-	conn0_2003 := &Connection{FromNodeID: n0.ID, ToNodeID: n2003.ID, Cost: 1.0}
-	conn2002_2 := &Connection{FromNodeID: n2002.ID, ToNodeID: n2.ID, Cost: 1.0}
-	conn2003_0 := &Connection{FromNodeID: n2003.ID, ToNodeID: n0.ID, Cost: 1.0}
-
-	n1001.Connections = []*Connection{conn1001_0, conn1001_2}
-	n2.Connections = []*Connection{conn2_1001, conn2_2002}
-	n0.Connections = []*Connection{conn0_1001, conn0_2003}
-	n2002.Connections = []*Connection{conn2002_2}
-	n2003.Connections = []*Connection{conn2003_0}
-
-	tree1 := &Tree{
-		Nodes:  []*Node{n1001, n0, n2, n2002, n2003},
-		Weight: 0,
-	}
-
-	// -------------------------
-	// Define tree2
-	// Example structure:
-	//         1001
-	//         /
-	//        0
-	//       / \
-	//      2   2003
-	//       \
-	//        3
-	//         \
-	//         2002
-	//
-	// Connection settings:
-	//   n1001 (1001) stores connection to 0,
-	//   n0 (0) stores connections to 1001, 2003, 2,
-	//   n2 (2) stores connections to 0, 3,
-	//   n3 (3) stores connections to 2, 2002,
-	//   n2002 (2002) stores connection to 3,
-	//   n2003 (2003) stores connection to 0.
-	n10012 := &Node{ID: 1001}
-	n02 := &Node{ID: 0}
-	n22 := &Node{ID: 2}
-	n32 := &Node{ID: 3}
-	n20022 := &Node{ID: 2002}
-	n20032 := &Node{ID: 2003}
-
-	conn1001_02 := &Connection{FromNodeID: n10012.ID, ToNodeID: n02.ID, Cost: 1.0}
-	conn0_10012 := &Connection{FromNodeID: n02.ID, ToNodeID: n10012.ID, Cost: 1.0}
-	conn0_20032 := &Connection{FromNodeID: n02.ID, ToNodeID: n20032.ID, Cost: 1.0}
-	conn0_22 := &Connection{FromNodeID: n02.ID, ToNodeID: n22.ID, Cost: 1.0}
-	conn2_02 := &Connection{FromNodeID: n22.ID, ToNodeID: n02.ID, Cost: 1.0}
-	conn2_32 := &Connection{FromNodeID: n22.ID, ToNodeID: n32.ID, Cost: 1.0}
-	conn3_22 := &Connection{FromNodeID: n32.ID, ToNodeID: n22.ID, Cost: 1.0}
-	conn3_20022 := &Connection{FromNodeID: n32.ID, ToNodeID: n20022.ID, Cost: 1.0}
-	conn2002_32 := &Connection{FromNodeID: n20022.ID, ToNodeID: n32.ID, Cost: 1.0}
-	conn2003_02 := &Connection{FromNodeID: n20032.ID, ToNodeID: n02.ID, Cost: 1.0}
-
-	n10012.Connections = []*Connection{conn1001_02}
-	n22.Connections = []*Connection{conn2_02, conn2_32}
-	n02.Connections = []*Connection{conn0_10012, conn0_20032, conn0_22}
-	n32.Connections = []*Connection{conn3_22, conn3_20022}
-	n20022.Connections = []*Connection{conn2002_32}
-	n20032.Connections = []*Connection{conn2003_02}
-
-	tree2 := &Tree{
-		Nodes:  []*Node{n10012, n02, n22, n32, n20022, n20032},
-		Weight: 0,
-	}
-
-	// -------------------------
-	// Calculate edit distance between tree1 and tree2
-	// -------------------------
-	distance := APTED(tree1, tree2)
-	fmt.Printf("Edit distance between tree1 and tree2: %v\n", distance)
 }

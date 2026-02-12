@@ -28,7 +28,7 @@ func DP_TSP(Graph *topology.Topology, source int, destination int) []int {
 	return path
 }
 
-//  1. List all possible paths from source to destination, without repeating any nodes
+// 1. List all possible paths from source to destination, without repeating any nodes
 //
 //  2. Divide all combinations into subproblems
 //     ex: G(i, set{}) = min(Cij + G(j, set{}), Cik + G(k, set{}), ...)

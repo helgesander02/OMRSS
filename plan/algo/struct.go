@@ -41,6 +41,41 @@ type Visibility struct {
 }
 
 type Pheromone struct {
-	TSN_PRM [][]float64
-	AVB_PRM [][]float64
+	TSN_PRM     [][]float64
+	AVB_PRM     [][]float64
+	CAN2TSN_PRM [][]float64
+}
+
+// OSRO structures (Path-based routing)
+type SP struct {
+	Paths      *routes.Paths_set
+	InputPaths *routes.Paths_set
+	BGPaths    *routes.Paths_set
+	Objs_sp    [4]float64
+	Timer      *algo_timer.Timer
+}
+
+type OSACO_Path struct {
+	Timeout    int
+	K          int
+	P          float64
+	KPaths     *routes.KPaths_set
+	VB_Path    *VisibilityPath
+	PRM_Path   *PheromonePath
+	InputPaths *routes.Paths_set
+	BGPaths    *routes.Paths_set
+	Objs_osaco [5][4]float64
+	Timer      [5]*algo_timer.Timer
+}
+
+type VisibilityPath struct {
+	TSN_VB     [][]float64
+	AVB_VB     [][]float64
+	CAN2TSN_VB [][]float64
+}
+
+type PheromonePath struct {
+	TSN_PRM     [][]float64
+	AVB_PRM     [][]float64
+	CAN2TSN_PRM [][]float64
 }

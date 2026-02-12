@@ -89,3 +89,70 @@ func (tree *Tree) Show_Cycle() {
 		fmt.Println("The MST has no cycle")
 	}
 }
+
+// Show functions for Path-based structures (OSRO)
+func (kpaths *KPaths_set) Show_KPaths_Set() {
+	tsn := 1
+	for _, kpath := range kpaths.TSNPaths {
+		fmt.Printf("\nTSN K-Path %d \n", tsn)
+		kpath.Show_KPath()
+		tsn++
+		break
+	}
+	avb := 1
+	for _, kpath := range kpaths.AVBPaths {
+		fmt.Printf("\nAVB K-Path %d \n", avb)
+		kpath.Show_KPath()
+		avb++
+		break
+	}
+	can := 1
+	for _, kpath := range kpaths.CAN2TSNPaths {
+		fmt.Printf("\nCAN2TSN K-Path %d (Method: %s)\n", can, kpath.Method)
+		kpath.Show_KPath()
+		can++
+		break
+	}
+}
+
+func (paths *Paths_set) Show_Paths_Set() {
+	tsn := 1
+	for _, path := range paths.TSNPaths {
+		fmt.Printf("\nTSN Path %d \n", tsn)
+		path.Show_PathStruct()
+		tsn++
+		break
+	}
+	avb := 1
+	for _, path := range paths.AVBPaths {
+		fmt.Printf("\nAVB Path %d \n", avb)
+		path.Show_PathStruct()
+		avb++
+		break
+	}
+	can := 1
+	for _, path := range paths.CAN2TSNPaths {
+		fmt.Printf("\nCAN2TSN Path %d (Method: %s)\n", can, path.Method)
+		path.Show_PathStruct()
+		can++
+		break
+	}
+}
+
+func (kpath *KPath) Show_KPath() {
+	for index, path := range kpath.Paths {
+		fmt.Printf("Path %d (Weight: %.2f)\n", index, path.Weight)
+		path.Show_PathStruct()
+	}
+}
+
+func (path *Path) Show_PathStruct() {
+	fmt.Printf("Path IDs: %v\n", path.IDs)
+	fmt.Printf("Weight: %.2f\n", path.Weight)
+	for _, node := range path.Nodes {
+		fmt.Printf("Node %d:\n", node.ID)
+		for _, c := range node.Connections {
+			fmt.Printf("  %d --> %d\n", c.FromNodeID, c.ToNodeID)
+		}
+	}
+}

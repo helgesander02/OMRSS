@@ -54,7 +54,6 @@ func (osaco *OSACO) OSACO_Initial_Settings(network *network.OMACO_Network, SMT *
 
 // Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"
 func (osaco *OSACO) OSACO_Run(network *network.OMACO_Network, timeout_index int, costSetting [4]int) [4]float64 {
-	// 6. OSACO
 	// Repeat the execution of epochs within the timeout
 	initialobj, initialcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, costSetting, false)
 	fmt.Println()

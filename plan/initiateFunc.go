@@ -62,5 +62,24 @@ func (plan *OMACO) InitiatePlan(costSetting [4]int) {
 }
 
 func (plan *OSRO) InitiatePlan(costSetting [4]int) {
+	// algo run
+	fmt.Println("Shortest Path")
+	fmt.Println("----------------------------------------")
+	plan.SP.SP_Run(plan.Network)
 
+	fmt.Println()
+	fmt.Println("OSACO (Path-based)")
+	fmt.Println("----------------------------------------")
+	plan.OSACO_Path.OSACO_Initial_Settings_Path(plan.Network, plan.SP.Paths)
+
+	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
+	for i := 0; i < 5; i++ {
+		plan.OSACO_Path.Objs_osaco[i] = plan.OSACO_Path.OSACO_Run_Path(plan.Network, i, costSetting)
+	}
+
+	// Note: Path-based objective calculation (schedule.OBJ_Path) is not yet implemented
+	// This will be added when path-based scheduling is completed
+	plan.SP.Objs_sp = [4]float64{0, 0, 0, 0}
+
+	fmt.Println("OSRO InitiatePlan completed")
 }
