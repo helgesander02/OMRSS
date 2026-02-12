@@ -56,6 +56,4 @@ func (network *OSRO_Network) GenerateNetwork() {
 	network.Graph_Set = graph.Generate_OSRO_Graphs(network.Topology, network.FlowSet, network.BytesRate)
 	fmt.Println("Complete Simulating Graphs.")
 	fmt.Println()
-
-	network.Graph_Set.Show_Graphs()
 }

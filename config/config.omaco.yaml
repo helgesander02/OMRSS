@@ -35,5 +35,4 @@ experiment:
 output:
   show_network: false
   show_plan: false
-  results_dir: "./result"
   log_level: "info"

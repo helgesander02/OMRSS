@@ -11,10 +11,10 @@ func (OC *OMACO_Memorizer) MCumulative(p plan.Plans) {
 				OC.average_obj_mdt[j] += p.(*plan.OMACO).MDTC.Objs_mdtc[j]
 			}
 			OC.average_objs_osaco[i][j] += p.(*plan.OMACO).OSACO.Objs_osaco[i][j]
-			OC.average_objs_osaco_ias[i][j] += p.(*plan.OMACO).OSACO_IAS.Objs_osaco[i][j]
+			OC.average_objs_osaco_apted[i][j] += p.(*plan.OMACO).OSACO_APTED.Objs_osaco[i][j]
 		}
 		OC.average_time_osaco[i] += p.(*plan.OMACO).OSACO.Timer[i].TimerOutputData()
-		OC.average_time_osaco_ias[i] += p.(*plan.OMACO).OSACO_IAS.Timer[i].TimerOutputData()
+		OC.average_time_osaco_apted[i] += p.(*plan.OMACO).OSACO_APTED.Timer[i].TimerOutputData()
 	}
 }
 

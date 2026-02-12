@@ -88,11 +88,6 @@ func run() error {
 	routes.SetRNG(rng)
 	algo.SetRNG(rng)
 
-	// Create results directory
-	if err := os.MkdirAll(cfg.Output.ResultsDir, 0755); err != nil {
-		return fmt.Errorf("failed to create results directory: %w", err)
-	}
-
 	// Run experiments
 	if err := runExperiments(ctx, cfg); err != nil {
 		return fmt.Errorf("experiment execution failed: %w", err)

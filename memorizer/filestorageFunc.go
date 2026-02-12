@@ -57,13 +57,13 @@ func average_data_to_result(file_name string) string {
 	text += fmt.Sprintf("timeout_X2: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_X2_O1"], data["average_objs_osaco_X2_O2"], data["average_objs_osaco_X2_O4"])
 	text += fmt.Sprintf("timeout_X1: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_X1_O1"], data["average_objs_osaco_X1_O2"], data["average_objs_osaco_X1_O4"])
 	text += fmt.Sprintf("Computering time: %v ms\n", data["average_time_osaco"])
-	text += "The average objective result for OSACO_IAS:\n"
-	text += fmt.Sprintf("timeout_X5: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_ias_X5_O1"], data["average_objs_osaco_ias_X5_O2"], data["average_objs_osaco_ias_X5_O4"])
-	text += fmt.Sprintf("timeout_X4: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_ias_X4_O1"], data["average_objs_osaco_ias_X4_O2"], data["average_objs_osaco_ias_X4_O4"])
-	text += fmt.Sprintf("timeout_X3: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_ias_X3_O1"], data["average_objs_osaco_ias_X3_O2"], data["average_objs_osaco_ias_X3_O4"])
-	text += fmt.Sprintf("timeout_X2: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_ias_X2_O1"], data["average_objs_osaco_ias_X2_O2"], data["average_objs_osaco_ias_X2_O4"])
-	text += fmt.Sprintf("timeout_X1: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_ias_X1_O1"], data["average_objs_osaco_ias_X1_O2"], data["average_objs_osaco_ias_X1_O4"])
-	text += fmt.Sprintf("Computering time: %v ms\n", data["average_time_osaco_ias"])
+	text += "The average objective result for OSACO_APTED:\n"
+	text += fmt.Sprintf("timeout_X5: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_apted_X5_O1"], data["average_objs_osaco_apted_X5_O2"], data["average_objs_osaco_apted_X5_O4"])
+	text += fmt.Sprintf("timeout_X4: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_apted_X4_O1"], data["average_objs_osaco_apted_X4_O2"], data["average_objs_osaco_apted_X4_O4"])
+	text += fmt.Sprintf("timeout_X3: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_apted_X3_O1"], data["average_objs_osaco_apted_X3_O2"], data["average_objs_osaco_apted_X3_O4"])
+	text += fmt.Sprintf("timeout_X2: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_apted_X2_O1"], data["average_objs_osaco_apted_X2_O2"], data["average_objs_osaco_apted_X2_O4"])
+	text += fmt.Sprintf("timeout_X1: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_apted_X1_O1"], data["average_objs_osaco_apted_X1_O2"], data["average_objs_osaco_apted_X1_O4"])
+	text += fmt.Sprintf("Computering time: %v ms\n", data["average_time_osaco_apted"])
 
 	return text
 }
@@ -135,7 +135,7 @@ func get_average_data(file_name string) (map[string]float64, int) {
 				data["average_time_osaco"] = val
 			}
 			if val, err := convertToFloat(columns[2]); err == nil {
-				data["average_time_osaco_ias"] = val
+				data["average_time_osaco_apted"] = val
 			}
 			if val, err := convertToFloat(columns[3]); err == nil {
 				testcase_numbers = int(val)
@@ -181,15 +181,15 @@ func get_average_data(file_name string) (map[string]float64, int) {
 
 		// OSACO IAS timeout cases
 		for i := 1; i <= 5; i++ {
-			if file.Name() == fmt.Sprintf("OSACO_IAS_timeout_X%d.csv", i) {
+			if file.Name() == fmt.Sprintf("osaco_apted_timeout_X%d.csv", i) {
 				if val, err := convertToFloat(columns[0]); err == nil {
-					data[fmt.Sprintf("average_objs_osaco_ias_X%d_O1", i)] = val
+					data[fmt.Sprintf("average_objs_osaco_apted_X%d_O1", i)] = val
 				}
 				if val, err := convertToFloat(columns[1]); err == nil {
-					data[fmt.Sprintf("average_objs_osaco_ias_X%d_O2", i)] = val
+					data[fmt.Sprintf("average_objs_osaco_apted_X%d_O2", i)] = val
 				}
 				if val, err := convertToFloat(columns[3]); err == nil {
-					data[fmt.Sprintf("average_objs_osaco_ias_X%d_O4", i)] = val
+					data[fmt.Sprintf("average_objs_osaco_apted_X%d_O4", i)] = val
 				}
 			}
 		}

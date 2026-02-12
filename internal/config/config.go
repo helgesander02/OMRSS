@@ -74,7 +74,6 @@ type ExperimentConfig struct {
 type OutputConfig struct {
 	ShowNetwork bool   `mapstructure:"show_network"`
 	ShowPlan    bool   `mapstructure:"show_plan"`
-	ResultsDir  string `mapstructure:"results_dir"`
 	LogLevel    string `mapstructure:"log_level"`
 }
 
@@ -154,7 +153,6 @@ func setDefaults(v *viper.Viper) {
 	// Output defaults
 	v.SetDefault("output.show_network", false)
 	v.SetDefault("output.show_plan", false)
-	v.SetDefault("output.results_dir", "./results")
 	v.SetDefault("output.log_level", "info")
 }
 
@@ -221,14 +219,13 @@ func (c *Config) GetTimeoutDuration() time.Duration {
 }
 
 func (c *Config) GetExperimentName() string {
-	return fmt.Sprintf("%s_tsn%d_avb%d_K%d_P%.1f_timeout%d_O1%d_O2%d",
+	return fmt.Sprintf("%s_tsn%d_avb%d_%s_K%d_P%.1f_timeout%d",
 		c.Network.Topology,
 		c.Network.Flows.TSN.Input,
 		c.Network.Flows.AVB.Input,
+		c.Algorithm.Name,
 		c.Algorithm.OSACO.KTrees,
 		c.Algorithm.OSACO.PheromoneEvaporation,
 		c.Algorithm.OSACO.Timeout,
-		c.Schedule.Costs.O1,
-		c.Schedule.Costs.O2,
 	)
 }

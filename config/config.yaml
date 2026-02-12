@@ -90,8 +90,5 @@ output:
   # Display comprehensive plan information
   show_plan: false
   
-  # Directory to store results
-  results_dir: "./result"
-  
   # Logging level: debug, info, warn, error
   log_level: "info"

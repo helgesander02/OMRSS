@@ -6,11 +6,11 @@ import (
 )
 
 type OMACO struct {
-	Network   *network.OMACO_Network
-	SMT       *algo.SMT
-	MDTC      *algo.MDTC
-	OSACO     *algo.OSACO
-	OSACO_IAS *algo.OSACO
+	Network     *network.OMACO_Network
+	SMT         *algo.SMT
+	MDTC        *algo.MDTC
+	OSACO       *algo.OSACO
+	OSACO_APTED *algo.OSACO
 }
 
 // Developing the OMACO plan
@@ -20,7 +20,7 @@ func new_OMACO_Plan(network *network.OMACO_Network, osacoTimeout int, osacoK int
 	OMACO.SMT = &algo.SMT{}
 	OMACO.MDTC = &algo.MDTC{}
 	OMACO.OSACO = &algo.OSACO{Timeout: osacoTimeout, K: osacoK, P: osacoP, Method_Number: 0}
-	OMACO.OSACO_IAS = &algo.OSACO{Timeout: osacoTimeout, K: osacoK, P: osacoP, Method_Number: -1}
+	OMACO.OSACO_APTED = &algo.OSACO{Timeout: osacoTimeout, K: osacoK, P: osacoP, Method_Number: -1}
 
 	return OMACO
 }

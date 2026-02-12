@@ -26,13 +26,13 @@ func (OC *OMACO_Memorizer) MStoreData(fileName string, testcase int) {
 	StoreCSV("OSACO_timeout_X3.csv", OC.average_objs_osaco[2], testcase)
 	StoreCSV("OSACO_timeout_X2.csv", OC.average_objs_osaco[1], testcase)
 	StoreCSV("OSACO_timeout_X1.csv", OC.average_objs_osaco[0], testcase)
-	log.Printf("Storing OSACO_IAS data to CSV...\n")
-	StoreCSV("OSACO_IAS_timeout_X5.csv", OC.average_objs_osaco_ias[4], testcase)
-	StoreCSV("OSACO_IAS_timeout_X4.csv", OC.average_objs_osaco_ias[3], testcase)
-	StoreCSV("OSACO_IAS_timeout_X3.csv", OC.average_objs_osaco_ias[2], testcase)
-	StoreCSV("OSACO_IAS_timeout_X2.csv", OC.average_objs_osaco_ias[1], testcase)
-	StoreCSV("OSACO_IAS_timeout_X1.csv", OC.average_objs_osaco_ias[0], testcase)
-	StoreComputeringTimeCSV("computering_time.csv", OC.average_time_mdt, OC.average_time_osaco[4], OC.average_time_osaco_ias[4], testcase)
+	log.Printf("Storing OSACO_APTED data to CSV...\n")
+	StoreCSV("OSACO_APTED_timeout_X5.csv", OC.average_objs_osaco_apted[4], testcase)
+	StoreCSV("OSACO_APTED_timeout_X4.csv", OC.average_objs_osaco_apted[3], testcase)
+	StoreCSV("OSACO_APTED_timeout_X3.csv", OC.average_objs_osaco_apted[2], testcase)
+	StoreCSV("OSACO_APTED_timeout_X2.csv", OC.average_objs_osaco_apted[1], testcase)
+	StoreCSV("OSACO_APTED_timeout_X1.csv", OC.average_objs_osaco_apted[0], testcase)
+	StoreComputeringTimeCSV("computering_time.csv", OC.average_time_mdt, OC.average_time_osaco[4], OC.average_time_osaco_apted[4], testcase)
 
 	switchWorkingPath("../..")
 }
@@ -64,7 +64,7 @@ func StoreCSV(name string, data [4]float64, testcase int) {
 	csvFile.Close()
 }
 
-func StoreComputeringTimeCSV(name string, average_time_mdt time.Duration, average_time_osaco time.Duration, average_time_osaco_ias time.Duration, testCase int) {
+func StoreComputeringTimeCSV(name string, average_time_mdt time.Duration, average_time_osaco time.Duration, average_time_osaco_apted time.Duration, testCase int) {
 	log.Printf("Opening file %s in append mode\n", name)
 	csvFile, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
@@ -77,7 +77,7 @@ func StoreComputeringTimeCSV(name string, average_time_mdt time.Duration, averag
 	defer csvFile.Close()
 
 	writer := csv.NewWriter(csvFile)
-	err = writer.Write(Tary2Sary(average_time_mdt, average_time_osaco, average_time_osaco_ias, testCase))
+	err = writer.Write(Tary2Sary(average_time_mdt, average_time_osaco, average_time_osaco_apted, testCase))
 	if err != nil {
 		log.Fatalf("Failed to writer %s.csv: %v\n", name, err)
 		return
@@ -99,10 +99,10 @@ func Fary2Sary(Fary [4]float64, testcase int) []string {
 	return Sary
 }
 
-func Tary2Sary(average_time_mdt time.Duration, average_time_osaco time.Duration, average_time_osaco_ias time.Duration, testCase int) []string {
+func Tary2Sary(average_time_mdt time.Duration, average_time_osaco time.Duration, average_time_osaco_apted time.Duration, testCase int) []string {
 	var (
 		Sary []string
-		Tary = []time.Duration{average_time_mdt, average_time_osaco, average_time_osaco_ias}
+		Tary = []time.Duration{average_time_mdt, average_time_osaco, average_time_osaco_apted}
 	)
 
 	for _, t := range Tary {

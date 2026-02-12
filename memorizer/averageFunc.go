@@ -11,10 +11,10 @@ func (OC *OMACO_Memorizer) MAverage(testCase int) {
 				OC.average_obj_mdt[j] = OC.average_obj_mdt[j] / float64(testCase)
 			}
 			OC.average_objs_osaco[i][j] = OC.average_objs_osaco[i][j] / float64(testCase)
-			OC.average_objs_osaco_ias[i][j] = OC.average_objs_osaco_ias[i][j] / float64(testCase)
+			OC.average_objs_osaco_apted[i][j] = OC.average_objs_osaco_apted[i][j] / float64(testCase)
 		}
 		OC.average_time_osaco[i] = time.Duration(int(OC.average_time_osaco[i]/time.Nanosecond)/testCase) * time.Nanosecond
-		OC.average_time_osaco_ias[i] = time.Duration(int(OC.average_time_osaco_ias[i]/time.Nanosecond)/testCase) * time.Nanosecond
+		OC.average_time_osaco_apted[i] = time.Duration(int(OC.average_time_osaco_apted[i]/time.Nanosecond)/testCase) * time.Nanosecond
 	}
 }
 

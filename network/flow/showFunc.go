@@ -34,12 +34,12 @@ func (flows *FlowSet) Show_Stream() {
 	}
 }
 
-func (flows *FlowSet) Show_Flow() {
+func (flows *FlowSet) Show_TTFlow() {
 	TSNFlows := flows.TSNFlows
 	AVBFlows := flows.AVBFlows
 	number := 1
 	for _, flow := range TSNFlows {
-		name := fmt.Sprint("TSNflow", number)
+		name := fmt.Sprint("TTflow", number)
 		fmt.Printf("Source: %d\n", flow.Source)
 		fmt.Printf("Destinations: %v\n", flow.Destinations)
 		fmt.Printf("%s : period:%d us, deadline:%d us, datasize:%f bytes\n",
@@ -59,6 +59,24 @@ func (flows *FlowSet) Show_Flow() {
 		number += 1
 
 		break
+	}
+}
+
+func (flows *FlowSet) Show_CANFlow() {
+	Method := flows.EncapsulateMethod
+	for _, merhod := range Method {
+		number := 1
+		fmt.Printf("Method Name: %s\n", merhod.Method_Name)
+		for _, flow := range merhod.CAN2TTFlows {
+			name := fmt.Sprint("CAN2TTflow", number)
+			fmt.Printf("Source: %d\n", flow.Source)
+			fmt.Printf("Destination: %v\n", flow.Destination)
+			fmt.Printf("%s : period:%d us, deadline:%d us, datasize:%f bytes\n",
+				name, flow.Period, flow.Deadline, flow.DataSize)
+			number += 1
+
+			break
+		}
 	}
 }
 
