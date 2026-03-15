@@ -2,49 +2,50 @@ package routes
 
 import (
 	"fmt"
+	"src/internal/config"
 	"src/network"
 )
 
 var v2v *V2V = &V2V{} // v2v is all paths connecting multiple terminals to terminals.
 
-func Get_SteninerTree_Routing(network *network.OMACO_Network) *Trees_set {
-	Trees_set := new_Trees_Set()
+func Get_SteninerTree_Routing(network *network.Network, cfg *config.Config) *TreesSet {
+	TreesSet := newTreesSet()
 
 	for nth, flow := range network.FlowSet.TSNFlows {
-		tree := SteninerTree(v2v, network.Graph_Set.TSNGraphs[nth], flow.Source, flow.Destinations, network.BytesRate)
-		Trees_set.TSNTrees = append(Trees_set.TSNTrees, tree)
+		tree := SteninerTree(v2v, network.GraphSet.TSNGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
+		TreesSet.TSNTrees = append(TreesSet.TSNTrees, tree)
 	}
-	fmt.Printf("Finish Steniner Tree %d TSN streams routing\n", len(Trees_set.TSNTrees))
+	fmt.Printf("Finish Steniner Tree %d TSN streams routing\n", len(TreesSet.TSNTrees))
 
 	for nth, flow := range network.FlowSet.AVBFlows {
-		tree := SteninerTree(v2v, network.Graph_Set.AVBGraphs[nth], flow.Source, flow.Destinations, network.BytesRate)
-		Trees_set.AVBTrees = append(Trees_set.AVBTrees, tree)
+		tree := SteninerTree(v2v, network.GraphSet.AVBGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
+		TreesSet.AVBTrees = append(TreesSet.AVBTrees, tree)
 	}
-	fmt.Printf("Finish Steniner Tree %d AVB streams routing\n", len(Trees_set.AVBTrees))
+	fmt.Printf("Finish Steniner Tree %d AVB streams routing\n", len(TreesSet.AVBTrees))
 
-	return Trees_set
+	return TreesSet
 }
 
-func Get_DistanceTree_Routing(network *network.OMACO_Network) *Trees_set {
-	Trees_set := new_Trees_Set()
+func Get_DistanceTree_Routing(network *network.Network, cfg *config.Config) *TreesSet {
+	TreesSet := newTreesSet()
 
 	for nth, flow := range network.FlowSet.TSNFlows {
-		tree := DistanceTree(network.Graph_Set.TSNGraphs[nth], flow.Source, flow.Destinations, network.BytesRate)
-		Trees_set.TSNTrees = append(Trees_set.TSNTrees, tree)
+		tree := DistanceTree(network.GraphSet.TSNGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
+		TreesSet.TSNTrees = append(TreesSet.TSNTrees, tree)
 	}
-	fmt.Printf("Finish Distance Tree %d TSN streams routing\n", len(Trees_set.TSNTrees))
+	fmt.Printf("Finish Distance Tree %d TSN streams routing\n", len(TreesSet.TSNTrees))
 
 	for nth, flow := range network.FlowSet.AVBFlows {
-		tree := DistanceTree(network.Graph_Set.AVBGraphs[nth], flow.Source, flow.Destinations, network.BytesRate)
-		Trees_set.AVBTrees = append(Trees_set.AVBTrees, tree)
+		tree := DistanceTree(network.GraphSet.AVBGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
+		TreesSet.AVBTrees = append(TreesSet.AVBTrees, tree)
 	}
-	fmt.Printf("Finish Distance Tree %d AVB streams routing\n", len(Trees_set.AVBTrees))
+	fmt.Printf("Finish Distance Tree %d AVB streams routing\n", len(TreesSet.AVBTrees))
 
-	return Trees_set
+	return TreesSet
 }
 
-func (trees_set *Trees_set) InputTreeSet(bg_tsn_end int, bg_avb_end int) *Trees_set {
-	Input_tree_set := new_Trees_Set()
+func (trees_set *TreesSet) InputTreeSet(bg_tsn_end int, bg_avb_end int) *TreesSet {
+	Input_tree_set := newTreesSet()
 
 	Input_tree_set.TSNTrees = append(Input_tree_set.TSNTrees, trees_set.TSNTrees[bg_tsn_end:]...)
 	Input_tree_set.AVBTrees = append(Input_tree_set.AVBTrees, trees_set.AVBTrees[bg_avb_end:]...)
@@ -52,8 +53,8 @@ func (trees_set *Trees_set) InputTreeSet(bg_tsn_end int, bg_avb_end int) *Trees_
 	return Input_tree_set
 }
 
-func (trees_set *Trees_set) BGTreeSet(bg_tsn_end int, bg_avb_end int) *Trees_set {
-	BG_tree_set := new_Trees_Set()
+func (trees_set *TreesSet) BGTreeSet(bg_tsn_end int, bg_avb_end int) *TreesSet {
+	BG_tree_set := newTreesSet()
 
 	BG_tree_set.TSNTrees = append(BG_tree_set.TSNTrees, trees_set.TSNTrees[:bg_tsn_end]...)
 	BG_tree_set.AVBTrees = append(BG_tree_set.AVBTrees, trees_set.AVBTrees[:bg_avb_end]...)
@@ -61,17 +62,17 @@ func (trees_set *Trees_set) BGTreeSet(bg_tsn_end int, bg_avb_end int) *Trees_set
 	return BG_tree_set
 }
 
-func Get_OSACO_Routing(network *network.OMACO_Network, SMT *Trees_set, K int, Method_Number int) *KTrees_set {
-	ktrees_set := new_KTrees_Set()
+func Get_OSACO_Routing(network *network.Network, cfg *config.Config, SMT *TreesSet, K int, Method_Number int) *KTreesSet {
+	ktrees_set := newKTreesSet()
 
 	for nth, flow := range network.FlowSet.TSNFlows {
-		Ktrees := KSpanningTree(v2v, SMT.TSNTrees[nth], K, flow.Source, flow.Destinations, network.BytesRate, Method_Number)
+		Ktrees := KSpanningTree(v2v, SMT.TSNTrees[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
 		ktrees_set.TSNTrees = append(ktrees_set.TSNTrees, Ktrees)
 	}
 	fmt.Printf("Finish OSACO %d TSN streams routing\n", len(ktrees_set.TSNTrees))
 
 	for nth, flow := range network.FlowSet.AVBFlows {
-		Ktrees := KSpanningTree(v2v, SMT.AVBTrees[nth], K, flow.Source, flow.Destinations, network.BytesRate, Method_Number)
+		Ktrees := KSpanningTree(v2v, SMT.AVBTrees[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
 		ktrees_set.AVBTrees = append(ktrees_set.AVBTrees, Ktrees)
 	}
 	fmt.Printf("Finish OSACO %d AVB streams routing\n", len(ktrees_set.AVBTrees))
@@ -79,8 +80,8 @@ func Get_OSACO_Routing(network *network.OMACO_Network, SMT *Trees_set, K int, Me
 	return ktrees_set
 }
 
-func (ktrees_set *KTrees_set) Input_ktree_set(bg_tsn_end int, bg_avb_end int) *KTrees_set {
-	Input_ktree_set := new_KTrees_Set()
+func (ktrees_set *KTreesSet) Input_ktree_set(bg_tsn_end int, bg_avb_end int) *KTreesSet {
+	Input_ktree_set := newKTreesSet()
 
 	Input_ktree_set.TSNTrees = append(Input_ktree_set.TSNTrees, ktrees_set.TSNTrees[bg_tsn_end:]...)
 	Input_ktree_set.AVBTrees = append(Input_ktree_set.AVBTrees, ktrees_set.AVBTrees[bg_tsn_end:]...)
@@ -88,8 +89,8 @@ func (ktrees_set *KTrees_set) Input_ktree_set(bg_tsn_end int, bg_avb_end int) *K
 	return Input_ktree_set
 }
 
-func (ktrees_set *KTrees_set) BG_ktree_set(bg_tsn_end int, bg_avb_end int) *KTrees_set {
-	BG_ktree_set := new_KTrees_Set()
+func (ktrees_set *KTreesSet) BG_ktree_set(bg_tsn_end int, bg_avb_end int) *KTreesSet {
+	BG_ktree_set := newKTreesSet()
 
 	BG_ktree_set.TSNTrees = append(BG_ktree_set.TSNTrees, ktrees_set.TSNTrees[:bg_tsn_end]...)
 	BG_ktree_set.AVBTrees = append(BG_ktree_set.AVBTrees, ktrees_set.AVBTrees[:bg_tsn_end]...)

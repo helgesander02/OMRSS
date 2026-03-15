@@ -18,8 +18,9 @@ type Config struct {
 type NetworkConfig struct {
 	Topology    string      `mapstructure:"topology"`
 	Hyperperiod int         `mapstructure:"hyperperiod"`
-	Bandwidth   float64     `mapstructure:"bandwidth"`
 	Flows       FlowsConfig `mapstructure:"flows"`
+	Bandwidth   float64     `mapstructure:"bandwidth"`
+	ByteRate    float64     // microseconds per byte
 }
 
 type FlowsConfig struct {
@@ -29,18 +30,49 @@ type FlowsConfig struct {
 }
 
 type TSNFlowConfig struct {
-	Input      int `mapstructure:"input"`
-	Background int `mapstructure:"background"`
+	Input      int                 `mapstructure:"input"`
+	Background int                 `mapstructure:"background"`
+	Params     TSNFlowParamsConfig `mapstructure:"params"`
 }
 
 type AVBFlowConfig struct {
-	Input      int `mapstructure:"input"`
-	Background int `mapstructure:"background"`
+	Input      int                 `mapstructure:"input"`
+	Background int                 `mapstructure:"background"`
+	Params     AVBFlowParamsConfig `mapstructure:"params"`
+}
+
+type TSNFlowParamsConfig struct {
+	Periods   []int     `mapstructure:"periods"`   // microseconds (array of possible values)
+	DataSizes []float64 `mapstructure:"datasizes"` // bytes (array of possible values)
+}
+
+type AVBFlowParamsConfig struct {
+	Period    int       `mapstructure:"period"`    // microseconds (fixed value)
+	Deadline  int       `mapstructure:"deadline"`  // microseconds (fixed value)
+	DataSizes []float64 `mapstructure:"datasizes"` // bytes (array of possible values)
 }
 
 type CANFlowConfig struct {
-	Important   int `mapstructure:"important"`
-	Unimportant int `mapstructure:"unimportant"`
+	Important   int                 `mapstructure:"important"`
+	Unimportant int                 `mapstructure:"unimportant"`
+	Params      CANFlowParamsConfig `mapstructure:"params"`
+}
+
+type CANFlowParamsConfig struct {
+	Important   CANImportantParams   `mapstructure:"important_params"`
+	Unimportant CANUnimportantParams `mapstructure:"unimportant_params"`
+}
+
+type CANImportantParams struct {
+	Period   int     `mapstructure:"period"`   // microseconds
+	Deadline int     `mapstructure:"deadline"` // microseconds
+	DataSize float64 `mapstructure:"datasize"` // bytes
+}
+
+type CANUnimportantParams struct {
+	Periods   []int   `mapstructure:"periods"`   // microseconds (array of possible values)
+	Deadlines []int   `mapstructure:"deadlines"` // microseconds (array of possible values)
+	DataSize  float64 `mapstructure:"datasize"`  // bytes
 }
 
 type AlgorithmConfig struct {
@@ -79,7 +111,6 @@ type OutputConfig struct {
 
 func Load(configName string) (*Config, error) {
 	v := viper.New()
-
 	setDefaults(v)
 
 	v.SetConfigType("yaml")
@@ -91,10 +122,8 @@ func Load(configName string) (*Config, error) {
 		v.SetConfigName("config.omaco")
 	case "osro":
 		v.SetConfigName("config.osro")
-	case "":
-		v.SetConfigName("config")
 	default:
-		v.SetConfigFile(configName)
+		v.SetConfigName("config")
 	}
 
 	v.SetEnvPrefix("OMRSS")
@@ -118,11 +147,14 @@ func Load(configName string) (*Config, error) {
 		return nil, fmt.Errorf("invalid configuration: %w", err)
 	}
 
+	bytesPerUs := (cfg.Network.Bandwidth / 8) * 1e-6                      // bytes per microsecond
+	cfg.Network.ByteRate = 1.0 / bytesPerUs                               // microseconds per byte
+	cfg.Network.Bandwidth = bytesPerUs * float64(cfg.Network.Hyperperiod) // bytes that can be transmitted in one hyperperiod
+
 	return &cfg, nil
 }
 
 func setDefaults(v *viper.Viper) {
-	// Network defaults
 	v.SetDefault("network.topology", "typical_complex")
 	v.SetDefault("network.hyperperiod", 6000)
 	v.SetDefault("network.bandwidth", 1e9)
@@ -133,31 +165,45 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("network.flows.can.important", 5)
 	v.SetDefault("network.flows.can.unimportant", 25)
 
-	// Algorithm defaults
+	// TSN flow parameters
+	v.SetDefault("network.flows.tsn.params.periods", []int{100, 500, 1000, 1500, 2000})
+	v.SetDefault("network.flows.tsn.params.datasizes", []float64{30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0})
+
+	// AVB flow parameters
+	v.SetDefault("network.flows.avb.params.period", 125)
+	v.SetDefault("network.flows.avb.params.deadline", 2000)
+	v.SetDefault("network.flows.avb.params.datasizes", []float64{1000.0, 1100.0, 1200.0, 1300.0, 1400.0, 1500.0})
+
+	// CAN important flow parameters
+	v.SetDefault("network.flows.can.params.important_params.period", 5000)
+	v.SetDefault("network.flows.can.params.important_params.deadline", 5000)
+	v.SetDefault("network.flows.can.params.important_params.datasize", 16.0)
+
+	// CAN unimportant flow parameters
+	v.SetDefault("network.flows.can.params.unimportant_params.periods", []int{50000, 100000, 150000})
+	v.SetDefault("network.flows.can.params.unimportant_params.deadlines", []int{10000, 12000, 14000, 16000, 18000, 20000})
+	v.SetDefault("network.flows.can.params.unimportant_params.datasize", 16.0)
+
 	v.SetDefault("algorithm.name", "omaco")
 	v.SetDefault("algorithm.osaco.timeout", 200)
 	v.SetDefault("algorithm.osaco.k_trees", 5)
 	v.SetDefault("algorithm.osaco.pheromone_evaporation", 0.7)
 	v.SetDefault("algorithm.osaco.method_number", 0)
 
-	// Schedule defaults
 	v.SetDefault("schedule.costs.o1", 100000000)
 	v.SetDefault("schedule.costs.o2", 100000)
 	v.SetDefault("schedule.costs.o3", 0)
 	v.SetDefault("schedule.costs.o4", 1)
 
-	// Experiment defaults
 	v.SetDefault("experiment.test_cases", 100)
 	v.SetDefault("experiment.random_seed", 42)
 
-	// Output defaults
 	v.SetDefault("output.show_network", false)
 	v.SetDefault("output.show_plan", false)
 	v.SetDefault("output.log_level", "info")
 }
 
 func (c *Config) Validate() error {
-	// Validate topology
 	validTopologies := map[string]bool{
 		"typical_complex": true,
 		"typical_simple":  true,
@@ -169,23 +215,19 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("invalid topology: %s (valid options: typical_complex, typical_simple, ring, layered_ring, industrial)", c.Network.Topology)
 	}
 
-	// Validate algorithm name
 	if c.Algorithm.Name != "omaco" && c.Algorithm.Name != "osro" {
 		return fmt.Errorf("invalid algorithm name: %s (valid options: omaco, osro)", c.Algorithm.Name)
 	}
 
-	// Validate pheromone evaporation
 	if c.Algorithm.OSACO.PheromoneEvaporation < 0 || c.Algorithm.OSACO.PheromoneEvaporation > 1 {
 		return fmt.Errorf("pheromone evaporation must be between 0 and 1, got: %f",
 			c.Algorithm.OSACO.PheromoneEvaporation)
 	}
 
-	// Validate test cases
 	if c.Experiment.TestCases <= 0 {
 		return fmt.Errorf("test_cases must be positive, got: %d", c.Experiment.TestCases)
 	}
 
-	// Validate positive values
 	if c.Network.Hyperperiod <= 0 {
 		return fmt.Errorf("hyperperiod must be positive, got: %d", c.Network.Hyperperiod)
 	}

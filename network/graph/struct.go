@@ -8,6 +8,6 @@ type Graphs struct {
 	CAN2TSNGraphs []*topology.Topology
 }
 
-func new_Graphs() *Graphs {
+func newGraphs() *Graphs {
 	return &Graphs{}
 }

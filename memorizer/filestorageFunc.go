@@ -10,62 +10,62 @@ import (
 	"strconv"
 )
 
-func (OC *OMACO_Memorizer) MStoreFile(file_name string) {
-	text := average_data_to_result(file_name)
+func (OC *OmacoMemorizer) MStoreFile(fileName string) {
+	text := averageDataToResult(fileName)
 
 	dirName := "result"
 	createFolder(dirName)
 	switchWorkingPath(dirName)
 
 	// Try to open the file in append mode first
-	txt_name := file_name + ".txt"
-	log.Printf("Opening file %s in append mode\n", txt_name)
-	file, err := os.OpenFile(txt_name, os.O_APPEND|os.O_WRONLY, 0644)
+	txtName := fileName + ".txt"
+	log.Printf("Opening file %s in append mode\n", txtName)
+	file, err := os.OpenFile(txtName, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		// If it fails, create the file
-		log.Printf("File not found, creating file %s\n", txt_name)
-		file, err = os.OpenFile(txt_name, os.O_CREATE|os.O_WRONLY, 0644)
+		log.Printf("File not found, creating file %s\n", txtName)
+		file, err = os.OpenFile(txtName, os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			log.Fatalf("Failed to create or open file %s: %v\n", txt_name, err)
+			log.Fatalf("Failed to create or open file %s: %v\n", txtName, err)
 		}
 	}
 	defer file.Close()
-	log.Printf("Writing text to file %s\n", txt_name)
+	log.Printf("Writing text to file %s\n", txtName)
 	fmt.Fprintln(file, text)
 
 	switchWorkingPath("..")
 }
 
-func (OS *OSRO_Memorizer) MStoreFile(file_name string) {
-	text := average_data_to_result_OSRO(file_name)
+func (OS *OsroMemorizer) MStoreFile(fileName string) {
+	text := averageDataToResult_OSRO(fileName)
 
 	dirName := "result"
 	createFolder(dirName)
 	switchWorkingPath(dirName)
 
 	// Try to open the file in append mode first
-	txt_name := file_name + ".txt"
-	log.Printf("Opening file %s in append mode\n", txt_name)
-	file, err := os.OpenFile(txt_name, os.O_APPEND|os.O_WRONLY, 0644)
+	txtName := fileName + ".txt"
+	log.Printf("Opening file %s in append mode\n", txtName)
+	file, err := os.OpenFile(txtName, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		// If it fails, create the file
-		log.Printf("File not found, creating file %s\n", txt_name)
-		file, err = os.OpenFile(txt_name, os.O_CREATE|os.O_WRONLY, 0644)
+		log.Printf("File not found, creating file %s\n", txtName)
+		file, err = os.OpenFile(txtName, os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			log.Fatalf("Failed to create or open file %s: %v\n", txt_name, err)
+			log.Fatalf("Failed to create or open file %s: %v\n", txtName, err)
 		}
 	}
 	defer file.Close()
-	log.Printf("Writing text to file %s\n", txt_name)
+	log.Printf("Writing text to file %s\n", txtName)
 	fmt.Fprintln(file, text)
 
 	switchWorkingPath("..")
 }
 
-func average_data_to_result(file_name string) string {
-	data, testcase_numbers := get_average_data(file_name)
+func averageDataToResult(fileName string) string {
+	data, testcaseNumbers := getAverageData(fileName)
 
-	text := fmt.Sprintf("( testcase numbers: %d ) ", testcase_numbers)
+	text := fmt.Sprintf("( testcase numbers: %d ) ", testcaseNumbers)
 	text += "--- The experimental results are as follows --- \n"
 	text += "The average objective result for the Steiner Tree:\n"
 	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", data["average_obj_smt_o1"], data["average_obj_smt_o2"], data["average_obj_smt_o4"])
@@ -90,9 +90,9 @@ func average_data_to_result(file_name string) string {
 	return text
 }
 
-func get_average_data(file_name string) (map[string]float64, int) {
+func getAverageData(fileName string) (map[string]float64, int) {
 	currentDir, _ := os.Getwd()
-	dir := filepath.Join(currentDir + "/data/" + file_name)
+	dir := filepath.Join(currentDir + "/data/" + fileName)
 	data := make(map[string]float64)
 
 	files, err := os.ReadDir(dir)
@@ -100,7 +100,7 @@ func get_average_data(file_name string) (map[string]float64, int) {
 		log.Fatalf("Error reading directory: %v", err)
 	}
 
-	testcase_numbers := 0
+	testcaseNumbers := 0
 	for _, file := range files {
 		if file.IsDir() {
 			continue
@@ -160,7 +160,7 @@ func get_average_data(file_name string) (map[string]float64, int) {
 				data["average_time_osaco_apted"] = val
 			}
 			if val, err := convertToFloat(columns[3]); err == nil {
-				testcase_numbers = int(val)
+				testcaseNumbers = int(val)
 			}
 
 		case "MTDC.csv":
@@ -217,13 +217,13 @@ func get_average_data(file_name string) (map[string]float64, int) {
 		}
 	}
 
-	return data, testcase_numbers
+	return data, testcaseNumbers
 }
 
-func average_data_to_result_OSRO(file_name string) string {
-	data, testcase_numbers := get_average_data_OSRO(file_name)
+func averageDataToResult_OSRO(fileName string) string {
+	data, testcaseNumbers := getAverageData_OSRO(fileName)
 
-	text := fmt.Sprintf("( testcase numbers: %d ) ", testcase_numbers)
+	text := fmt.Sprintf("( testcase numbers: %d ) ", testcaseNumbers)
 	text += "--- The experimental results are as follows --- \n"
 	text += "The average objective result for the Shortest Path:\n"
 	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", data["average_obj_sp_o1"], data["average_obj_sp_o2"], data["average_obj_sp_o4"])
@@ -239,9 +239,9 @@ func average_data_to_result_OSRO(file_name string) string {
 	return text
 }
 
-func get_average_data_OSRO(file_name string) (map[string]float64, int) {
+func getAverageData_OSRO(fileName string) (map[string]float64, int) {
 	currentDir, _ := os.Getwd()
-	dir := filepath.Join(currentDir + "/data/" + file_name)
+	dir := filepath.Join(currentDir + "/data/" + fileName)
 	data := make(map[string]float64)
 
 	files, err := os.ReadDir(dir)
@@ -249,7 +249,7 @@ func get_average_data_OSRO(file_name string) (map[string]float64, int) {
 		log.Fatalf("Error reading directory: %v", err)
 	}
 
-	testcase_numbers := 0
+	testcaseNumbers := 0
 	for _, file := range files {
 		if file.IsDir() {
 			continue
@@ -306,7 +306,7 @@ func get_average_data_OSRO(file_name string) (map[string]float64, int) {
 				data["average_time_osaco_path"] = val
 			}
 			if val, err := convertToFloat(columns[2]); err == nil {
-				testcase_numbers = int(val)
+				testcaseNumbers = int(val)
 			}
 
 		case "ShortestPath.csv":
@@ -337,5 +337,5 @@ func get_average_data_OSRO(file_name string) (map[string]float64, int) {
 		}
 	}
 
-	return data, testcase_numbers
+	return data, testcaseNumbers
 }

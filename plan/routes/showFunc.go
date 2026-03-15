@@ -24,7 +24,7 @@ func (graph *Graph) Show_Path() {
 	}
 }
 
-func (trees *KTrees_set) Show_kTrees_Set() {
+func (trees *KTreesSet) Show_kTrees_Set() {
 	tsn := 1
 	for _, ktrees := range trees.TSNTrees {
 		fmt.Printf("\nTSN Tree %d \n", tsn)
@@ -43,7 +43,7 @@ func (trees *KTrees_set) Show_kTrees_Set() {
 	}
 }
 
-func (trees *Trees_set) Show_Trees_Set() {
+func (trees *TreesSet) Show_Trees_Set() {
 	tsn := 1
 	for _, tree := range trees.TSNTrees {
 		fmt.Printf("\nTSN Tree %d \n", tsn)
@@ -91,7 +91,7 @@ func (tree *Tree) Show_Cycle() {
 }
 
 // Show functions for Path-based structures (OSRO)
-func (kpaths *KPaths_set) Show_KPaths_Set() {
+func (kpaths *KPathsSet) Show_KPaths_Set() {
 	tsn := 1
 	for _, kpath := range kpaths.TSNPaths {
 		fmt.Printf("\nTSN K-Path %d \n", tsn)
@@ -115,7 +115,7 @@ func (kpaths *KPaths_set) Show_KPaths_Set() {
 	}
 }
 
-func (paths *Paths_set) Show_Paths_Set() {
+func (paths *PathsSet) Show_Paths_Set() {
 	tsn := 1
 	for _, path := range paths.TSNPaths {
 		fmt.Printf("\nTSN Path %d \n", tsn)

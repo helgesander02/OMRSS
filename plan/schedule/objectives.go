@@ -2,6 +2,7 @@ package schedule
 
 import (
 	"fmt"
+	"src/internal/config"
 	"src/network"
 	"src/network/flow/tt"
 	"src/plan/routes"
@@ -10,7 +11,7 @@ import (
 )
 
 // Objectives
-func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_set, II_prime *routes.Trees_set, costSetting [4]int, showflow bool) ([4]float64, int) {
+func OBJ(network *network.Network, cfg *config.Config, X *routes.KTreesSet, II *routes.TreesSet, II_prime *routes.TreesSet, costSetting [4]int, showflow bool) ([4]float64, int) {
 	S := network.FlowSet.InputOMACOFlowSet()
 	S_prime := network.FlowSet.BGOMACOFlowSet()
 	var (
@@ -26,7 +27,7 @@ func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_
 	// Round1: Schedule BG flow
 	// O1
 	for nth, route := range II_prime.TSNTrees {
-		schedulability := schedulability(0, S_prime.TSNFlows[nth], route, linkmap, network.Bandwidth, network.HyperPeriod)
+		schedulability := schedulability(0, S_prime.TSNFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		tsn_failed_count += 1 - schedulability
 		//fmt.Printf("BackGround TSN route%d: %b \n", nth, schedulability)
 	}
@@ -35,7 +36,7 @@ func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_
 	for nth, route := range II_prime.AVBTrees {
 		wcd := WCD(route, X, S_prime.AVBFlows[nth], network.FlowSet)
 		avb_wcd_sum += wcd
-		schedulability := schedulability(wcd, S_prime.AVBFlows[nth], route, linkmap, network.Bandwidth, network.HyperPeriod)
+		schedulability := schedulability(wcd, S_prime.AVBFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		avb_failed_count += 1 - schedulability
 		//fmt.Printf("BackGround AVB route%d: %b \n", nth, schedulability)
 	}
@@ -44,7 +45,7 @@ func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_
 	// Round2: Schedule Input flow
 	// O1
 	for nth, route := range II.TSNTrees {
-		schedulability := schedulability(0, S.TSNFlows[nth], route, linkmap, network.Bandwidth, network.HyperPeriod)
+		schedulability := schedulability(0, S.TSNFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		tsn_failed_count += 1 - schedulability
 		//fmt.Printf("Input TSN route%d: %b \n", nth, schedulability)
 	}
@@ -53,7 +54,7 @@ func OBJ(network *network.OMACO_Network, X *routes.KTrees_set, II *routes.Trees_
 	for nth, route := range II.AVBTrees {
 		wcd := WCD(route, X, S.AVBFlows[nth], network.FlowSet)
 		avb_wcd_sum += wcd
-		schedulability := schedulability(wcd, S.AVBFlows[nth], route, linkmap, network.Bandwidth, network.HyperPeriod)
+		schedulability := schedulability(wcd, S.AVBFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		avb_failed_count += 1 - schedulability
 		//fmt.Printf("Input AVB route%d: %b \n", nth, schedulability)
 	}

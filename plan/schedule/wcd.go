@@ -8,10 +8,10 @@ import (
 )
 
 // Worse-Case Delay
-func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *tt.Flow, flow_set *flow.FlowSet) time.Duration {
+func WCD(z *routes.Tree, KTreesSet *routes.KTreesSet, flow *tt.Flow, flowSet *flow.FlowSet) time.Duration {
 	end2end := time.Duration(0)
 	node := z.GetNodeByID(flow.Source)
-	wcd := end2end_delay(node, -1, end2end, z, KTrees_set, flow, flow_set)
+	wcd := end2endDelay(node, -1, end2end, z, KTreesSet, flow, flowSet)
 	//fmt.Printf("max wcd: %v \n", wcd)
 
 	return wcd
@@ -19,7 +19,7 @@ func WCD(z *routes.Tree, KTrees_set *routes.KTrees_set, flow *tt.Flow, flow_set 
 
 // Use DFS to find all dataflow paths in the Route
 // Calculate the End to End Delay for each dataflow path and select the maximum one
-func end2end_delay(node *routes.Node, parentID int, end2end time.Duration, z *routes.Tree, KTrees_set *routes.KTrees_set, flow *tt.Flow, flow_set *flow.FlowSet) time.Duration {
+func end2endDelay(node *routes.Node, parentID int, end2end time.Duration, z *routes.Tree, KTreesSet *routes.KTreesSet, flow *tt.Flow, flowSet *flow.FlowSet) time.Duration {
 	//fmt.Printf("%d: %v \n", node.ID, end2end)
 	maxE2E := end2end
 	for _, link := range node.Connections {
@@ -29,14 +29,14 @@ func end2end_delay(node *routes.Node, parentID int, end2end time.Duration, z *ro
 
 		} else {
 			// Calculation of latency for a single link
-			per_hop += transmit_avb_itself(flow.DataSize, link.Cost)
-			//per_hop += interfere_from_be(conn.Cost)
-			per_hop += interfere_from_avb(link, KTrees_set, flow.DataSize)
-			per_hop += interfere_from_tsn(link, KTrees_set, flow_set)
+			per_hop += transmitAVBItself(flow.DataSize, link.Cost)
+			//per_hop += interfereFromBE(conn.Cost)
+			per_hop += interfereFromAVB(link, KTreesSet, flow.DataSize)
+			per_hop += interfereFromTSN(link, KTreesSet, flowSet)
 			end2end += per_hop
 
 			nextnode := z.GetNodeByID(link.ToNodeID)
-			nextE2E := end2end_delay(nextnode, node.ID, end2end, z, KTrees_set, flow, flow_set)
+			nextE2E := end2endDelay(nextnode, node.ID, end2end, z, KTreesSet, flow, flowSet)
 
 			if maxE2E < nextE2E {
 				maxE2E = nextE2E
@@ -49,30 +49,30 @@ func end2end_delay(node *routes.Node, parentID int, end2end time.Duration, z *ro
 }
 
 // Calculate the transmission time of AVB
-func transmit_avb_itself(datasize float64, bytes_rate float64) time.Duration {
+func transmitAVBItself(datasize float64, bytesRate float64) time.Duration {
 	/// Maximum proportion of bandwidth that AVB streams can occupy.
 	const MAX_AVB_SETTING float64 = 0.75
-	nanoseconds := datasize * bytes_rate * MAX_AVB_SETTING
+	nanoseconds := datasize * bytesRate * MAX_AVB_SETTING
 	duration := time.Duration(int64(nanoseconds))
 
 	return duration
 }
 
 // The time occupied by a BE packet before transmission
-//func interfere_from_be(bytes_rate float64) time.Duration {
+//func interfereFromBE(bytesRate float64) time.Duration {
 //	// Maximum number of bytes in a frame.
 //	const MTU float64 = 1500.
-//	nanoseconds := MTU * bytes_rate
+//	nanoseconds := MTU * bytesRate
 //	duration := time.Duration(int64(nanoseconds))
 //
 //	return duration
 //}
 
 // The time occupied by other AVB packets during transmission
-func interfere_from_avb(link *routes.Connection, KTrees_set *routes.KTrees_set, datasize float64) time.Duration {
+func interfereFromAVB(link *routes.Connection, KTreesSet *routes.KTreesSet, datasize float64) time.Duration {
 	// Occupied bytes by other AVB
 	var occupiedbytes float64
-	for _, avb_ktree := range KTrees_set.AVBTrees {
+	for _, avb_ktree := range KTreesSet.AVBTrees {
 		for _, tree := range avb_ktree.Trees {
 			node := tree.GetNodeByID(link.FromNodeID)
 			if node != nil {
@@ -86,27 +86,27 @@ func interfere_from_avb(link *routes.Connection, KTrees_set *routes.KTrees_set, 
 	}
 	occupiedbytes -= datasize // Deducting its own datasize
 
-	return transmit_avb_itself(occupiedbytes, link.Cost)
+	return transmitAVBItself(occupiedbytes, link.Cost)
 }
 
 // The known time occupied by TSN packets during transmission
-func interfere_from_tsn(link *routes.Connection, KTrees_set *routes.KTrees_set, flow_set *flow.FlowSet) time.Duration {
+func interfereFromTSN(link *routes.Connection, KTreesSet *routes.KTreesSet, flowSet *flow.FlowSet) time.Duration {
 	// Occupied bytes by TSN
 	var occupiedbytes float64
-	for nth, tsn_ktree := range KTrees_set.TSNTrees {
+	for nth, tsn_ktree := range KTreesSet.TSNTrees {
 		for _, tree := range tsn_ktree.Trees {
 			node := tree.GetNodeByID(link.FromNodeID)
 			if node != nil {
 				for _, conn := range node.Connections {
 					if conn.ToNodeID == link.ToNodeID {
 						// occupiedbytes += datasize * (hyperPeriod / period)
-						occupiedbytes += flow_set.TSNFlows[nth].DataSize *
-							(float64(flow_set.TSNFlows[nth].HyperPeriod) / float64(flow_set.TSNFlows[nth].Period))
+						occupiedbytes += flowSet.TSNFlows[nth].DataSize *
+							(float64(flowSet.TSNFlows[nth].HyperPeriod) / float64(flowSet.TSNFlows[nth].Period))
 					}
 				}
 			}
 		}
 	}
 
-	return transmit_avb_itself(occupiedbytes, link.Cost)
+	return transmitAVBItself(occupiedbytes, link.Cost)
 }

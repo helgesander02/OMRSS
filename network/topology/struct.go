@@ -1,18 +1,18 @@
 package topology
 
 type Node struct {
-	ID          int
-	Connections []*Connection
+	ID    int
+	Links []*Link
 }
 
-type Connection struct {
+type Link struct {
 	FromNodeID int     // strat
 	ToNodeID   int     // next
-	Cost       float64 // 1Gbps => (750,000 bytes/6ms) 750,000 bytes under 6ms for each link ==> 125 bytes/ns
+	Cost       float64 // 1Gbps => (750,000 bytes/6ms) 750,000 bytes under 6ms for each link ==> 125 bytes/us
 }
 
-func new_Connection(fromNodeID int, toNodeID int, cost float64) *Connection {
-	return &Connection{
+func NewLink(fromNodeID int, toNodeID int, cost float64) *Link {
+	return &Link{
 		FromNodeID: fromNodeID,
 		ToNodeID:   toNodeID,
 		Cost:       cost,
@@ -26,7 +26,7 @@ type Topology struct {
 	Nodes    []*Node
 }
 
-func new_Topology() *Topology {
+func NewTopology() *Topology {
 	return &Topology{}
 }
 

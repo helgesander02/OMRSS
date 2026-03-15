@@ -3,6 +3,7 @@ package algo
 import (
 	"fmt"
 	"math"
+	"src/internal/config"
 	"src/internal/random"
 	"src/network"
 	"src/network/flow"
@@ -25,20 +26,20 @@ func SetRNG(r *random.Generator) {
 	rng = r
 }
 
-func (osaco *OSACO) OSACO_Initial_Settings(network *network.OMACO_Network, SMT *routes.Trees_set) {
+func (osaco *OSACO) OSACO_Initial_Settings(network *network.Network, cfg *config.Config, SMT *routes.TreesSet) {
 	//// OSACO computing time: Estimate the time it takes to compute routing information
-	bgTSN = network.BGTSN
-	bgAVB = network.BGAVB
+	bgTSN = cfg.Network.Flows.TSN.Background
+	bgAVB = cfg.Network.Flows.AVB.Background
 
 	timer := algo_timer.NewTimer()
 	timer.TimerStart()
-	osaco.KTrees = routes.Get_OSACO_Routing(network, SMT, osaco.K, osaco.Method_Number)
+	osaco.KTrees = routes.Get_OSACO_Routing(network, cfg, SMT, osaco.K, osaco.Method_Number)
 	timer.TimerEnd()
 
 	osaco.InputTrees = SMT.InputTreeSet(bgTSN, bgAVB)
 	osaco.BGTrees = SMT.BGTreeSet(bgTSN, bgAVB)
-	osaco.PRM = compute_prm(osaco.KTrees)
-	osaco.VB = compute_vb(osaco.KTrees, network.FlowSet)
+	osaco.PRM = computePrm(osaco.KTrees)
+	osaco.VB = computeVb(osaco.KTrees, network.FlowSet)
 
 	osaco.Timer[0] = algo_timer.NewTimer()
 	osaco.Timer[0].TimerMerge(timer)
@@ -53,9 +54,9 @@ func (osaco *OSACO) OSACO_Initial_Settings(network *network.OMACO_Network, SMT *
 }
 
 // Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based Industrial Control Systems"
-func (osaco *OSACO) OSACO_Run(network *network.OMACO_Network, timeout_index int, costSetting [4]int) [4]float64 {
+func (osaco *OSACO) OSACO_Run(network *network.Network, cfg *config.Config, timeoutIndex int, costSetting [4]int) [4]float64 {
 	// Repeat the execution of epochs within the timeout
-	initialobj, initialcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, costSetting, false)
+	initialobj, initialcost := schedule.OBJ(network, cfg, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, costSetting, false)
 	fmt.Println()
 	fmt.Printf("initial value: %d \n", initialcost)
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", initialobj[0], initialobj[1], initialobj[3])
@@ -65,12 +66,12 @@ func (osaco *OSACO) OSACO_Run(network *network.OMACO_Network, timeout_index int,
 	i := 1
 	for {
 		fmt.Printf("\nepoch%d:\n", i)
-		osaco.Timer[timeout_index].TimerStart()
-		II := epoch(network, osaco, timeout_index, costSetting)
-		osaco.Timer[timeout_index].TimerStop()
+		osaco.Timer[timeoutIndex].TimerStart()
+		II := epoch(network, cfg, osaco, timeoutIndex, costSetting)
+		osaco.Timer[timeoutIndex].TimerStop()
 
-		_, cost1 := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees, costSetting, false)               // new
-		_, cost2 := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, costSetting, false) // old
+		_, cost1 := schedule.OBJ(network, cfg, osaco.KTrees, II, osaco.BGTrees, costSetting, false)               // new
+		_, cost2 := schedule.OBJ(network, cfg, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, costSetting, false) // old
 
 		if cost1 < cost2 {
 			osaco.InputTrees = II
@@ -83,20 +84,20 @@ func (osaco *OSACO) OSACO_Run(network *network.OMACO_Network, timeout_index int,
 		}
 	}
 
-	resultobj, resultcost := schedule.OBJ(network, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, costSetting, true)
+	resultobj, resultcost := schedule.OBJ(network, cfg, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, costSetting, true)
 	fmt.Println()
 	fmt.Printf("result value: %d \n", resultcost)
 	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
 	fmt.Println()
 
 	if resultobj[0] != 0 || resultobj[1] != 0 {
-		osaco.Timer[timeout_index].TimerMax()
+		osaco.Timer[timeoutIndex].TimerMax()
 	}
 
 	return resultobj
 }
 
-func compute_prm(X *routes.KTrees_set) *Pheromone {
+func computePrm(X *routes.KTreesSet) *Pheromone {
 	pheromone := &Pheromone{}
 
 	for nth, ktree := range X.TSNTrees {
@@ -126,10 +127,10 @@ func compute_prm(X *routes.KTrees_set) *Pheromone {
 	return pheromone
 }
 
-func compute_vb(X *routes.KTrees_set, flow_set *flow.FlowSet) *Visibility {
+func computeVb(X *routes.KTreesSet, flowSet *flow.FlowSet) *Visibility {
 	var preference float64 = 2.
-	Input_flow_set := flow_set.InputOMACOFlowSet()
-	BG_flow_set := flow_set.BGOMACOFlowSet()
+	Input_flowSet := flowSet.InputOMACOFlowSet()
+	BG_flowSet := flowSet.BGOMACOFlowSet()
 
 	visibility := &Visibility{}
 	// OSACO CompVB
@@ -161,12 +162,12 @@ func compute_vb(X *routes.KTrees_set, flow_set *flow.FlowSet) *Visibility {
 
 			if nth >= bgAVB {
 				//fmt.Printf("Input flow%d tree%d \n", nth, kth)
-				value := mult / float64(schedule.WCD(z, X, Input_flow_set.AVBFlows[nth-bgAVB], flow_set))
+				value := mult / float64(schedule.WCD(z, X, Input_flowSet.AVBFlows[nth-bgAVB], flowSet))
 				v = append(v, value)
 
 			} else {
 				//fmt.Printf("Backgourd flow%d tree%d \n", nth, kth)
-				value := mult / float64(schedule.WCD(z, X, BG_flow_set.AVBFlows[nth], flow_set))
+				value := mult / float64(schedule.WCD(z, X, BG_flowSet.AVBFlows[nth], flowSet))
 				v = append(v, value)
 			}
 		}
@@ -176,14 +177,14 @@ func compute_vb(X *routes.KTrees_set, flow_set *flow.FlowSet) *Visibility {
 	return visibility
 }
 
-func probability(osaco *OSACO) (*routes.Trees_set, *routes.Trees_set, [2][]int, [2][]int) {
+func probability(osaco *OSACO) (*routes.TreesSet, *routes.TreesSet, [2][]int, [2][]int) {
 	var (
 		input_k_location [2][]int // (tsn k index, avb k index)
 		bg_k_location    [2][]int // (tsn k index, avb k index)
 	)
 
-	II := &routes.Trees_set{}
-	II_prime := &routes.Trees_set{}
+	II := &routes.TreesSet{}
+	II_prime := &routes.TreesSet{}
 	for nth, ktree := range osaco.KTrees.TSNTrees {
 		Denominator := 0.
 		for kth := range ktree.Trees {
@@ -243,18 +244,18 @@ func probability(osaco *OSACO) (*routes.Trees_set, *routes.Trees_set, [2][]int, 
 	return II, II_prime, input_k_location, bg_k_location
 }
 
-func epoch(network *network.OMACO_Network, osaco *OSACO, timeout_index int, costSetting [4]int) *routes.Trees_set {
+func epoch(network *network.Network, cfg *config.Config, osaco *OSACO, timeoutIndex int, costSetting [4]int) *routes.TreesSet {
 	II, _, input_k_location, _ := probability(osaco)
 	//II, II_prime, input_k_location, bg_k_location := Probability(osaco.KTrees, osaco.VB, osaco.PRM) // BG ... pass
 	fmt.Printf("Select input routing %v \n", input_k_location)
 	//fmt.Printf("Select background routing %v \n", bg_k_location) // BG ... pass
-	osaco.Timer[timeout_index].TimerStop()
-	obj_list, cost := schedule.OBJ(network, osaco.KTrees, II, osaco.BGTrees, costSetting, false)
+	osaco.Timer[timeoutIndex].TimerStop()
+	obj_list, cost := schedule.OBJ(network, cfg, osaco.KTrees, II, osaco.BGTrees, costSetting, false)
 	//obj, cost := Obj(network, X, II, II_prime) // BG ... pass
-	osaco.Timer[timeout_index].TimerStart()
+	osaco.Timer[timeoutIndex].TimerStart()
 
 	if obj_list[0] == 0 && obj_list[1] == 0 {
-		osaco.Timer[timeout_index].TimerEnd()
+		osaco.Timer[timeoutIndex].TimerEnd()
 	}
 
 	for nth, ktree := range osaco.KTrees.TSNTrees {

@@ -2,15 +2,13 @@ package topology
 
 import (
 	"encoding/json"
-	"src/internal/random"
 )
 
-// DeepCopy Topology
 func (t1 *Topology) TopologyDeepCopy() *Topology {
 	if buf, err := json.Marshal(t1); err != nil {
 		return nil
 	} else {
-		t2 := new_Topology()
+		t2 := NewTopology()
 		if err = json.Unmarshal(buf, t2); err != nil {
 			return nil
 		}
@@ -18,20 +16,11 @@ func (t1 *Topology) TopologyDeepCopy() *Topology {
 	}
 }
 
-// Global RNG instance (will be set by network package)
-var rng *random.Generator
-
-// SetRNG sets the random number generator for this package
-func SetRNG(r *random.Generator) {
-	rng = r
-}
-
-func (t *Topology) SelectCANNodeSet() []int {
-	const count = 5
-	result := make([]int, 0, count)
+func (t *Topology) SelectCANNodes() []int {
+	result := make([]int, 0, CANNodeCount)
 	used := make(map[int]bool)
 
-	for len(result) < count {
+	for len(result) < CANNodeCount {
 		index := rng.IntN(len(t.Nodes))
 		node := t.Nodes[index]
 
@@ -68,19 +57,6 @@ func (t *Topology) GetNodeByID(id int) *Node {
 	return nil
 }
 
-func (t *Topology) RemoveEdge(u, v int) {
-	n := t.GetNodeByID(u)
-	if n == nil {
-		return
-	}
-	for i, connection := range n.Connections {
-		if connection.ToNodeID == v {
-			n.Connections = append(n.Connections[:i], n.Connections[i+1:]...)
-			return
-		}
-	}
-}
-
 func (t *Topology) GetListenerAndTalker(source int, destination int) bool {
 	if t.Talker[0].ID == source && t.Listener[0].ID == destination {
 		return true
@@ -90,8 +66,8 @@ func (t *Topology) GetListenerAndTalker(source int, destination int) bool {
 
 func (t *Topology) GetListenerAndTalkerSet(source int, destinations []int) bool {
 	if t.Talker[0].ID == source && len(t.Listener) == len(destinations) {
-		for _, desdestination := range destinations {
-			if t.GetNodeByID(desdestination) == nil {
+		for _, desDestination := range destinations {
+			if t.GetNodeByID(desDestination) == nil {
 				return false
 			}
 		}

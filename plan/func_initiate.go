@@ -2,52 +2,55 @@ package plan
 
 import (
 	"fmt"
+	"src/internal/config"
 	"src/plan/schedule"
 )
 
-func (plan *OMACO) InitiatePlan(costSetting [4]int) {
+func (plan *OMACO) InitiatePlan(costSetting [4]int, cfg *config.Config) {
 	// algo run
 	fmt.Println("Steiner Tree")
 	fmt.Println("----------------------------------------")
-	plan.SMT.SMT_Run(plan.Network)
+	plan.SMT.SMT_Run(plan.Network, cfg)
 
 	fmt.Println()
 	fmt.Println("MDTC")
 	fmt.Println("----------------------------------------")
-	plan.MDTC.MDTC_Run(plan.Network)
+	plan.MDTC.MDTC_Run(plan.Network, cfg)
 
 	fmt.Println()
 	fmt.Println("OSACO")
 	fmt.Println("----------------------------------------")
-	plan.OSACO.OSACO_Initial_Settings(plan.Network, plan.SMT.Trees)
+	plan.OSACO.OSACO_Initial_Settings(plan.Network, cfg, plan.SMT.Trees)
 	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
 	for i := 0; i < 5; i++ {
-		plan.OSACO.Objs_osaco[i] = plan.OSACO.OSACO_Run(plan.Network, i, costSetting)
+		plan.OSACO.Objs_osaco[i] = plan.OSACO.OSACO_Run(plan.Network, cfg, i, costSetting)
 	}
 
 	fmt.Println()
 	fmt.Println("OSACO_APTED")
 	fmt.Println("----------------------------------------")
-	plan.OSACO_APTED.OSACO_Initial_Settings(plan.Network, plan.SMT.Trees)
+	plan.OSACO_APTED.OSACO_Initial_Settings(plan.Network, cfg, plan.SMT.Trees)
 	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
 	for i := 0; i < 5; i++ {
-		plan.OSACO_APTED.Objs_osaco[i] = plan.OSACO_APTED.OSACO_Run(plan.Network, i, costSetting)
+		plan.OSACO_APTED.Objs_osaco[i] = plan.OSACO_APTED.OSACO_Run(plan.Network, cfg, i, costSetting)
 	}
 
 	obj_smt, _ := schedule.OBJ(
 		plan.Network,
+		cfg,
 		plan.OSACO.KTrees,
-		plan.SMT.Trees.InputTreeSet(plan.Network.BGTSN, plan.Network.BGAVB),
-		plan.SMT.Trees.BGTreeSet(plan.Network.BGTSN, plan.Network.BGAVB),
+		plan.SMT.Trees.InputTreeSet(cfg.Network.Flows.TSN.Background, cfg.Network.Flows.AVB.Background),
+		plan.SMT.Trees.BGTreeSet(cfg.Network.Flows.TSN.Background, cfg.Network.Flows.AVB.Background),
 		costSetting,
 		true,
 	)
 
 	obj_mdt, _ := schedule.OBJ(
 		plan.Network,
+		cfg,
 		plan.OSACO.KTrees,
-		plan.MDTC.Trees.InputTreeSet(plan.Network.BGTSN, plan.Network.BGAVB),
-		plan.MDTC.Trees.BGTreeSet(plan.Network.BGTSN, plan.Network.BGAVB),
+		plan.MDTC.Trees.InputTreeSet(cfg.Network.Flows.TSN.Background, cfg.Network.Flows.AVB.Background),
+		plan.MDTC.Trees.BGTreeSet(cfg.Network.Flows.TSN.Background, cfg.Network.Flows.AVB.Background),
 		costSetting,
 		true,
 	)
@@ -61,16 +64,16 @@ func (plan *OMACO) InitiatePlan(costSetting [4]int) {
 
 }
 
-func (plan *OSRO) InitiatePlan(costSetting [4]int) {
+func (plan *OSRO) InitiatePlan(costSetting [4]int, cfg *config.Config) {
 	// algo run
 	fmt.Println("Shortest Path")
 	fmt.Println("----------------------------------------")
-	plan.SP.SP_Run(plan.Network)
+	plan.SP.SP_Run(plan.Network, cfg)
 
 	fmt.Println()
 	fmt.Println("OSACO (Path-based)")
 	fmt.Println("----------------------------------------")
-	plan.OSACO_Path.OSACO_Initial_Settings_Path(plan.Network, plan.SP.Paths)
+	plan.OSACO_Path.OSACO_Initial_Settings_Path(plan.Network, cfg, plan.SP.Paths)
 
 	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
 	for i := 0; i < 5; i++ {

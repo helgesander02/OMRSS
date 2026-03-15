@@ -7,35 +7,84 @@ import (
 // Global RNG instance (will be set by network package)
 var rng *random.Generator
 
+// Global CAN parameters (will be set from config)
+var importantCANParams struct {
+	period   int
+	deadline int
+	dataSize float64
+}
+
+var unimportantCANParams struct {
+	periods   []int
+	deadlines []int
+	dataSize  float64
+}
+
 // SetRNG sets the random number generator for this package
 func SetRNG(r *random.Generator) {
 	rng = r
 }
 
-func config_ImportantCAN_Stream() *importantCAN {
-	importantcan := new_importantCAN()
-
-	return importantcan
+// SetImportantCANParams sets the parameters for important CAN flows from config
+func SetImportantCANParams(period int, deadline int, dataSize float64) {
+	importantCANParams.period = period
+	importantCANParams.deadline = deadline
+	importantCANParams.dataSize = dataSize
 }
 
-func config_UnimportantCAN_Stream() *unimportantCAN {
-	ucPeriod, ucDeadline := random_UnimportantCAN()
-	unimportantcan := new_unimportantCAN(ucPeriod, ucDeadline)
+// SetUnimportantCANParams sets the parameters for unimportant CAN flows from config
+func SetUnimportantCANParams(periods []int, deadlines []int, dataSize float64) {
+	unimportantCANParams.periods = periods
+	unimportantCANParams.deadlines = deadlines
+	unimportantCANParams.dataSize = dataSize
+}
+
+func configImportantCANStream() *importantCAN {
+	// Use configured parameters if available, otherwise use defaults
+	if importantCANParams.period > 0 {
+		return newImportantCANWithParams(
+			importantCANParams.period,
+			importantCANParams.deadline,
+			importantCANParams.dataSize,
+		)
+	}
+	return newImportantCAN()
+}
+
+func configUnimportantCANStream() *unimportantCAN {
+	ucPeriod, ucDeadline := randomUnimportantCAN()
+
+	// Use configured data size if available
+	dataSize := 16.0
+	if unimportantCANParams.dataSize > 0 {
+		dataSize = unimportantCANParams.dataSize
+	}
+
+	unimportantcan := newUnimportantCAN(ucPeriod, ucDeadline)
+	unimportantcan.DataSize = dataSize
 
 	return unimportantcan
 }
 
-func random_UnimportantCAN() (int, int) {
-	unimportantCANPeriodArr := []int{50000, 100000, 150000}
-	unimportantCANDeadlineArr := []int{10000, 12000, 14000, 16000, 18000, 20000}
+func randomUnimportantCAN() (int, int) {
+	// Use configured parameters if available, otherwise use defaults
+	periods := unimportantCANParams.periods
+	deadlines := unimportantCANParams.deadlines
 
-	periodIdx := rng.IntN(len(unimportantCANPeriodArr))
-	deadlineIdx := rng.IntN(len(unimportantCANDeadlineArr))
+	if len(periods) == 0 {
+		periods = []int{50000, 100000, 150000}
+	}
+	if len(deadlines) == 0 {
+		deadlines = []int{10000, 12000, 14000, 16000, 18000, 20000}
+	}
 
-	return unimportantCANPeriodArr[periodIdx], unimportantCANDeadlineArr[deadlineIdx]
+	periodIdx := rng.IntN(len(periods))
+	deadlineIdx := rng.IntN(len(deadlines))
+
+	return periods[periodIdx], deadlines[deadlineIdx]
 }
 
-func random_CAN_Devices_For_Path(canNodeSet []int) (int, int) {
+func randomCANDevicesForPath(canNodeSet []int) (int, int) {
 	sourceIndex := rng.IntN(len(canNodeSet))
 	sourceNode := canNodeSet[sourceIndex]
 

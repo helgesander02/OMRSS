@@ -4,61 +4,61 @@ import (
 	"fmt"
 )
 
-func Generate_TT_Flows(Nnode_length int, bgTSN int, bgAVB int, inputTSN int, inputAVB int, HyperPeriod int) ([]*Flow, []*Flow) {
-	tsn_flows := new_TSN_flows()
-	avb_flows := new_AVB_flows()
+func GenerateTTFlows(nnodeLength int, bgTSN int, bgAVB int, inputTSN int, inputAVB int, hyperPeriod int) ([]*Flow, []*Flow) {
+	tsnFlows := newTSNFlows()
+	avbFlows := newAVBFlows()
 
 	// Generate TT BG Flows, round 1
-	tsn_flows = Generate_TT_TSNFlow(tsn_flows, Nnode_length, bgTSN, HyperPeriod)
-	avb_flows = Generate_TT_AVBFlow(avb_flows, Nnode_length, bgAVB, HyperPeriod)
+	tsnFlows = GenerateTTTSNFlow(tsnFlows, nnodeLength, bgTSN, hyperPeriod)
+	avbFlows = GenerateTTAVBFlow(avbFlows, nnodeLength, bgAVB, hyperPeriod)
 	fmt.Printf("Complete generating round%d bgstreams.\n", 1)
 
 	// Generate TT Input Flows,round 2
-	tsn_flows = Generate_TT_TSNFlow(tsn_flows, Nnode_length, inputTSN, HyperPeriod)
-	avb_flows = Generate_TT_AVBFlow(avb_flows, Nnode_length, inputAVB, HyperPeriod)
+	tsnFlows = GenerateTTTSNFlow(tsnFlows, nnodeLength, inputTSN, hyperPeriod)
+	avbFlows = GenerateTTAVBFlow(avbFlows, nnodeLength, inputAVB, hyperPeriod)
 	fmt.Printf("Complete generating round%d tsnstreams.\n", 2)
 
-	fmt.Println("TSN:", len(tsn_flows), "AVB:", len(avb_flows), "Complete generating TT Flows.")
+	fmt.Println("TSN:", len(tsnFlows), "AVB:", len(avbFlows), "Complete generating TT Flows.")
 
-	return tsn_flows, avb_flows
+	return tsnFlows, avbFlows
 }
 
-func Generate_TT_TSNFlow(flows []*Flow, Nnode_length int, TS int, HyperPeriod int) []*Flow {
+func GenerateTTTSNFlow(flows []*Flow, nnodeLength int, TS int, hyperPeriod int) []*Flow {
 	for flow := 0; flow < TS; flow++ {
-		tsn := config_TSN_Stream()
-		source, destinations := random_TT_Devices_For_Tree(Nnode_length)
+		tsn := configTSNStream()
+		source, destinations := randomTTDevicesForTree(nnodeLength)
 
-		Flow := Generate_TT_Stream(tsn.Period, tsn.Deadline, tsn.DataSize, HyperPeriod)
-		Flow.Source = source
-		Flow.Destinations = destinations
+		ttFlow := GenerateTTStream(tsn.Period, tsn.Deadline, tsn.DataSize, hyperPeriod)
+		ttFlow.Source = source
+		ttFlow.Destinations = destinations
 
-		flows = append(flows, Flow)
+		flows = append(flows, ttFlow)
 	}
 	return flows
 }
 
-func Generate_TT_AVBFlow(flows []*Flow, Nnode_length int, AS int, HyperPeriod int) []*Flow {
+func GenerateTTAVBFlow(flows []*Flow, nnodeLength int, AS int, hyperPeriod int) []*Flow {
 	for flow := 0; flow < AS; flow++ {
-		avb := config_AVB_Stream()
-		source, destinations := random_TT_Devices_For_Tree(Nnode_length)
+		avb := configAVBStream()
+		source, destinations := randomTTDevicesForTree(nnodeLength)
 
-		Flow := Generate_TT_Stream(avb.Period, avb.Deadline, avb.DataSize, HyperPeriod)
-		Flow.Source = source
-		Flow.Destinations = destinations
+		ttFlow := GenerateTTStream(avb.Period, avb.Deadline, avb.DataSize, hyperPeriod)
+		ttFlow.Source = source
+		ttFlow.Destinations = destinations
 
-		flows = append(flows, Flow)
+		flows = append(flows, ttFlow)
 	}
 	return flows
 }
 
-func Generate_TT_Stream(period int, deadline int, datasize float64, HyperPeriod int) *Flow {
+func GenerateTTStream(period int, deadline int, datasize float64, hyperPeriod int) *Flow {
 	var number int = 0
 
-	flow := new_TTFlow(period, deadline, datasize, HyperPeriod)
-	for ArrivalTime := 0; ArrivalTime < HyperPeriod; ArrivalTime += period {
-		FinishTime := ArrivalTime + deadline
+	flow := newTTFlow(period, deadline, datasize, hyperPeriod)
+	for arrivalTime := 0; arrivalTime < hyperPeriod; arrivalTime += period {
+		finishTime := arrivalTime + deadline
 		name := fmt.Sprint("stream", number)
-		stream := new_TTStream(name, ArrivalTime, datasize, deadline, FinishTime)
+		stream := newTTStream(name, arrivalTime, datasize, deadline, finishTime)
 		flow.Streams = append(flow.Streams, stream)
 		number += 1
 	}

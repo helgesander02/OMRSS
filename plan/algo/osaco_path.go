@@ -3,6 +3,7 @@ package algo
 import (
 	"fmt"
 	"math"
+	"src/internal/config"
 	"src/network"
 	"src/network/flow"
 	"src/plan/algo_timer"
@@ -16,19 +17,19 @@ var (
 )
 
 // OSACO_Initial_Settings_Path initializes OSACO for path-based routing (OSRO)
-func (osaco *OSACO_Path) OSACO_Initial_Settings_Path(network *network.OSRO_Network, SP *routes.Paths_set) {
-	bgTSN_path = network.BGTSN
-	bgAVB_path = network.BGAVB
+func (osaco *OSACO_Path) OSACO_Initial_Settings_Path(network *network.Network, cfg *config.Config, SP *routes.PathsSet) {
+	bgTSN_path = cfg.Network.Flows.TSN.Background
+	bgAVB_path = cfg.Network.Flows.AVB.Background
 
 	timer := algo_timer.NewTimer()
 	timer.TimerStart()
-	osaco.KPaths = routes.Get_KPath_Routing(network, SP, osaco.K)
+	osaco.KPaths = routes.Get_KPath_Routing(network, cfg, SP, osaco.K)
 	timer.TimerEnd()
 
 	osaco.InputPaths = SP.InputPathSet(bgTSN_path, bgAVB_path)
 	osaco.BGPaths = SP.BGPathSet(bgTSN_path, bgAVB_path)
-	osaco.PRM_Path = compute_prm_path(osaco.KPaths)
-	osaco.VB_Path = compute_vb_path(osaco.KPaths, network.FlowSet)
+	osaco.PRM_Path = computePrmPath(osaco.KPaths)
+	osaco.VB_Path = computeVbPath(osaco.KPaths, network.FlowSet)
 
 	for i := 0; i < 5; i++ {
 		osaco.Timer[i] = algo_timer.NewTimer()
@@ -37,7 +38,7 @@ func (osaco *OSACO_Path) OSACO_Initial_Settings_Path(network *network.OSRO_Netwo
 }
 
 // OSACO_Run_Path runs OSACO algorithm for path-based routing
-func (osaco *OSACO_Path) OSACO_Run_Path(network *network.OSRO_Network, timeout_index int, costSetting [4]int) [4]float64 {
+func (osaco *OSACO_Path) OSACO_Run_Path(network *network.Network, timeoutIndex int, costSetting [4]int) [4]float64 {
 	// Note: Path-based scheduling objective function will be implemented
 	// when path-based WCD (Worst-Case Delay) calculation is available
 	initialobj := [4]float64{0, 0, 0, 0}
@@ -53,9 +54,9 @@ func (osaco *OSACO_Path) OSACO_Run_Path(network *network.OSRO_Network, timeout_i
 
 	for {
 		fmt.Printf("\nepoch%d:\n", i)
-		osaco.Timer[timeout_index].TimerStart()
-		II := epoch_path(network, osaco, timeout_index, costSetting)
-		osaco.Timer[timeout_index].TimerStop()
+		osaco.Timer[timeoutIndex].TimerStart()
+		II := epochPath(network, osaco, timeoutIndex, costSetting)
+		osaco.Timer[timeoutIndex].TimerStop()
 
 		// Note: Cost calculation will use path-based OBJ function when available
 		cost1 := 0 // Placeholder for new path cost
@@ -81,14 +82,14 @@ func (osaco *OSACO_Path) OSACO_Run_Path(network *network.OSRO_Network, timeout_i
 	fmt.Println()
 
 	if resultobj[0] != 0 || resultobj[1] != 0 {
-		osaco.Timer[timeout_index].TimerMax()
+		osaco.Timer[timeoutIndex].TimerMax()
 	}
 
 	return resultobj
 }
 
-// compute_prm_path initializes pheromone values for paths
-func compute_prm_path(X *routes.KPaths_set) *PheromonePath {
+// computePrmPath initializes pheromone values for paths
+func computePrmPath(X *routes.KPathsSet) *PheromonePath {
 	pheromone := &PheromonePath{}
 
 	for nth, kpath := range X.TSNPaths {
@@ -126,8 +127,8 @@ func compute_prm_path(X *routes.KPaths_set) *PheromonePath {
 	return pheromone
 }
 
-// compute_vb_path computes visibility values for paths
-func compute_vb_path(X *routes.KPaths_set, flow_set *flow.FlowSet) *VisibilityPath {
+// computeVbPath computes visibility values for paths
+func computeVbPath(X *routes.KPathsSet, flowSet *flow.FlowSet) *VisibilityPath {
 	var preference float64 = 2.
 
 	visibility := &VisibilityPath{}
@@ -178,15 +179,15 @@ func compute_vb_path(X *routes.KPaths_set, flow_set *flow.FlowSet) *VisibilityPa
 	return visibility
 }
 
-// probability_path selects paths based on pheromone and visibility
-func probability_path(osaco *OSACO_Path) (*routes.Paths_set, *routes.Paths_set, [3][]int, [3][]int) {
+// probabilityPath selects paths based on pheromone and visibility
+func probabilityPath(osaco *OSACO_Path) (*routes.PathsSet, *routes.PathsSet, [3][]int, [3][]int) {
 	var (
 		input_k_location [3][]int // (tsn k index, avb k index, can2tsn k index)
 		bg_k_location    [3][]int // (tsn k index, avb k index, can2tsn k index)
 	)
 
-	II := &routes.Paths_set{}
-	II_prime := &routes.Paths_set{}
+	II := &routes.PathsSet{}
+	II_prime := &routes.PathsSet{}
 
 	// TSN paths
 	for nth, kpath := range osaco.KPaths.TSNPaths {
@@ -270,22 +271,22 @@ func probability_path(osaco *OSACO_Path) (*routes.Paths_set, *routes.Paths_set, 
 	return II, II_prime, input_k_location, bg_k_location
 }
 
-// epoch_path performs one epoch of OSACO for paths
-func epoch_path(network *network.OSRO_Network, osaco *OSACO_Path, timeout_index int, costSetting [4]int) *routes.Paths_set {
-	II, _, input_k_location, _ := probability_path(osaco)
+// epochPath performs one epoch of OSACO for paths
+func epochPath(network *network.Network, osaco *OSACO_Path, timeoutIndex int, costSetting [4]int) *routes.PathsSet {
+	II, _, input_k_location, _ := probabilityPath(osaco)
 
 	fmt.Printf("Select input routing %v \n", input_k_location)
 
-	osaco.Timer[timeout_index].TimerStop()
+	osaco.Timer[timeoutIndex].TimerStop()
 
 	// Note: Objective calculation will be implemented with path-based scheduling
 	obj_list := [4]float64{0, 0, 0, 0}
 	cost := 0
 
-	osaco.Timer[timeout_index].TimerStart()
+	osaco.Timer[timeoutIndex].TimerStart()
 
 	if obj_list[0] == 0 && obj_list[1] == 0 {
-		osaco.Timer[timeout_index].TimerEnd()
+		osaco.Timer[timeoutIndex].TimerEnd()
 	}
 
 	// Update pheromones for TSN

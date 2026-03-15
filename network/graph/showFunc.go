@@ -1,18 +1,18 @@
 package graph
 
-func (graphs *Graphs) Show_Graphs() {
+func (graphs *Graphs) ShowGraphs() {
 	for _, graph := range graphs.TSNGraphs {
-		graph.Show_Topology()
+		graph.ShowTopology()
 		break
 	}
 
 	for _, graph := range graphs.AVBGraphs {
-		graph.Show_Topology()
+		graph.ShowTopology()
 		break
 	}
 
 	for _, graph := range graphs.CAN2TSNGraphs {
-		graph.Show_Topology()
+		graph.ShowTopology()
 		break
 	}
 }

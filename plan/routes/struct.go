@@ -1,29 +1,29 @@
 package routes
 
-type KTrees_set struct {
+type KTreesSet struct {
 	TSNTrees []*KTrees
 	AVBTrees []*KTrees
 }
 
-func new_KTrees_Set() *KTrees_set {
-	return &KTrees_set{}
+func newKTreesSet() *KTreesSet {
+	return &KTreesSet{}
 }
 
 type KTrees struct {
 	Trees []*Tree
 }
 
-func new_KTrees() *KTrees {
+func newKTrees() *KTrees {
 	return &KTrees{}
 }
 
-type Trees_set struct {
+type TreesSet struct {
 	TSNTrees []*Tree
 	AVBTrees []*Tree
 }
 
-func new_Trees_Set() *Trees_set {
-	return &Trees_set{}
+func newTreesSet() *TreesSet {
+	return &TreesSet{}
 }
 
 type Tree struct {
@@ -31,7 +31,7 @@ type Tree struct {
 	Weight int
 }
 
-func new_Tree() *Tree {
+func newTree() *Tree {
 	return &Tree{}
 }
 
@@ -46,7 +46,7 @@ type Connection struct {
 	Cost       float64 // 1Gbps => (750,000 bytes/6ms) 750,000 bytes under 6ms for each link ==> 125 bytes/us
 }
 
-func new_Connection(fromNodeID int, toNodeID int, cost float64) *Connection {
+func newConnection(fromNodeID int, toNodeID int, cost float64) *Connection {
 	return &Connection{
 		FromNodeID: fromNodeID,
 		ToNodeID:   toNodeID,
@@ -84,14 +84,14 @@ type Edge struct {
 }
 
 // OSRO Path-based structures
-type KPaths_set struct {
+type KPathsSet struct {
 	TSNPaths     []*KPath
 	AVBPaths     []*KPath
 	CAN2TSNPaths []*KPath
 }
 
-func new_KPaths_Set() *KPaths_set {
-	return &KPaths_set{}
+func newKPathsSet() *KPathsSet {
+	return &KPathsSet{}
 }
 
 type KPath struct {
@@ -102,7 +102,7 @@ type KPath struct {
 	Method string
 }
 
-func new_KPath(k int, source, target int) *KPath {
+func newKPath(k int, source, target int) *KPath {
 	return &KPath{
 		K:      k,
 		Source: source,
@@ -111,14 +111,14 @@ func new_KPath(k int, source, target int) *KPath {
 	}
 }
 
-type Paths_set struct {
+type PathsSet struct {
 	TSNPaths     []*Path
 	AVBPaths     []*Path
 	CAN2TSNPaths []*Path
 }
 
-func new_Paths_Set() *Paths_set {
-	return &Paths_set{}
+func newPathsSet() *PathsSet {
+	return &PathsSet{}
 }
 
 type Path struct {
@@ -128,7 +128,7 @@ type Path struct {
 	Weight float64
 }
 
-func new_Path() *Path {
+func newPath() *Path {
 	return &Path{}
 }
 

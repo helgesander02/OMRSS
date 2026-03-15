@@ -6,7 +6,7 @@ type Queue struct {
 	Streams []*Stream
 }
 
-func new_Queue() *Queue {
+func newQueue() *Queue {
 	return &Queue{}
 }
 
@@ -25,19 +25,19 @@ func (q *Queue) popQueueByHead(head int) {
 	q.Streams = q.Streams[head:]
 }
 
-func (q *Queue) checkDrop(current_time int) int {
-	o1_drop := 0
+func (q *Queue) checkDrop(currentTime int) int {
+	o1Drop := 0
 	for drop := len(q.Streams) - 1; drop >= 0; drop-- {
-		if current_time > q.Streams[drop].FinishTime {
-			o1_drop++
+		if currentTime > q.Streams[drop].FinishTime {
+			o1Drop++
 			q.popQueueByIdx(drop)
 		}
 	}
 
-	return o1_drop
+	return o1Drop
 }
 
-func (q *Queue) sortQueue(method string, current_time int) {
+func (q *Queue) sortQueue(method string, currentTime int) {
 	switch method {
 	case "fifo":
 		// arrival time (small → large)
@@ -54,8 +54,8 @@ func (q *Queue) sortQueue(method string, current_time int) {
 	case "wst":
 		// finish time - current time (small → large)
 		sort.Slice(q.Streams, func(i, j int) bool {
-			ti := q.Streams[i].FinishTime - current_time
-			tj := q.Streams[j].FinishTime - current_time
+			ti := q.Streams[i].FinishTime - currentTime
+			tj := q.Streams[j].FinishTime - currentTime
 			return ti < tj
 		})
 

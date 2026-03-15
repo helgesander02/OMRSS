@@ -10,11 +10,19 @@ type importantCAN struct {
 	DataSize float64
 }
 
-func new_importantCAN() *importantCAN {
+func newImportantCAN() *importantCAN {
 	return &importantCAN{
-		Period:   5000, // 5000us
-		Deadline: 5000, // Period = Deadline
-		DataSize: 16,   // 16bytes
+		Period:   5000, // 5000us (default)
+		Deadline: 5000, // Period = Deadline (default)
+		DataSize: 16,   // 16bytes (default)
+	}
+}
+
+func newImportantCANWithParams(period int, deadline int, dataSize float64) *importantCAN {
+	return &importantCAN{
+		Period:   period,
+		Deadline: deadline,
+		DataSize: dataSize,
 	}
 }
 
@@ -24,7 +32,7 @@ type unimportantCAN struct {
 	DataSize float64
 }
 
-func new_unimportantCAN(ucPeriod int, ucDeadline int) *unimportantCAN {
+func newUnimportantCAN(ucPeriod int, ucDeadline int) *unimportantCAN {
 	return &unimportantCAN{
 		Period:   ucPeriod,   // 50000~150000us up 50000us
 		Deadline: ucDeadline, // 10000~20000us up 2000us
@@ -40,7 +48,7 @@ type Stream struct {
 	FinishTime  int
 }
 
-func new_CANStream(name string, arrivalTime int, datasize float64, deadline int, finishTime int) *Stream {
+func newCANStream(name string, arrivalTime int, datasize float64, deadline int, finishTime int) *Stream {
 	return &Stream{
 		Name:        name,
 		ArrivalTime: arrivalTime,
@@ -50,12 +58,12 @@ func new_CANStream(name string, arrivalTime int, datasize float64, deadline int,
 	}
 }
 
-func createCAN2TTStream(arrival_time int, deadline int, datasize float64) *Stream {
+func createCAN2TTStream(arrivalTime int, deadline int, datasize float64) *Stream {
 	newStream := &Stream{
-		ArrivalTime: arrival_time,
+		ArrivalTime: arrivalTime,
 		Deadline:    deadline,
 		DataSize:    datasize,
-		FinishTime:  arrival_time + deadline,
+		FinishTime:  arrivalTime + deadline,
 	}
 
 	return newStream
@@ -71,7 +79,7 @@ type Flow struct {
 	Streams     []*Stream
 }
 
-func new_CANFlow(period int, deadline int, datasize float64, hyperPeriod int) *Flow {
+func newCANFlow(period int, deadline int, datasize float64, hyperPeriod int) *Flow {
 	return &Flow{
 		Period:      period,
 		Deadline:    deadline,
@@ -80,27 +88,27 @@ func new_CANFlow(period int, deadline int, datasize float64, hyperPeriod int) *F
 	}
 }
 
-func new_CAN2TTFlow() *Flow {
+func newCAN2TTFlow() *Flow {
 	return &Flow{}
 }
 
 type Method struct {
-	Method_Name      string
-	CAN2TTFlows      []*Flow
-	BytesSent        float64
-	TTFrameCount     int
-	CAN2TT_O1_Drop   int
-	CAN_Area_O1_Drop int
-	CAN2TSN_Delay    time.Duration
+	MethodName    string
+	CAN2TTFlows   []*Flow
+	BytesSent     float64
+	TTFrameCount  int
+	CAN2TTO1Drop  int
+	CANAreaO1Drop int
+	CAN2TSNDelay  time.Duration
 }
 
-func new_Method(method_name string) *Method {
+func newMethod(methodName string) *Method {
 	return &Method{
-		Method_Name: method_name,
+		MethodName: methodName,
 	}
 }
 
-func new_Method_Set() []*Method {
-	var method_set []*Method
-	return method_set
+func newMethodSet() []*Method {
+	var methodSet []*Method
+	return methodSet
 }

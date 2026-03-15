@@ -2,18 +2,19 @@ package routes
 
 import (
 	"fmt"
+	"src/internal/config"
 	"src/network"
 	"src/network/topology"
 )
 
 // Get_KPath_Routing computes K shortest paths for all flows in OSRO network
-func Get_KPath_Routing(network *network.OSRO_Network, shortestPaths *Paths_set, K int) *KPaths_set {
-	kpaths_set := new_KPaths_Set()
+func Get_KPath_Routing(network *network.Network, cfg *config.Config, shortestPaths *PathsSet, K int) *KPathsSet {
+	kpaths_set := newKPathsSet()
 
 	// TSN flows
 	for nth, flow := range network.FlowSet.TSNFlows {
 		dest := flow.Destinations[0]
-		kpath := BuildKPath(K, flow.Source, dest, network.Graph_Set.TSNGraphs[nth], network.BytesRate)
+		kpath := BuildKPath(K, flow.Source, dest, network.GraphSet.TSNGraphs[nth], cfg.Network.ByteRate)
 		kpaths_set.TSNPaths = append(kpaths_set.TSNPaths, kpath)
 	}
 	fmt.Printf("Finish K-Path %d TSN streams routing (K=%d)\n", len(kpaths_set.TSNPaths), K)
@@ -21,7 +22,7 @@ func Get_KPath_Routing(network *network.OSRO_Network, shortestPaths *Paths_set, 
 	// AVB flows
 	for nth, flow := range network.FlowSet.AVBFlows {
 		dest := flow.Destinations[0]
-		kpath := BuildKPath(K, flow.Source, dest, network.Graph_Set.AVBGraphs[nth], network.BytesRate)
+		kpath := BuildKPath(K, flow.Source, dest, network.GraphSet.AVBGraphs[nth], cfg.Network.ByteRate)
 		kpaths_set.AVBPaths = append(kpaths_set.AVBPaths, kpath)
 	}
 	fmt.Printf("Finish K-Path %d AVB streams routing (K=%d)\n", len(kpaths_set.AVBPaths), K)
@@ -37,14 +38,14 @@ func Get_KPath_Routing(network *network.OSRO_Network, shortestPaths *Paths_set, 
 			if existingKPath, ok := usedKPath[key]; ok {
 				// KPath already computed, clone and set method
 				newKPath := CloneKPath(existingKPath)
-				newKPath.Method = method.Method_Name
+				newKPath.Method = method.MethodName
 				kpaths_set.CAN2TSNPaths = append(kpaths_set.CAN2TSNPaths, newKPath)
 			} else {
 				// Compute new KPath
-				topo := network.Graph_Set.GetGarphBySD(flow.Source, flow.Destination)
-				kpath := BuildKPath(K, flow.Source, flow.Destination, topo, network.BytesRate)
+				topo := network.GraphSet.GetGarphBySD(flow.Source, flow.Destination)
+				kpath := BuildKPath(K, flow.Source, flow.Destination, topo, cfg.Network.ByteRate)
 				if kpath != nil {
-					kpath.Method = method.Method_Name
+					kpath.Method = method.MethodName
 				}
 				kpaths_set.CAN2TSNPaths = append(kpaths_set.CAN2TSNPaths, kpath)
 				usedKPath[key] = kpath
@@ -65,7 +66,7 @@ func BuildKPath(k int, src, dst int, topo *topology.Topology, cost float64) *KPa
 	pathIDs := YenKPaths(graph, src, dst, k)
 
 	// Create KPath structure
-	kpath := new_KPath(k, src, dst)
+	kpath := newKPath(k, src, dst)
 	for _, ids := range pathIDs {
 		path := ConvertIDsToPath(ids, topo, cost)
 		if path != nil {
@@ -94,8 +95,8 @@ func CloneKPath(src *KPath) *KPath {
 }
 
 // InputKPathSet splits KPaths into input KPaths
-func (kpaths_set *KPaths_set) InputKPathSet(bgTSN int, bgAVB int) *KPaths_set {
-	input := new_KPaths_Set()
+func (kpaths_set *KPathsSet) InputKPathSet(bgTSN int, bgAVB int) *KPathsSet {
+	input := newKPathsSet()
 	input.TSNPaths = append(input.TSNPaths, kpaths_set.TSNPaths[bgTSN:]...)
 	input.AVBPaths = append(input.AVBPaths, kpaths_set.AVBPaths[bgAVB:]...)
 	input.CAN2TSNPaths = append(input.CAN2TSNPaths, kpaths_set.CAN2TSNPaths...)
@@ -103,8 +104,8 @@ func (kpaths_set *KPaths_set) InputKPathSet(bgTSN int, bgAVB int) *KPaths_set {
 }
 
 // BGKPathSet splits KPaths into background KPaths
-func (kpaths_set *KPaths_set) BGKPathSet(bgTSN int, bgAVB int) *KPaths_set {
-	bg := new_KPaths_Set()
+func (kpaths_set *KPathsSet) BGKPathSet(bgTSN int, bgAVB int) *KPathsSet {
+	bg := newKPathsSet()
 	bg.TSNPaths = append(bg.TSNPaths, kpaths_set.TSNPaths[:bgTSN]...)
 	bg.AVBPaths = append(bg.AVBPaths, kpaths_set.AVBPaths[:bgAVB]...)
 	return bg

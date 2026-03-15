@@ -6,17 +6,17 @@ import (
 )
 
 type SMT struct {
-	Trees      *routes.Trees_set
-	InputTrees *routes.Trees_set
-	BGTrees    *routes.Trees_set
+	Trees      *routes.TreesSet
+	InputTrees *routes.TreesSet
+	BGTrees    *routes.TreesSet
 	Objs_smt   [4]float64
 	Timer      *algo_timer.Timer
 }
 
 type MDTC struct {
-	Trees      *routes.Trees_set
-	InputTrees *routes.Trees_set
-	BGTrees    *routes.Trees_set
+	Trees      *routes.TreesSet
+	InputTrees *routes.TreesSet
+	BGTrees    *routes.TreesSet
 	Objs_mdtc  [4]float64
 	Timer      *algo_timer.Timer
 }
@@ -25,11 +25,11 @@ type OSACO struct {
 	Timeout       int
 	K             int
 	P             float64
-	KTrees        *routes.KTrees_set
+	KTrees        *routes.KTreesSet
 	VB            *Visibility
 	PRM           *Pheromone
-	InputTrees    *routes.Trees_set
-	BGTrees       *routes.Trees_set
+	InputTrees    *routes.TreesSet
+	BGTrees       *routes.TreesSet
 	Objs_osaco    [5][4]float64        // 200ms{o1, o2, o3, o4} 400ms{o1, o2, o3, o4} 600ms{o1, o2, o3, o4}, 800ms{o1, o2, o3, o4}, 1000ms{o1, o2, o3, o4}
 	Timer         [5]*algo_timer.Timer // 200ms{time} 400ms{time} 600ms{time}, 800ms{time}, 1000ms{time}
 	Method_Number int                  // 0: TOP K minimum weight 1: Increasing Arithmetic Sequence 2: Average Arithmetic Sequence
@@ -48,9 +48,9 @@ type Pheromone struct {
 
 // OSRO structures (Path-based routing)
 type SP struct {
-	Paths      *routes.Paths_set
-	InputPaths *routes.Paths_set
-	BGPaths    *routes.Paths_set
+	Paths      *routes.PathsSet
+	InputPaths *routes.PathsSet
+	BGPaths    *routes.PathsSet
 	Objs_sp    [4]float64
 	Timer      *algo_timer.Timer
 }
@@ -59,11 +59,11 @@ type OSACO_Path struct {
 	Timeout    int
 	K          int
 	P          float64
-	KPaths     *routes.KPaths_set
+	KPaths     *routes.KPathsSet
 	VB_Path    *VisibilityPath
 	PRM_Path   *PheromonePath
-	InputPaths *routes.Paths_set
-	BGPaths    *routes.Paths_set
+	InputPaths *routes.PathsSet
+	BGPaths    *routes.PathsSet
 	Objs_osaco [5][4]float64
 	Timer      [5]*algo_timer.Timer
 }

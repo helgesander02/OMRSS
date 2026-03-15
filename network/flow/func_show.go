@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (flows *FlowSet) Show_Stream() {
+func (flows *FlowSet) ShowStream() {
 	TSNFlows := flows.TSNFlows
 	AVBFlows := flows.AVBFlows
 	number := 1
@@ -34,7 +34,7 @@ func (flows *FlowSet) Show_Stream() {
 	}
 }
 
-func (flows *FlowSet) Show_TTFlow() {
+func (flows *FlowSet) ShowTTFlow() {
 	TSNFlows := flows.TSNFlows
 	AVBFlows := flows.AVBFlows
 	number := 1
@@ -62,12 +62,12 @@ func (flows *FlowSet) Show_TTFlow() {
 	}
 }
 
-func (flows *FlowSet) Show_CANFlow() {
+func (flows *FlowSet) ShowCANFlow() {
 	Method := flows.EncapsulateMethod
-	for _, merhod := range Method {
+	for _, method := range Method {
 		number := 1
-		fmt.Printf("Method Name: %s\n", merhod.Method_Name)
-		for _, flow := range merhod.CAN2TTFlows {
+		fmt.Printf("Method Name: %s\n", method.MethodName)
+		for _, flow := range method.CAN2TTFlows {
 			name := fmt.Sprint("CAN2TTflow", number)
 			fmt.Printf("Source: %d\n", flow.Source)
 			fmt.Printf("Destination: %v\n", flow.Destination)
@@ -80,7 +80,7 @@ func (flows *FlowSet) Show_CANFlow() {
 	}
 }
 
-func (flows *FlowSet) Show_Flows() {
+func (flows *FlowSet) ShowFlows() {
 	// Display all flows.
 	fmt.Printf("Total Flows:%d ( TSN Flows:%d  AVB Flows:%d )\n",
 		len(flows.TSNFlows)+len(flows.AVBFlows), len(flows.TSNFlows), len(flows.AVBFlows))

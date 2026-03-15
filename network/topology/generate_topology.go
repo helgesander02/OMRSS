@@ -7,10 +7,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func Generate_Topology(topologyName string, cost float64) *Topology {
-	// 1. Read YAML file
-	// 2. Create Data
-	// 3. Parse YAML into the Data
+func GenerateTopology(topologyName string, cost float64) *Topology {
+	// Read YAML file: ./yaml
+	// Create and parse YAML into the Data
 	data, err := os.ReadFile("yaml/" + topologyName + ".yaml")
 	if err != nil {
 		log.Fatalf("error: %v", err)
@@ -21,41 +20,33 @@ func Generate_Topology(topologyName string, cost float64) *Topology {
 		log.Fatalf("error: %v", err)
 	}
 
-	// 1. Constructing Topology structures
-	topology := new_Topology()
+	// Devices(EndStations) Switchs(Bridges)
+	topology := NewTopology()
 
-	// 2. Create Switch Node
-	// 2.1 Switchs (Bridges) number
-	// 2.2 Switch Connection
 	for s := 0; s < d.Scale.Bridges; s++ {
-		snode := &Node{ID: s}
-		topology.Switch = append(topology.Switch, snode)
+		switchNode := &Node{ID: s}
+		topology.Switch = append(topology.Switch, switchNode)
 	}
-	define_switch_connection(topology, d.BridgeEdges, cost)
+	defineSwitchConnection(topology, d.BridgeEdges, cost)
 
-	// 3. Create null Nodes
-	// 3.1 END Devices (End Stations) number
-	// 3.2 END Devices Connection
 	for es := 0; es < d.Scale.EndStations; es++ {
 		node := &Node{ID: es + 3000}
 		topology.Nodes = append(topology.Nodes, node)
 	}
-	define_nodes_connection(topology, d.EndStationEdges, cost)
+	defineNodesConnection(topology, d.EndStationEdges, cost)
 
 	return topology
 }
 
-// Define a topology where switches are interconnected with each other
-func define_switch_connection(topology *Topology, bridge_edges []Edge, cost float64) {
-	for _, edge := range bridge_edges {
+func defineSwitchConnection(topology *Topology, bridgeEdges []Edge, cost float64) {
+	for _, edge := range bridgeEdges {
 		topology.AddS2S(edge.Ends[0], edge.Ends[1], cost)
 	}
 
 }
 
-// Define a topology where null nodes are connected to switches
-func define_nodes_connection(topology *Topology, endstation_edges []Edge, cost float64) {
-	for _, edge := range endstation_edges {
+func defineNodesConnection(topology *Topology, endstationEdges []Edge, cost float64) {
+	for _, edge := range endstationEdges {
 		topology.AddnullN2S(edge.Ends[0], edge.Ends[1], cost)
 	}
 

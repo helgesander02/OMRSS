@@ -16,7 +16,7 @@ func SteninerTree(v2v *V2V, t *topology.Topology, Source int, Destinations []int
 	// If there is a vertex, find all shortest paths between the vertex and terminals.
 	// Choose the path with the minimum cost and add all the vertices from this shortest path to the tree.
 	var (
-		tree      *Tree = new_Tree()
+		tree      *Tree = newTree()
 		used_tmal []int
 	)
 
@@ -44,7 +44,7 @@ func SteninerTree(v2v *V2V, t *topology.Topology, Source int, Destinations []int
 		} else {
 			BP := make(map[int][][]int)
 			for _, terminal1 := range Terminal {
-				if terminal_been_used(used_tmal, terminal1) {
+				if terminalBeenUsed(used_tmal, terminal1) {
 					continue
 				}
 				// Find the set of all shortest paths from Vertex to Vertexs
@@ -131,7 +131,7 @@ func addShortestPaths(BP map[int][][]int, paths [][]int) {
 	}
 }
 
-func terminal_been_used(A []int, b int) bool {
+func terminalBeenUsed(A []int, b int) bool {
 	for _, a := range A {
 		if a == b {
 			return true
@@ -146,7 +146,7 @@ func GetGarph(topology *topology.Topology) *Graph {
 	for _, t := range topology.Talker {
 		gt := &Vertex{}
 		gt.ID = t.ID
-		gt.AddEdge(t.Connections)
+		gt.AddEdge(t.Links)
 		graph.Vertexs = append(graph.Vertexs, gt)
 	}
 
@@ -154,7 +154,7 @@ func GetGarph(topology *topology.Topology) *Graph {
 	for _, s := range topology.Switch {
 		gs := &Vertex{}
 		gs.ID = s.ID
-		gs.AddEdge(s.Connections)
+		gs.AddEdge(s.Links)
 		graph.Vertexs = append(graph.Vertexs, gs)
 	}
 
@@ -162,14 +162,14 @@ func GetGarph(topology *topology.Topology) *Graph {
 	for _, l := range topology.Listener {
 		gl := &Vertex{}
 		gl.ID = l.ID
-		gl.AddEdge(l.Connections)
+		gl.AddEdge(l.Links)
 		graph.Vertexs = append(graph.Vertexs, gl)
 	}
 
 	return graph
 }
 
-func (vertex *Vertex) AddEdge(connections []*topology.Connection) {
+func (vertex *Vertex) AddEdge(connections []*topology.Link) {
 	for _, c := range connections {
 		edge := &Edge{
 			Strat: c.FromNodeID,

@@ -6,7 +6,7 @@ import (
 
 // QINGHAN YU et al., "Online Scheduling for Dynamic VM Migration in Multicast Time-Sensitive Networks"
 func DistanceTree(Graph *topology.Topology, Source int, Destinations []int, cost float64) *Tree {
-	MDTC := new_Tree()
+	MDTC := newTree()
 	for _, destination := range Destinations {
 		MDPC := DP_TSP(Graph, Source, destination)
 		MDTC.IntoTree(MDPC, cost)
@@ -23,7 +23,7 @@ func DP_TSP(Graph *topology.Topology, source int, destination int) []int {
 		visited []int // The feedback path of subproblems
 	)
 	node := Graph.GetNodeByID(source)
-	path = get_tsp_shortestpath(Graph, node, visited, destination)
+	path = getTSPShortestPath(Graph, node, visited, destination)
 
 	return path
 }
@@ -41,7 +41,7 @@ func DP_TSP(Graph *topology.Topology, source int, destination int) []int {
 //     - 4 - D      C14 + G(4, {D}) cost=2
 //
 //     path = S - 1 - 4 - D
-func get_tsp_shortestpath(Graph *topology.Topology, node *topology.Node, visited []int, end int) []int {
+func getTSPShortestPath(Graph *topology.Topology, node *topology.Node, visited []int, end int) []int {
 	var (
 		paths [][]int
 	)
@@ -51,22 +51,22 @@ func get_tsp_shortestpath(Graph *topology.Topology, node *topology.Node, visited
 		return visited
 	}
 
-	for _, conn := range node.Connections {
-		if loopcompare_simplex(conn.ToNodeID, visited) {
+	for _, conn := range node.Links {
+		if loopCompareSimplex(conn.ToNodeID, visited) {
 			continue
 		}
 
 		nextnode := Graph.GetNodeByID(conn.ToNodeID)
-		path := get_tsp_shortestpath(Graph, nextnode, visited, end)
+		path := getTSPShortestPath(Graph, nextnode, visited, end)
 		if len(path) != 0 {
 			paths = append(paths, path)
 		}
 	}
 
-	return select_min_path(paths)
+	return selectMinPath(paths)
 }
 
-func select_min_path(paths [][]int) []int {
+func selectMinPath(paths [][]int) []int {
 	var (
 		min_path   []int
 		min_length = 100

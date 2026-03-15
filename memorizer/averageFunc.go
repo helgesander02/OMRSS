@@ -2,7 +2,7 @@ package memorizer
 
 import "time"
 
-func (OC *OMACO_Memorizer) MAverage(testCase int) {
+func (OC *OmacoMemorizer) MAverage(testCase int) {
 	OC.average_time_mdt = time.Duration(int(OC.average_time_mdt/time.Nanosecond)/testCase) * time.Nanosecond
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 4; j++ {
@@ -18,7 +18,7 @@ func (OC *OMACO_Memorizer) MAverage(testCase int) {
 	}
 }
 
-func (OS *OSRO_Memorizer) MAverage(testCase int) {
+func (OS *OsroMemorizer) MAverage(testCase int) {
 	OS.average_time_mdt = time.Duration(int(OS.average_time_mdt/time.Nanosecond)/testCase) * time.Nanosecond
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 4; j++ {

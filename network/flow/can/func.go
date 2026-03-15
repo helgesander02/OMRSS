@@ -2,7 +2,7 @@ package can
 
 import "encoding/json"
 
-func (f *Flow) deepcopyFlow() *Flow {
+func (f *Flow) deepCopyFlow() *Flow {
 	if f == nil {
 		return nil
 	}

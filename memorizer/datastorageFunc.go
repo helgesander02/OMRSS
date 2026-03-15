@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (OC *OMACO_Memorizer) MStoreData(fileName string, testcase int) {
+func (OC *OmacoMemorizer) MStoreData(fileName string, testcase int) {
 	dirName := "data"
 	createFolder(dirName)
 	switchWorkingPath(dirName)
@@ -37,7 +37,7 @@ func (OC *OMACO_Memorizer) MStoreData(fileName string, testcase int) {
 	switchWorkingPath("../..")
 }
 
-func (OS *OSRO_Memorizer) MStoreData(fileName string, testcase int) {
+func (OS *OsroMemorizer) MStoreData(fileName string, testcase int) {
 	dirName := "data"
 	createFolder(dirName)
 	switchWorkingPath(dirName)

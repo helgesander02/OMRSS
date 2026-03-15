@@ -240,7 +240,7 @@ func BuildGraphFromTopology(topo *topology.Topology) *Graph {
 			}
 
 			// Add edges
-			for _, conn := range node.Connections {
+			for _, conn := range node.Links {
 				edge := &Edge{
 					Strat: conn.FromNodeID,
 					End:   conn.ToNodeID,
@@ -262,7 +262,7 @@ func BuildGraphFromTopology(topo *topology.Topology) *Graph {
 
 // ConvertIDsToTree converts a path (node IDs) to a Tree structure
 func ConvertIDsToTree(ids []int, topo *topology.Topology, cost float64) *Tree {
-	tree := new_Tree()
+	tree := newTree()
 
 	for i := 0; i < len(ids)-1; i++ {
 		node1, found1 := tree.CheckNodeByID(ids[i])
@@ -285,10 +285,10 @@ func ConvertIDsToTree(ids []int, topo *topology.Topology, cost float64) *Tree {
 		}
 
 		if !hasConnection {
-			conn1 := new_Connection(ids[i], ids[i+1], cost)
+			conn1 := newConnection(ids[i], ids[i+1], cost)
 			node1.Connections = append(node1.Connections, conn1)
 
-			conn2 := new_Connection(ids[i+1], ids[i], cost)
+			conn2 := newConnection(ids[i+1], ids[i], cost)
 			node2.Connections = append(node2.Connections, conn2)
 
 			tree.Weight++

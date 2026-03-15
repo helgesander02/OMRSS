@@ -6,22 +6,22 @@ import (
 	"src/network/topology"
 )
 
-func Generate_OMACO_Graphs(topology *topology.Topology, flows *flow.FlowSet, bytes_rate float64) *Graphs {
+func GenerateOMACOGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesRate float64) *Graphs {
 	// Constructing Graph structures
-	graphs := new_Graphs()
+	graphs := newGraphs()
 
 	// Generating TSN Graphs
 	for _, flow := range flows.TSNFlows {
-		t := topology.TopologyDeepCopy()                                // Duplicate of Topology
-		t.AddN2S2N_For_Tree(flow.Source, flow.Destinations, bytes_rate) // Undirected Graph
+		t := topology.TopologyDeepCopy()                               // Duplicate of Topology
+		t.AddN2S2N_For_Tree(flow.Source, flow.Destinations, bytesRate) // Undirected Graph
 		graphs.TSNGraphs = append(graphs.TSNGraphs, t)
 	}
 	fmt.Println(len(graphs.TSNGraphs), " TSN Graphs generated.")
 
 	// Generating AVB Graphs
 	for _, flow := range flows.AVBFlows {
-		t := topology.TopologyDeepCopy()                                // Duplicate of Topology
-		t.AddN2S2N_For_Tree(flow.Source, flow.Destinations, bytes_rate) // Undirected Graph
+		t := topology.TopologyDeepCopy()                               // Duplicate of Topology
+		t.AddN2S2N_For_Tree(flow.Source, flow.Destinations, bytesRate) // Undirected Graph
 		graphs.AVBGraphs = append(graphs.AVBGraphs, t)
 	}
 	fmt.Println(len(graphs.AVBGraphs), " AVB Graphs generated.")
@@ -29,22 +29,22 @@ func Generate_OMACO_Graphs(topology *topology.Topology, flows *flow.FlowSet, byt
 	return graphs
 }
 
-func Generate_OSRO_Graphs(topology *topology.Topology, flows *flow.FlowSet, bytes_rate float64) *Graphs {
+func GenerateOSROGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesRate float64) *Graphs {
 	// Constructing Graph structures
-	graphs := new_Graphs()
+	graphs := newGraphs()
 
 	// Generating TSN Graphs
 	for _, flow := range flows.TSNFlows {
-		t := topology.TopologyDeepCopy()                                   // Duplicate of Topology
-		t.AddN2S2N_For_Path(flow.Source, flow.Destinations[0], bytes_rate) // Undirected Graph
+		t := topology.TopologyDeepCopy()                                  // Duplicate of Topology
+		t.AddN2S2N_For_Path(flow.Source, flow.Destinations[0], bytesRate) // Undirected Graph
 		graphs.TSNGraphs = append(graphs.TSNGraphs, t)
 	}
 	fmt.Println(len(graphs.TSNGraphs), " TSN Graphs generated.")
 
 	// Generating AVB Graphs
 	for _, flow := range flows.AVBFlows {
-		t := topology.TopologyDeepCopy()                                   // Duplicate of Topology
-		t.AddN2S2N_For_Path(flow.Source, flow.Destinations[0], bytes_rate) // Undirected Graph
+		t := topology.TopologyDeepCopy()                                  // Duplicate of Topology
+		t.AddN2S2N_For_Path(flow.Source, flow.Destinations[0], bytesRate) // Undirected Graph
 		graphs.AVBGraphs = append(graphs.AVBGraphs, t)
 	}
 	fmt.Println(len(graphs.AVBGraphs), " AVB Graphs generated.")
@@ -53,8 +53,8 @@ func Generate_OSRO_Graphs(topology *topology.Topology, flows *flow.FlowSet, byte
 	for _, method := range flows.EncapsulateMethod {
 		for _, can2tsnflow := range method.CAN2TTFlows {
 			if !graphs.checkListenerAndTalker(can2tsnflow.Source, can2tsnflow.Destination) {
-				t := topology.TopologyDeepCopy()                                             // Duplicate of Topology
-				t.AddN2S2N_For_Path(can2tsnflow.Source, can2tsnflow.Destination, bytes_rate) // Undirected Graph
+				t := topology.TopologyDeepCopy()                                            // Duplicate of Topology
+				t.AddN2S2N_For_Path(can2tsnflow.Source, can2tsnflow.Destination, bytesRate) // Undirected Graph
 				graphs.CAN2TSNGraphs = append(graphs.CAN2TSNGraphs, t)
 
 			}

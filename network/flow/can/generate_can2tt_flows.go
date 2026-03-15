@@ -5,54 +5,54 @@ import (
 	"time"
 )
 
-func Generate_CAN2TT_Flows(CANnode []int, importantCAN int, unimportantCAN int, hyperperiod int) []*Method {
+func GenerateCAN2TTFlows(CANnode []int, importantCAN int, unimportantCAN int, hyperperiod int) []*Method {
 	// step 1: generate CAN flows
-	ImportantCANFlows, UnimportantCANFlows := Generate_CAN_Flows(CANnode, importantCAN, unimportantCAN, hyperperiod)
+	importantCANFlows, unimportantCANFlows := GenerateCANFlows(CANnode, importantCAN, unimportantCAN, hyperperiod)
 
 	// step2: prepare method list
-	var method_list = []string{"fifo", "priority", "obo", "wst", "mao"}
+	var methodList = []string{"fifo", "priority", "obo", "wst", "mao"}
 
 	// step3: according to different encapsulation methods, generate CAN2TT flows
-	Method_Set := new_Method_Set()
-	for _, method_name := range method_list {
-		can2ttClusterPool := new_ClusterPool()
+	methodSet := newMethodSet()
+	for _, methodName := range methodList {
+		can2ttClusterPool := newClusterPool()
 
-		if method_name == "mao" {
-			for _, impf := range ImportantCANFlows {
-				flowCopy := impf.deepcopyFlow()
+		if methodName == "mao" {
+			for _, impf := range importantCANFlows {
+				flowCopy := impf.deepCopyFlow()
 				can2ttClusterPool.organizeCANStreamByPeriodAndDomain(flowCopy)
 			}
-			for _, unimpf := range UnimportantCANFlows {
-				flowCopy := unimpf.deepcopyFlow()
+			for _, unimpf := range unimportantCANFlows {
+				flowCopy := unimpf.deepCopyFlow()
 				can2ttClusterPool.organizeCANStreamByPeriodAndDomain(flowCopy)
 			}
 
 		} else {
-			for _, impf := range ImportantCANFlows {
-				flowCopy := impf.deepcopyFlow()
+			for _, impf := range importantCANFlows {
+				flowCopy := impf.deepCopyFlow()
 				can2ttClusterPool.organizeCANStreamByDomain(flowCopy)
 			}
-			for _, unimpf := range UnimportantCANFlows {
-				flowCopy := unimpf.deepcopyFlow()
+			for _, unimpf := range unimportantCANFlows {
+				flowCopy := unimpf.deepCopyFlow()
 				can2ttClusterPool.organizeCANStreamByDomain(flowCopy)
 			}
 		}
 
 		start := time.Now()
-		method := new_Method(method_name)
+		method := newMethod(methodName)
 		method.EncapsulateCAN2TT(can2ttClusterPool)
-		method.CAN2TSN_Delay = time.Since(start)
-		Method_Set = append(Method_Set, method)
+		method.CAN2TSNDelay = time.Since(start)
+		methodSet = append(methodSet, method)
 	}
 
-	return Method_Set
+	return methodSet
 }
 
 type ClusterPool struct {
 	Clusters []*CANStreamCluster
 }
 
-func new_ClusterPool() *ClusterPool {
+func newClusterPool() *ClusterPool {
 	return &ClusterPool{}
 }
 
@@ -77,7 +77,7 @@ func (can2ttClusterPool *ClusterPool) organizeCANStreamByPeriodAndDomain(f *Flow
 }
 
 func (can2ttClusterPool *ClusterPool) addNewCluster(f *Flow) {
-	cluster := new_StreamCluster()
+	cluster := newStreamCluster()
 	cluster.Source = f.Source
 	cluster.Destination = f.Destination
 	cluster.Period = f.Period
@@ -89,10 +89,10 @@ func (can2ttClusterPool *ClusterPool) addNewCluster(f *Flow) {
 	can2ttClusterPool.Clusters = append(can2ttClusterPool.Clusters, cluster)
 }
 
-func (can2ttClusterPool *ClusterPool) Show_ClusterPool() {
+func (can2ttClusterPool *ClusterPool) ShowClusterPool() {
 	fmt.Println("CAN2TT Traffic Router:")
 	for _, cluster := range can2ttClusterPool.Clusters {
-		cluster.Show_StreamCluster()
+		cluster.ShowStreamCluster()
 	}
 }
 
@@ -100,21 +100,21 @@ type CANStreamCluster struct {
 	Flow
 }
 
-func new_StreamCluster() *CANStreamCluster {
+func newStreamCluster() *CANStreamCluster {
 	return &CANStreamCluster{}
 }
 
-func (cluster *CANStreamCluster) getStreamsByCurrentTime(current_time int) []*Stream {
+func (cluster *CANStreamCluster) getStreamsByCurrentTime(currentTime int) []*Stream {
 	streams := []*Stream{}
 	for _, stream := range cluster.Streams {
-		if stream.ArrivalTime == current_time {
+		if stream.ArrivalTime == currentTime {
 			streams = append(streams, stream)
 		}
 	}
 	return streams
 }
 
-func (cluster *CANStreamCluster) Show_StreamCluster() {
+func (cluster *CANStreamCluster) ShowStreamCluster() {
 	fmt.Printf("Queue (%d→%d) streams=%d\n", cluster.Source, cluster.Destination, len(cluster.Streams))
 	fmt.Printf("Period: %v  ,Deadline: %v ,Datasize: %v\n", cluster.Period, cluster.Deadline, cluster.DataSize)
 }

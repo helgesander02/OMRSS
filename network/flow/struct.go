@@ -11,6 +11,6 @@ type FlowSet struct {
 	EncapsulateMethod []*can.Method
 }
 
-func new_Flow_Set() *FlowSet {
+func newFlowSet() *FlowSet {
 	return &FlowSet{}
 }

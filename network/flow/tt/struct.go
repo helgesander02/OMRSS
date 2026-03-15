@@ -6,7 +6,7 @@ type TSN struct {
 	DataSize float64 // 30~100bytes up 10bytes
 }
 
-func new_TSN(tPeriod int, tDatasize float64) *TSN {
+func newTSN(tPeriod int, tDatasize float64) *TSN {
 	return &TSN{
 		Period:   tPeriod,
 		Deadline: tPeriod,
@@ -20,10 +20,21 @@ type AVB struct {
 	DataSize float64 // 1000~1500bytes  up 100bytes
 }
 
-func new_AVB(aDatasize float64) *AVB {
+func newAVB(aDatasize float64) *AVB {
+	// Use config values if set, otherwise use defaults
+	period := avbPeriod
+	if period == 0 {
+		period = 125
+	}
+
+	deadline := avbDeadline
+	if deadline == 0 {
+		deadline = 2000
+	}
+
 	return &AVB{
-		Period:   125,
-		Deadline: 2000,
+		Period:   period,
+		Deadline: deadline,
 		DataSize: aDatasize,
 	}
 }
@@ -36,7 +47,7 @@ type Stream struct {
 	FinishTime  int
 }
 
-func new_TTStream(name string, arrivalTime int, datasize float64, deadline int, finishTime int) *Stream {
+func newTTStream(name string, arrivalTime int, datasize float64, deadline int, finishTime int) *Stream {
 	return &Stream{
 		Name:        name,
 		ArrivalTime: arrivalTime,
@@ -56,21 +67,21 @@ type Flow struct {
 	Streams      []*Stream
 }
 
-func new_TTFlow(period int, deadline int, datasize float64, HyperPeriod int) *Flow {
+func newTTFlow(period int, deadline int, datasize float64, hyperPeriod int) *Flow {
 	return &Flow{
 		Period:      period,
 		Deadline:    deadline,
 		DataSize:    datasize,
-		HyperPeriod: HyperPeriod,
+		HyperPeriod: hyperPeriod,
 	}
 }
 
-func new_TSN_flows() []*Flow {
-	var TSN_flows []*Flow
-	return TSN_flows
+func newTSNFlows() []*Flow {
+	var tsnFlows []*Flow
+	return tsnFlows
 }
 
-func new_AVB_flows() []*Flow {
-	var AVB_flows []*Flow
-	return AVB_flows
+func newAVBFlows() []*Flow {
+	var avbFlows []*Flow
+	return avbFlows
 }

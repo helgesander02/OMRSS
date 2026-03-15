@@ -25,9 +25,9 @@ func (tree *Tree) IntoTree(P []int, cost float64) {
 			}
 		}
 		if b3 {
-			connection1 := new_Connection(P[l], P[l-1], cost)
+			connection1 := newConnection(P[l], P[l-1], cost)
 			node1.Connections = append(node1.Connections, connection1)
-			connection2 := new_Connection(P[l-1], P[l], cost)
+			connection2 := newConnection(P[l-1], P[l], cost)
 			node2.Connections = append(node2.Connections, connection2)
 		}
 	}
@@ -180,7 +180,7 @@ func (tree1 *Tree) TreeDeepCopy() *Tree {
 	if buf, err := json.Marshal(tree1); err != nil {
 		return nil
 	} else {
-		tree2 := new_Tree()
+		tree2 := newTree()
 		if err = json.Unmarshal(buf, tree2); err != nil {
 			return nil
 		}
@@ -188,7 +188,7 @@ func (tree1 *Tree) TreeDeepCopy() *Tree {
 	}
 }
 
-func loopcompare_simplex(a int, b []int) bool {
+func loopCompareSimplex(a int, b []int) bool {
 	for _, v := range b {
 		if a == v {
 			return true
@@ -197,7 +197,7 @@ func loopcompare_simplex(a int, b []int) bool {
 	return false
 }
 
-func loopcompare_complex(a, b []int) bool {
+func loopCompareComplex(a, b []int) bool {
 	if len(a) != len(b) {
 		return false
 	}

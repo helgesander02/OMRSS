@@ -1,6 +1,3 @@
-# OMRSS (Optimal Multi-hop Routing and Scheduling System) Configuration
-# ========================================================================
-
 # Network Parameters
 # ------------------
 network:
@@ -24,16 +21,41 @@ network:
     tsn:
       input: 35       # Number of TSN input flows
       background: 35  # Number of TSN background flows
+      
+      # TSN flow parameters
+      params:
+        periods: [100, 500, 1000, 1500, 2000]  # Possible period values (microseconds)
+        datasizes: [30, 40, 50, 60, 70, 80, 90, 100]  # Possible data size values (bytes)
     
     # AVB (Audio Video Bridging) flows
     avb:
       input: 15       # Number of AVB input flows
       background: 15  # Number of AVB background flows
+      
+      # AVB flow parameters
+      params:
+        period: 125     # Period in microseconds (fixed value)
+        deadline: 2000  # Deadline in microseconds (fixed value)
+        datasizes: [1000, 1100, 1200, 1300, 1400, 1500]  # Possible data size values (bytes)
     
     # CAN (Controller Area Network) flows
     can:
       important: 5    # Number of CAN important flows
       unimportant: 25 # Number of CAN unimportant flows
+      
+      # CAN flow parameters
+      params:
+        # Important CAN flow characteristics
+        important_params:
+          period: 5000     # Period in microseconds
+          deadline: 5000   # Deadline in microseconds (typically equal to period)
+          datasize: 16     # Data size in bytes
+        
+        # Unimportant CAN flow characteristics
+        unimportant_params:
+          periods: [50000, 100000, 150000]  # Possible period values (microseconds)
+          deadlines: [10000, 12000, 14000, 16000, 18000, 20000]  # Possible deadline values (microseconds)
+          datasize: 16     # Data size in bytes
 
 # Algorithm Parameters
 # --------------------

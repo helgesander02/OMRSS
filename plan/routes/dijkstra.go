@@ -20,7 +20,7 @@ func Dijkstra(graph *Graph, strat int, terminal int) *Graph {
 		vertex.Path = -1
 	}
 
-	get_dijkstra_shortestpath(graph, strat, terminal)
+	getDijkstraShortestPath(graph, strat, terminal)
 
 	sort.Slice(graph.Path, func(p, q int) bool {
 		return len(graph.Path[p]) < len(graph.Path[q])
@@ -30,7 +30,7 @@ func Dijkstra(graph *Graph, strat int, terminal int) *Graph {
 }
 
 // DFS graph return all P(shortest path)
-func get_dijkstra_shortestpath(graph *Graph, strat int, terminal int) {
+func getDijkstraShortestPath(graph *Graph, strat int, terminal int) {
 	vertex := graph.FindVertex(strat)
 	vertex.Visited = true
 
@@ -48,7 +48,7 @@ func get_dijkstra_shortestpath(graph *Graph, strat int, terminal int) {
 				graph.AddPath(terminal)
 			}
 		}
-		get_dijkstra_shortestpath(graph, edge.End, terminal)
+		getDijkstraShortestPath(graph, edge.End, terminal)
 	}
 
 	vertex.Visited = false
@@ -73,7 +73,7 @@ func (graph *Graph) AddPath(terminal int) {
 		InPath := true
 		for _, P := range graph.Path {
 			// If P is already present in the path, do not include it
-			if loopcompare_complex(P, path) {
+			if loopCompareComplex(P, path) {
 				InPath = false
 				break
 			}

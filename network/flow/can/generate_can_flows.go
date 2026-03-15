@@ -4,57 +4,57 @@ import (
 	"fmt"
 )
 
-func Generate_CAN_Flows(CANnode []int, importantCAN int, unimportantCAN int, HyperPeriod int) ([]*Flow, []*Flow) {
+func GenerateCANFlows(CANnode []int, importantCAN int, unimportantCAN int, hyperPeriod int) ([]*Flow, []*Flow) {
 	// Generate CAN Flows
-	ImportantCANFlows := Generate_Important_CANFlow(CANnode, importantCAN, HyperPeriod)
-	UnimportantCANFlows := Generate_Unimportant_CANFlow(CANnode, unimportantCAN, HyperPeriod)
-	fmt.Println("Important CAN:", len(ImportantCANFlows), "Unimportant CAN:", len(UnimportantCANFlows), "Complete generating CAN flows.")
+	importantCANFlows := GenerateImportantCANFlow(CANnode, importantCAN, hyperPeriod)
+	unimportantCANFlows := GenerateUnimportantCANFlow(CANnode, unimportantCAN, hyperPeriod)
+	fmt.Println("Important CAN:", len(importantCANFlows), "Unimportant CAN:", len(unimportantCANFlows), "Complete generating CAN flows.")
 
-	return ImportantCANFlows, UnimportantCANFlows
+	return importantCANFlows, unimportantCANFlows
 }
 
-func Generate_Important_CANFlow(CANnode []int, impcan int, HyperPeriod int) []*Flow {
-	ImportantCANFlows := []*Flow{}
+func GenerateImportantCANFlow(CANnode []int, impcan int, hyperPeriod int) []*Flow {
+	importantCANFlows := []*Flow{}
 	for flow := 0; flow < impcan; flow++ {
-		importantCAN := config_ImportantCAN_Stream()
-		source, destination := random_CAN_Devices_For_Path(CANnode)
+		importantCAN := configImportantCANStream()
+		source, destination := randomCANDevicesForPath(CANnode)
 
-		Flow := Generate_CAN_Streams(importantCAN.Period, importantCAN.Deadline, importantCAN.DataSize, HyperPeriod)
-		Flow.Source = source
-		Flow.Destination = destination
+		canFlow := GenerateCANStreams(importantCAN.Period, importantCAN.Deadline, importantCAN.DataSize, hyperPeriod)
+		canFlow.Source = source
+		canFlow.Destination = destination
 
-		ImportantCANFlows = append(ImportantCANFlows, Flow)
+		importantCANFlows = append(importantCANFlows, canFlow)
 	}
 
-	return ImportantCANFlows
+	return importantCANFlows
 }
 
-func Generate_Unimportant_CANFlow(CANnode []int, umimpcan int, HyperPeriod int) []*Flow {
-	UnimportantCANFlows := []*Flow{}
+func GenerateUnimportantCANFlow(CANnode []int, umimpcan int, hyperPeriod int) []*Flow {
+	unimportantCANFlows := []*Flow{}
 	for flow := 0; flow < umimpcan; flow++ {
-		unimportantCAN := config_UnimportantCAN_Stream()
+		unimportantCAN := configUnimportantCANStream()
 
 		// Random End Devices 1. source(Talker) 2. destinations(listener)
-		source, destination := random_CAN_Devices_For_Path(CANnode)
+		source, destination := randomCANDevicesForPath(CANnode)
 
-		Flow := Generate_CAN_Streams(unimportantCAN.Period, unimportantCAN.Deadline, unimportantCAN.DataSize, HyperPeriod)
-		Flow.Source = source
-		Flow.Destination = destination
+		canFlow := GenerateCANStreams(unimportantCAN.Period, unimportantCAN.Deadline, unimportantCAN.DataSize, hyperPeriod)
+		canFlow.Source = source
+		canFlow.Destination = destination
 
-		UnimportantCANFlows = append(UnimportantCANFlows, Flow)
+		unimportantCANFlows = append(unimportantCANFlows, canFlow)
 	}
 
-	return UnimportantCANFlows
+	return unimportantCANFlows
 }
 
-func Generate_CAN_Streams(period int, deadline int, datasize float64, HyperPeriod int) *Flow {
+func GenerateCANStreams(period int, deadline int, datasize float64, hyperPeriod int) *Flow {
 	var number int = 0
 
-	flow := new_CANFlow(period, deadline, datasize, HyperPeriod)
-	for ArrivalTime := 0; ArrivalTime < HyperPeriod; ArrivalTime += period {
-		FinishTime := ArrivalTime + deadline
+	flow := newCANFlow(period, deadline, datasize, hyperPeriod)
+	for arrivalTime := 0; arrivalTime < hyperPeriod; arrivalTime += period {
+		finishTime := arrivalTime + deadline
 		name := fmt.Sprint("canstream", number)
-		stream := new_CANStream(name, ArrivalTime, datasize, deadline, FinishTime)
+		stream := newCANStream(name, arrivalTime, datasize, deadline, finishTime)
 		flow.Streams = append(flow.Streams, stream)
 		number += 1
 	}

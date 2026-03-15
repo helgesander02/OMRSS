@@ -1,45 +1,45 @@
 package can
 
-type Encapsulate_Config struct {
-	Datasize_Least float64
-	Datasize_Max   float64
-	Step           int
-	CANBandwidth   float64
-	BytesPerStep   float64
+type EncapsulateConfig struct {
+	DatasizeLeast float64
+	DatasizeMax   float64
+	Step          int
+	CANBandwidth  float64
+	BytesPerStep  float64
 }
 
-func new_Encapsulate_Config() *Encapsulate_Config {
-	return &Encapsulate_Config{
-		Datasize_Least: 64.,                    // bytes
-		Datasize_Max:   1500.,                  // bytes
-		Step:           1000,                   // us
-		CANBandwidth:   1000000.0,              // CAN bandwidth 1 Mbps
-		BytesPerStep:   (1000000.0 / 8) * 1e-3, // bytes per 1000 us
+func newEncapsulateConfig() *EncapsulateConfig {
+	return &EncapsulateConfig{
+		DatasizeLeast: 64.,                    // bytes
+		DatasizeMax:   1500.,                  // bytes
+		Step:          1000,                   // us
+		CANBandwidth:  1000000.0,              // CAN bandwidth 1 Mbps
+		BytesPerStep:  (1000000.0 / 8) * 1e-3, // bytes per 1000 us
 	}
 }
 
 func (method *Method) EncapsulateCAN2TT(can2ttClusterPool *ClusterPool) {
-	encap_config := new_Encapsulate_Config()
+	encapConfig := newEncapsulateConfig()
 	if len(method.CAN2TTFlows) == 0 {
 		method.organizeCAN2TTFlows(can2ttClusterPool)
 	}
 
-	switch method.Method_Name {
+	switch method.MethodName {
 	case "obo":
-		method.encap_obo(can2ttClusterPool, encap_config)
+		method.encapOBO(can2ttClusterPool, encapConfig)
 	case "wst":
-		method.encap_wst(can2ttClusterPool, encap_config)
+		method.encapWST(can2ttClusterPool, encapConfig)
 	case "mao":
-		method.encap_mao(can2ttClusterPool, encap_config)
+		method.encapMAO(can2ttClusterPool, encapConfig)
 	default:
-		method.encap_fifo_or_priority(can2ttClusterPool, encap_config)
+		method.encapFIFOOrPriority(can2ttClusterPool, encapConfig)
 	}
 }
 
 func (method *Method) organizeCAN2TTFlows(can2ttClusterPool *ClusterPool) {
 	for _, cluster := range can2ttClusterPool.Clusters {
 		if !method.flowExists(cluster.Source, cluster.Destination) {
-			can2ttFlow := new_CAN2TTFlow()
+			can2ttFlow := newCAN2TTFlow()
 			can2ttFlow.Source = cluster.Source
 			can2ttFlow.Destination = cluster.Destination
 			can2ttFlow.Period = cluster.Period
@@ -70,69 +70,69 @@ func (method *Method) flowExists(source int, destination int) bool {
 	return false
 }
 
-func (method *Method) encap_fifo_or_priority(can2ttClusterPool *ClusterPool, encap_config *Encapsulate_Config) {
-	for _, can_stream_cluster := range can2ttClusterPool.Clusters {
-		queue := new_Queue()
-		can2ttFlow := method.getCAN2TTFlowByDomain(can_stream_cluster.Source, can_stream_cluster.Destination)
+func (method *Method) encapFIFOOrPriority(can2ttClusterPool *ClusterPool, encapConfig *EncapsulateConfig) {
+	for _, canStreamCluster := range can2ttClusterPool.Clusters {
+		queue := newQueue()
+		can2ttFlow := method.getCAN2TTFlowByDomain(canStreamCluster.Source, canStreamCluster.Destination)
 
 		deadline := 0
-		datasize_count := 0.
-		for current_time := 0; current_time < can2ttFlow.HyperPeriod; current_time += encap_config.Step {
-			queue.appendQueue(can_stream_cluster.getStreamsByCurrentTime(current_time))
-			queue.sortQueue(method.Method_Name, current_time)
+		datasizeCount := 0.
+		for currentTime := 0; currentTime < can2ttFlow.HyperPeriod; currentTime += encapConfig.Step {
+			queue.appendQueue(canStreamCluster.getStreamsByCurrentTime(currentTime))
+			queue.sortQueue(method.MethodName, currentTime)
 
-			// fristly, drop overdue streams
-			method.CAN2TT_O1_Drop += queue.checkDrop(current_time)
+			// firstly, drop overdue streams
+			method.CAN2TTO1Drop += queue.checkDrop(currentTime)
 
 			// secondly, encapsulate streams
 			head := 0
 			for head < len(queue.Streams) {
 				stream := queue.Streams[head]
-				datasize_count += stream.DataSize
+				datasizeCount += stream.DataSize
 				head++
 				if deadline == 0 || stream.Deadline < deadline {
 					deadline = stream.Deadline
 				}
 
-				if datasize_count >= encap_config.Datasize_Max {
-					method.flushStream(can2ttFlow, current_time, datasize_count, deadline, encap_config.Datasize_Least)
-					datasize_count = 0
+				if datasizeCount >= encapConfig.DatasizeMax {
+					method.flushStream(can2ttFlow, currentTime, datasizeCount, deadline, encapConfig.DatasizeLeast)
+					datasizeCount = 0
 					queue.popQueueByHead(head)
 					head = 0
 					deadline = 0
 				}
 			}
 
-			if datasize_count > 0 && current_time%can2ttFlow.Period == 0 {
-				method.flushStream(can2ttFlow, current_time, datasize_count, deadline, encap_config.Datasize_Least)
-				datasize_count = 0
+			if datasizeCount > 0 && currentTime%can2ttFlow.Period == 0 {
+				method.flushStream(can2ttFlow, currentTime, datasizeCount, deadline, encapConfig.DatasizeLeast)
+				datasizeCount = 0
 				queue.popQueueByHead(head)
 				head = 0
 				deadline = 0
 			}
 		}
-		if datasize_count > 0 {
-			method.flushStream(can2ttFlow, can2ttFlow.HyperPeriod, datasize_count, deadline, encap_config.Datasize_Least)
-			datasize_count = 0
+		if datasizeCount > 0 {
+			method.flushStream(can2ttFlow, can2ttFlow.HyperPeriod, datasizeCount, deadline, encapConfig.DatasizeLeast)
+			datasizeCount = 0
 			deadline = 0
 		}
 	}
 }
 
-func (method *Method) encap_obo(can2ttClusterPool *ClusterPool, encap_config *Encapsulate_Config) {
-	for _, can_stream_cluster := range can2ttClusterPool.Clusters {
-		queue := new_Queue()
-		can2ttFlow := method.getCAN2TTFlowByDomain(can_stream_cluster.Source, can_stream_cluster.Destination)
+func (method *Method) encapOBO(can2ttClusterPool *ClusterPool, encapConfig *EncapsulateConfig) {
+	for _, canStreamCluster := range can2ttClusterPool.Clusters {
+		queue := newQueue()
+		can2ttFlow := method.getCAN2TTFlowByDomain(canStreamCluster.Source, canStreamCluster.Destination)
 
-		for current_time := 0; current_time < can2ttFlow.HyperPeriod; current_time += encap_config.Step {
-			queue.appendQueue(can_stream_cluster.getStreamsByCurrentTime(current_time))
+		for currentTime := 0; currentTime < can2ttFlow.HyperPeriod; currentTime += encapConfig.Step {
+			queue.appendQueue(canStreamCluster.getStreamsByCurrentTime(currentTime))
 
-			// fristly, drop overdue streams
-			method.CAN2TT_O1_Drop += queue.checkDrop(current_time)
+			// firstly, drop overdue streams
+			method.CAN2TTO1Drop += queue.checkDrop(currentTime)
 
 			// secondly, encapsulate streams
 			for len(queue.Streams) > 0 {
-				method.flushStream(can2ttFlow, current_time, encap_config.Datasize_Least, queue.Streams[0].Deadline, encap_config.Datasize_Least)
+				method.flushStream(can2ttFlow, currentTime, encapConfig.DatasizeLeast, queue.Streams[0].Deadline, encapConfig.DatasizeLeast)
 				queue.popQueueByIdx(0)
 			}
 
@@ -140,81 +140,81 @@ func (method *Method) encap_obo(can2ttClusterPool *ClusterPool, encap_config *En
 	}
 }
 
-func (method *Method) encap_wst(can2ttClusterPool *ClusterPool, encap_config *Encapsulate_Config) {
+func (method *Method) encapWST(can2ttClusterPool *ClusterPool, encapConfig *EncapsulateConfig) {
 	const guardBase = 1800 // µs
-	for _, can_stream_cluster := range can2ttClusterPool.Clusters {
-		queue := new_Queue()
-		can2ttFlow := method.getCAN2TTFlowByDomain(can_stream_cluster.Source, can_stream_cluster.Destination)
+	for _, canStreamCluster := range can2ttClusterPool.Clusters {
+		queue := newQueue()
+		can2ttFlow := method.getCAN2TTFlowByDomain(canStreamCluster.Source, canStreamCluster.Destination)
 
-		datasize_count := 0.
+		datasizeCount := 0.
 		deadline := 0
-		for current_time := 0; current_time < can2ttFlow.HyperPeriod; current_time += encap_config.Step {
-			queue.appendQueue(can_stream_cluster.getStreamsByCurrentTime(current_time))
-			queue.sortQueue(method.Method_Name, current_time)
+		for currentTime := 0; currentTime < can2ttFlow.HyperPeriod; currentTime += encapConfig.Step {
+			queue.appendQueue(canStreamCluster.getStreamsByCurrentTime(currentTime))
+			queue.sortQueue(method.MethodName, currentTime)
 
-			// fristly, drop overdue streams
-			method.CAN2TT_O1_Drop += queue.checkDrop(current_time)
+			// firstly, drop overdue streams
+			method.CAN2TTO1Drop += queue.checkDrop(currentTime)
 
 			// secondly, encapsulate streams
 			guard := guardBase + len(queue.Streams)*600
 			if len(queue.Streams) == 0 {
 				continue
 			}
-			for queue.hasImminent(current_time, guard) {
+			for queue.hasImminent(currentTime, guard) {
 				head := 0
-				for head < len(queue.Streams) && datasize_count+queue.Streams[head].DataSize < encap_config.Datasize_Max {
+				for head < len(queue.Streams) && datasizeCount+queue.Streams[head].DataSize < encapConfig.DatasizeMax {
 					if deadline == 0 || queue.Streams[head].Deadline < deadline {
 						deadline = queue.Streams[head].Deadline
 					}
 
-					datasize_count += queue.Streams[head].DataSize
+					datasizeCount += queue.Streams[head].DataSize
 					head++
 				}
 
-				method.flushStream(can2ttFlow, current_time, datasize_count, deadline, encap_config.Datasize_Least)
+				method.flushStream(can2ttFlow, currentTime, datasizeCount, deadline, encapConfig.DatasizeLeast)
 				queue.popQueueByHead(head)
-				datasize_count = 0
+				datasizeCount = 0
 				deadline = 0
 			}
 		}
 
 		if len(queue.Streams) > 0 {
-			method.flushStream(can2ttFlow, can2ttFlow.HyperPeriod, datasize_count, deadline, encap_config.Datasize_Least)
-			datasize_count = 0
+			method.flushStream(can2ttFlow, can2ttFlow.HyperPeriod, datasizeCount, deadline, encapConfig.DatasizeLeast)
+			datasizeCount = 0
 			deadline = 0
 		}
 	}
 }
 
-func (method *Method) encap_mao(can2ttClusterPool *ClusterPool, encap_config *Encapsulate_Config) {
+func (method *Method) encapMAO(can2ttClusterPool *ClusterPool, encapConfig *EncapsulateConfig) {
 	// step1: MAO Aggregation (已實現)
 	MTU := 1500.0
-	for _, can_stream_cluster := range can2ttClusterPool.Clusters {
-		queue := new_Queue()
-		can2ttFlow := method.getCAN2TTFlowByDomain(can_stream_cluster.Source, can_stream_cluster.Destination)
+	for _, canStreamCluster := range can2ttClusterPool.Clusters {
+		queue := newQueue()
+		can2ttFlow := method.getCAN2TTFlowByDomain(canStreamCluster.Source, canStreamCluster.Destination)
 
 		deadline := 0
-		datasize_count := 0.
-		for current_time := 0; current_time < can2ttFlow.HyperPeriod; current_time += encap_config.Step {
-			queue.appendQueue(can_stream_cluster.getStreamsByCurrentTime(current_time))
-			queue.sortQueue(method.Method_Name, current_time)
+		datasizeCount := 0.
+		for currentTime := 0; currentTime < can2ttFlow.HyperPeriod; currentTime += encapConfig.Step {
+			queue.appendQueue(canStreamCluster.getStreamsByCurrentTime(currentTime))
+			queue.sortQueue(method.MethodName, currentTime)
 
-			// fristly, drop overdue streams
-			method.CAN2TT_O1_Drop += queue.checkDrop(current_time)
+			// firstly, drop overdue streams
+			method.CAN2TTO1Drop += queue.checkDrop(currentTime)
 
 			// secondly, encapsulate streams
 			head := 0
 			for head < len(queue.Streams) {
 				stream := queue.Streams[head]
-				datasize_count += stream.DataSize
+				datasizeCount += stream.DataSize
 				head++
 				if deadline == 0 || stream.Deadline < deadline {
 					deadline = stream.Deadline
 				}
 
-				if datasize_count >= (MTU / 2) {
-					method.flushStream(can2ttFlow, current_time, datasize_count, deadline, encap_config.Datasize_Least)
-					datasize_count = 0
+				if datasizeCount >= (MTU / 2) {
+					method.flushStream(can2ttFlow, currentTime, datasizeCount, deadline, encapConfig.DatasizeLeast)
+					datasizeCount = 0
 					queue.popQueueByHead(head)
 					head = 0
 					deadline = 0
@@ -223,9 +223,9 @@ func (method *Method) encap_mao(can2ttClusterPool *ClusterPool, encap_config *En
 
 		}
 
-		if datasize_count >= 0 {
-			method.flushStream(can2ttFlow, can2ttFlow.HyperPeriod, datasize_count, deadline, encap_config.Datasize_Least)
-			datasize_count = 0
+		if datasizeCount >= 0 {
+			method.flushStream(can2ttFlow, can2ttFlow.HyperPeriod, datasizeCount, deadline, encapConfig.DatasizeLeast)
+			datasizeCount = 0
 			deadline = 0
 		}
 	}
@@ -234,9 +234,9 @@ func (method *Method) encap_mao(can2ttClusterPool *ClusterPool, encap_config *En
 	method.harmonicMerge(MTU)
 }
 
-func (method *Method) flushStream(flow *Flow, now int, packedSize float64, dl int, Datasize_Least float64) {
-	if packedSize < Datasize_Least {
-		packedSize = Datasize_Least
+func (method *Method) flushStream(flow *Flow, now int, packedSize float64, dl int, datasizeLeast float64) {
+	if packedSize < datasizeLeast {
+		packedSize = datasizeLeast
 	}
 	stream := createCAN2TTStream(now, dl, packedSize+42)
 	flow.Streams = append(flow.Streams, stream)
