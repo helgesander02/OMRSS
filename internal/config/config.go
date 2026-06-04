@@ -111,11 +111,9 @@ type OutputConfig struct {
 
 func Load(configName string) (*Config, error) {
 	v := viper.New()
-	setDefaults(v)
 
 	v.SetConfigType("yaml")
-	v.AddConfigPath("./config")
-	v.AddConfigPath(".")
+	v.AddConfigPath("./internal/config")
 
 	switch configName {
 	case "omaco":
@@ -152,55 +150,6 @@ func Load(configName string) (*Config, error) {
 	cfg.Network.Bandwidth = bytesPerUs * float64(cfg.Network.Hyperperiod) // bytes that can be transmitted in one hyperperiod
 
 	return &cfg, nil
-}
-
-func setDefaults(v *viper.Viper) {
-	v.SetDefault("network.topology", "typical_complex")
-	v.SetDefault("network.hyperperiod", 6000)
-	v.SetDefault("network.bandwidth", 1e9)
-	v.SetDefault("network.flows.tsn.input", 35)
-	v.SetDefault("network.flows.tsn.background", 35)
-	v.SetDefault("network.flows.avb.input", 15)
-	v.SetDefault("network.flows.avb.background", 15)
-	v.SetDefault("network.flows.can.important", 5)
-	v.SetDefault("network.flows.can.unimportant", 25)
-
-	// TSN flow parameters
-	v.SetDefault("network.flows.tsn.params.periods", []int{100, 500, 1000, 1500, 2000})
-	v.SetDefault("network.flows.tsn.params.datasizes", []float64{30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0})
-
-	// AVB flow parameters
-	v.SetDefault("network.flows.avb.params.period", 125)
-	v.SetDefault("network.flows.avb.params.deadline", 2000)
-	v.SetDefault("network.flows.avb.params.datasizes", []float64{1000.0, 1100.0, 1200.0, 1300.0, 1400.0, 1500.0})
-
-	// CAN important flow parameters
-	v.SetDefault("network.flows.can.params.important_params.period", 5000)
-	v.SetDefault("network.flows.can.params.important_params.deadline", 5000)
-	v.SetDefault("network.flows.can.params.important_params.datasize", 16.0)
-
-	// CAN unimportant flow parameters
-	v.SetDefault("network.flows.can.params.unimportant_params.periods", []int{50000, 100000, 150000})
-	v.SetDefault("network.flows.can.params.unimportant_params.deadlines", []int{10000, 12000, 14000, 16000, 18000, 20000})
-	v.SetDefault("network.flows.can.params.unimportant_params.datasize", 16.0)
-
-	v.SetDefault("algorithm.name", "omaco")
-	v.SetDefault("algorithm.osaco.timeout", 200)
-	v.SetDefault("algorithm.osaco.k_trees", 5)
-	v.SetDefault("algorithm.osaco.pheromone_evaporation", 0.7)
-	v.SetDefault("algorithm.osaco.method_number", 0)
-
-	v.SetDefault("schedule.costs.o1", 100000000)
-	v.SetDefault("schedule.costs.o2", 100000)
-	v.SetDefault("schedule.costs.o3", 0)
-	v.SetDefault("schedule.costs.o4", 1)
-
-	v.SetDefault("experiment.test_cases", 100)
-	v.SetDefault("experiment.random_seed", 42)
-
-	v.SetDefault("output.show_network", false)
-	v.SetDefault("output.show_plan", false)
-	v.SetDefault("output.log_level", "info")
 }
 
 func (c *Config) Validate() error {

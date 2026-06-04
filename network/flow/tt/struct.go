@@ -39,7 +39,7 @@ func newAVB(aDatasize float64) *AVB {
 	}
 }
 
-type Stream struct {
+type Frame struct {
 	Name        string
 	ArrivalTime int
 	DataSize    float64
@@ -47,8 +47,8 @@ type Stream struct {
 	FinishTime  int
 }
 
-func newTTStream(name string, arrivalTime int, datasize float64, deadline int, finishTime int) *Stream {
-	return &Stream{
+func newTTFrame(name string, arrivalTime int, datasize float64, deadline int, finishTime int) *Frame {
+	return &Frame{
 		Name:        name,
 		ArrivalTime: arrivalTime,
 		DataSize:    datasize,
@@ -64,7 +64,7 @@ type Flow struct {
 	HyperPeriod  int
 	Source       int
 	Destinations []int
-	Streams      []*Stream
+	Frames       []*Frame
 }
 
 func newTTFlow(period int, deadline int, datasize float64, hyperPeriod int) *Flow {

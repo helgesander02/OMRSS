@@ -219,29 +219,29 @@ func (method *Method) mergeFlowGroup(group *FlowGroup) *Flow {
 		Deadline:    group.MinDeadline,     // 最小截止時間
 		DataSize:    group.TotalSize,       // 總數據大小
 		HyperPeriod: firstFlow.HyperPeriod, // 保持相同的HyperPeriod
-		Streams:     make([]*Stream, 0),
+		Frames:      make([]*Frame, 0),
 	}
 
-	// 合併所有Stream（根據新的週期重新生成）
-	mergedFlow.Streams = method.regenerateStreams(group, mergedFlow.Period, mergedFlow.HyperPeriod)
+	// 合併所有Frame（根據新的週期重新生成）
+	mergedFlow.Frames = method.regenerateFrames(group, mergedFlow.Period, mergedFlow.HyperPeriod)
 
 	return mergedFlow
 }
 
-// regenerateStreams 根據新的週期重新生成Stream
-func (method *Method) regenerateStreams(group *FlowGroup, newPeriod int, hyperPeriod int) []*Stream {
-	streams := make([]*Stream, 0)
+// regenerateFrames 根據新的週期重新生成Frame
+func (method *Method) regenerateFrames(group *FlowGroup, newPeriod int, hyperPeriod int) []*Frame {
+	frames := make([]*Frame, 0)
 
-	// 按照新週期生成Stream實例
+	// 按照新週期生成Frame實例
 	for currentTime := 0; currentTime < hyperPeriod; currentTime += newPeriod {
-		stream := &Stream{
+		frame := &Frame{
 			ArrivalTime: currentTime,
 			Deadline:    group.MinDeadline,
 			DataSize:    group.TotalSize,
 			FinishTime:  currentTime + group.MinDeadline,
 		}
-		streams = append(streams, stream)
+		frames = append(frames, frame)
 	}
 
-	return streams
+	return frames
 }

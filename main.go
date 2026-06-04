@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -14,13 +15,7 @@ import (
 	"src/memorizer"
 	"src/network"
 	"src/plan"
-
-	"github.com/spf13/pflag"
 )
-
-func init() {
-	pflag.StringP("config", "c", "", "Path to configuration file")
-}
 
 func main() {
 	if err := run(); err != nil {
@@ -29,15 +24,11 @@ func main() {
 }
 
 func run() error {
-	pflag.Parse()
-
 	// Load configuration
-	configFile, err := pflag.CommandLine.GetString("config")
-	if err != nil {
-		return err
-	}
+	configFile := flag.String("config", "omaco", "Path to configuration file (omaco, osro)")
+	flag.Parse()
 
-	cfg, err := config.Load(configFile)
+	cfg, err := config.Load(*configFile)
 	if err != nil {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
@@ -49,7 +40,6 @@ func run() error {
 	fmt.Printf("Topology: %s\n", cfg.Network.Topology)
 	fmt.Printf("Algorithm: %s\n", cfg.Algorithm.Name)
 	fmt.Printf("Test Cases: %d\n", cfg.Experiment.TestCases)
-	fmt.Printf("Random Seed: %d\n", cfg.Experiment.RandomSeed)
 	fmt.Println("========================================")
 	fmt.Println()
 

@@ -40,7 +40,7 @@ func newUnimportantCAN(ucPeriod int, ucDeadline int) *unimportantCAN {
 	}
 }
 
-type Stream struct {
+type Frame struct {
 	Name        string
 	ArrivalTime int
 	DataSize    float64
@@ -48,8 +48,8 @@ type Stream struct {
 	FinishTime  int
 }
 
-func newCANStream(name string, arrivalTime int, datasize float64, deadline int, finishTime int) *Stream {
-	return &Stream{
+func newCANFrame(name string, arrivalTime int, datasize float64, deadline int, finishTime int) *Frame {
+	return &Frame{
 		Name:        name,
 		ArrivalTime: arrivalTime,
 		DataSize:    datasize,
@@ -58,15 +58,15 @@ func newCANStream(name string, arrivalTime int, datasize float64, deadline int, 
 	}
 }
 
-func createCAN2TTStream(arrivalTime int, deadline int, datasize float64) *Stream {
-	newStream := &Stream{
+func createCAN2TTFrame(arrivalTime int, deadline int, datasize float64) *Frame {
+	newFrame := &Frame{
 		ArrivalTime: arrivalTime,
 		Deadline:    deadline,
 		DataSize:    datasize,
 		FinishTime:  arrivalTime + deadline,
 	}
 
-	return newStream
+	return newFrame
 }
 
 type Flow struct {
@@ -76,7 +76,7 @@ type Flow struct {
 	HyperPeriod int
 	Source      int
 	Destination int
-	Streams     []*Stream
+	Frames      []*Frame
 }
 
 func newCANFlow(period int, deadline int, datasize float64, hyperPeriod int) *Flow {

@@ -11,12 +11,12 @@ func GenerateTTFlows(nnodeLength int, bgTSN int, bgAVB int, inputTSN int, inputA
 	// Generate TT BG Flows, round 1
 	tsnFlows = GenerateTTTSNFlow(tsnFlows, nnodeLength, bgTSN, hyperPeriod)
 	avbFlows = GenerateTTAVBFlow(avbFlows, nnodeLength, bgAVB, hyperPeriod)
-	fmt.Printf("Complete generating round%d bgstreams.\n", 1)
+	fmt.Printf("Complete generating round%d bgframes.\n", 1)
 
 	// Generate TT Input Flows,round 2
 	tsnFlows = GenerateTTTSNFlow(tsnFlows, nnodeLength, inputTSN, hyperPeriod)
 	avbFlows = GenerateTTAVBFlow(avbFlows, nnodeLength, inputAVB, hyperPeriod)
-	fmt.Printf("Complete generating round%d tsnstreams.\n", 2)
+	fmt.Printf("Complete generating round%d tsnframes.\n", 2)
 
 	fmt.Println("TSN:", len(tsnFlows), "AVB:", len(avbFlows), "Complete generating TT Flows.")
 
@@ -25,10 +25,10 @@ func GenerateTTFlows(nnodeLength int, bgTSN int, bgAVB int, inputTSN int, inputA
 
 func GenerateTTTSNFlow(flows []*Flow, nnodeLength int, TS int, hyperPeriod int) []*Flow {
 	for flow := 0; flow < TS; flow++ {
-		tsn := configTSNStream()
+		tsn := configTSNFrame()
 		source, destinations := randomTTDevicesForTree(nnodeLength)
 
-		ttFlow := GenerateTTStream(tsn.Period, tsn.Deadline, tsn.DataSize, hyperPeriod)
+		ttFlow := GenerateTTFrame(tsn.Period, tsn.Deadline, tsn.DataSize, hyperPeriod)
 		ttFlow.Source = source
 		ttFlow.Destinations = destinations
 
@@ -39,10 +39,10 @@ func GenerateTTTSNFlow(flows []*Flow, nnodeLength int, TS int, hyperPeriod int) 
 
 func GenerateTTAVBFlow(flows []*Flow, nnodeLength int, AS int, hyperPeriod int) []*Flow {
 	for flow := 0; flow < AS; flow++ {
-		avb := configAVBStream()
+		avb := configAVBFrame()
 		source, destinations := randomTTDevicesForTree(nnodeLength)
 
-		ttFlow := GenerateTTStream(avb.Period, avb.Deadline, avb.DataSize, hyperPeriod)
+		ttFlow := GenerateTTFrame(avb.Period, avb.Deadline, avb.DataSize, hyperPeriod)
 		ttFlow.Source = source
 		ttFlow.Destinations = destinations
 
@@ -51,15 +51,15 @@ func GenerateTTAVBFlow(flows []*Flow, nnodeLength int, AS int, hyperPeriod int) 
 	return flows
 }
 
-func GenerateTTStream(period int, deadline int, datasize float64, hyperPeriod int) *Flow {
+func GenerateTTFrame(period int, deadline int, datasize float64, hyperPeriod int) *Flow {
 	var number int = 0
 
 	flow := newTTFlow(period, deadline, datasize, hyperPeriod)
 	for arrivalTime := 0; arrivalTime < hyperPeriod; arrivalTime += period {
 		finishTime := arrivalTime + deadline
-		name := fmt.Sprint("stream", number)
-		stream := newTTStream(name, arrivalTime, datasize, deadline, finishTime)
-		flow.Streams = append(flow.Streams, stream)
+		name := fmt.Sprint("frame", number)
+		frame := newTTFrame(name, arrivalTime, datasize, deadline, finishTime)
+		flow.Frames = append(flow.Frames, frame)
 		number += 1
 	}
 

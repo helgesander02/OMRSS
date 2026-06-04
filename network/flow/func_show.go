@@ -4,16 +4,16 @@ import (
 	"fmt"
 )
 
-func (flows *FlowSet) ShowStream() {
+func (flows *FlowSet) ShowFrame() {
 	TSNFlows := flows.TSNFlows
 	AVBFlows := flows.AVBFlows
 	number := 1
 	for _, flow := range TSNFlows {
 		name := fmt.Sprint("TSNflow", number)
 		fmt.Println(name)
-		for _, stream := range flow.Streams {
+		for _, frame := range flow.Frames {
 			fmt.Printf("%s ArrivalTime:%d DataSize:%f Deadline:%d FinishTime:%d\n",
-				stream.Name, stream.ArrivalTime, stream.DataSize, stream.Deadline, stream.FinishTime)
+				frame.Name, frame.ArrivalTime, frame.DataSize, frame.Deadline, frame.FinishTime)
 		}
 		number += 1
 
@@ -24,9 +24,9 @@ func (flows *FlowSet) ShowStream() {
 	for _, flow := range AVBFlows {
 		name := fmt.Sprint("AVBflow", number)
 		fmt.Println(name)
-		for _, stream := range flow.Streams {
+		for _, frame := range flow.Frames {
 			fmt.Printf("%s ArrivalTime:%d DataSize:%f Deadline:%d FinishTime:%d\n",
-				stream.Name, stream.ArrivalTime, stream.DataSize, stream.Deadline, stream.FinishTime)
+				frame.Name, frame.ArrivalTime, frame.DataSize, frame.Deadline, frame.FinishTime)
 		}
 		number += 1
 

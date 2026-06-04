@@ -15,32 +15,32 @@ func GenerateCAN2TTFlows(CANnode []int, importantCAN int, unimportantCAN int, hy
 	// step3: according to different encapsulation methods, generate CAN2TT flows
 	methodSet := newMethodSet()
 	for _, methodName := range methodList {
-		can2ttClusterPool := newClusterPool()
+		forwardingEngine := newForwardingEngine()
 
 		if methodName == "mao" {
 			for _, impf := range importantCANFlows {
 				flowCopy := impf.deepCopyFlow()
-				can2ttClusterPool.organizeCANStreamByPeriodAndDomain(flowCopy)
+				forwardingEngine.aggregateCANFrameByPeriodAndDomain(flowCopy)
 			}
 			for _, unimpf := range unimportantCANFlows {
 				flowCopy := unimpf.deepCopyFlow()
-				can2ttClusterPool.organizeCANStreamByPeriodAndDomain(flowCopy)
+				forwardingEngine.aggregateCANFrameByPeriodAndDomain(flowCopy)
 			}
 
 		} else {
 			for _, impf := range importantCANFlows {
 				flowCopy := impf.deepCopyFlow()
-				can2ttClusterPool.organizeCANStreamByDomain(flowCopy)
+				forwardingEngine.aggregateCANFrameByDomain(flowCopy)
 			}
 			for _, unimpf := range unimportantCANFlows {
 				flowCopy := unimpf.deepCopyFlow()
-				can2ttClusterPool.organizeCANStreamByDomain(flowCopy)
+				forwardingEngine.aggregateCANFrameByDomain(flowCopy)
 			}
 		}
 
 		start := time.Now()
 		method := newMethod(methodName)
-		method.EncapsulateCAN2TT(can2ttClusterPool)
+		method.EncapsulateCAN2TT(forwardingEngine)
 		method.CAN2TSNDelay = time.Since(start)
 		methodSet = append(methodSet, method)
 	}
@@ -48,73 +48,73 @@ func GenerateCAN2TTFlows(CANnode []int, importantCAN int, unimportantCAN int, hy
 	return methodSet
 }
 
-type ClusterPool struct {
-	Clusters []*CANStreamCluster
+type ForwardingEngine struct {
+	BUSs []*CANBUS
 }
 
-func newClusterPool() *ClusterPool {
-	return &ClusterPool{}
+func newForwardingEngine() *ForwardingEngine {
+	return &ForwardingEngine{}
 }
 
-func (can2ttClusterPool *ClusterPool) organizeCANStreamByDomain(f *Flow) {
-	for _, cluster := range can2ttClusterPool.Clusters {
-		if cluster.Source == f.Source && cluster.Destination == f.Destination {
-			cluster.Streams = append(cluster.Streams, f.Streams...)
+func (forwardingEngine *ForwardingEngine) aggregateCANFrameByDomain(f *Flow) {
+	for _, canBUS := range forwardingEngine.BUSs {
+		if canBUS.Source == f.Source && canBUS.Destination == f.Destination {
+			canBUS.Frames = append(canBUS.Frames, f.Frames...)
 			return
 		}
 	}
-	can2ttClusterPool.addNewCluster(f)
+	forwardingEngine.addNewBus(f)
 }
 
-func (can2ttClusterPool *ClusterPool) organizeCANStreamByPeriodAndDomain(f *Flow) {
-	for _, cluster := range can2ttClusterPool.Clusters {
-		if cluster.Period == f.Period && cluster.Source == f.Source && cluster.Destination == f.Destination {
-			cluster.Streams = append(cluster.Streams, f.Streams...)
+func (forwardingEngine *ForwardingEngine) aggregateCANFrameByPeriodAndDomain(f *Flow) {
+	for _, canBUS := range forwardingEngine.BUSs {
+		if canBUS.Period == f.Period && canBUS.Source == f.Source && canBUS.Destination == f.Destination {
+			canBUS.Frames = append(canBUS.Frames, f.Frames...)
 			return
 		}
 	}
-	can2ttClusterPool.addNewCluster(f)
+	forwardingEngine.addNewBus(f)
 }
 
-func (can2ttClusterPool *ClusterPool) addNewCluster(f *Flow) {
-	cluster := newStreamCluster()
-	cluster.Source = f.Source
-	cluster.Destination = f.Destination
-	cluster.Period = f.Period
-	cluster.Deadline = f.Deadline
-	cluster.DataSize = f.DataSize
-	cluster.HyperPeriod = f.HyperPeriod
-	cluster.Streams = append(cluster.Streams, f.Streams...)
+func (forwardingEngine *ForwardingEngine) addNewBus(f *Flow) {
+	canBUS := newCANBUS()
+	canBUS.Source = f.Source
+	canBUS.Destination = f.Destination
+	canBUS.Period = f.Period
+	canBUS.Deadline = f.Deadline
+	canBUS.DataSize = f.DataSize
+	canBUS.HyperPeriod = f.HyperPeriod
+	canBUS.Frames = append(canBUS.Frames, f.Frames...)
 
-	can2ttClusterPool.Clusters = append(can2ttClusterPool.Clusters, cluster)
+	forwardingEngine.BUSs = append(forwardingEngine.BUSs, canBUS)
 }
 
-func (can2ttClusterPool *ClusterPool) ShowClusterPool() {
+func (forwardingEngine *ForwardingEngine) ShowForwardingEngine() {
 	fmt.Println("CAN2TT Traffic Router:")
-	for _, cluster := range can2ttClusterPool.Clusters {
-		cluster.ShowStreamCluster()
+	for _, canBUS := range forwardingEngine.BUSs {
+		canBUS.ShowCANBUS()
 	}
 }
 
-type CANStreamCluster struct {
+type CANBUS struct {
 	Flow
 }
 
-func newStreamCluster() *CANStreamCluster {
-	return &CANStreamCluster{}
+func newCANBUS() *CANBUS {
+	return &CANBUS{}
 }
 
-func (cluster *CANStreamCluster) getStreamsByCurrentTime(currentTime int) []*Stream {
-	streams := []*Stream{}
-	for _, stream := range cluster.Streams {
-		if stream.ArrivalTime == currentTime {
-			streams = append(streams, stream)
+func (canBUS *CANBUS) getFramesByCurrentTime(currentTime int) []*Frame {
+	frames := []*Frame{}
+	for _, frame := range canBUS.Frames {
+		if frame.ArrivalTime == currentTime {
+			frames = append(frames, frame)
 		}
 	}
-	return streams
+	return frames
 }
 
-func (cluster *CANStreamCluster) ShowStreamCluster() {
-	fmt.Printf("Queue (%d→%d) streams=%d\n", cluster.Source, cluster.Destination, len(cluster.Streams))
-	fmt.Printf("Period: %v  ,Deadline: %v ,Datasize: %v\n", cluster.Period, cluster.Deadline, cluster.DataSize)
+func (canBUS *CANBUS) ShowCANBUS() {
+	fmt.Printf("Queue (%d→%d) frames=%d\n", canBUS.Source, canBUS.Destination, len(canBUS.Frames))
+	fmt.Printf("Period: %v  ,Deadline: %v ,Datasize: %v\n", canBUS.Period, canBUS.Deadline, canBUS.DataSize)
 }

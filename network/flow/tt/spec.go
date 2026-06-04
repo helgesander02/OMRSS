@@ -38,14 +38,14 @@ func SetAVBParams(period, deadline int, dataSizes []float64) {
 	avbDataSizes = dataSizes
 }
 
-func configTSNStream() *TSN {
+func configTSNFrame() *TSN {
 	tPeriod, tDatasize := randomTSN()
 	tsn := newTSN(tPeriod, tDatasize)
 
 	return tsn
 }
 
-func configAVBStream() *AVB {
+func configAVBFrame() *AVB {
 	aDatasize := randomAVB()
 	avb := newAVB(aDatasize)
 

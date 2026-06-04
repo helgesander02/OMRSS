@@ -39,7 +39,7 @@ func SetUnimportantCANParams(periods []int, deadlines []int, dataSize float64) {
 	unimportantCANParams.dataSize = dataSize
 }
 
-func configImportantCANStream() *importantCAN {
+func configImportantCANFrame() *importantCAN {
 	// Use configured parameters if available, otherwise use defaults
 	if importantCANParams.period > 0 {
 		return newImportantCANWithParams(
@@ -51,7 +51,7 @@ func configImportantCANStream() *importantCAN {
 	return newImportantCAN()
 }
 
-func configUnimportantCANStream() *unimportantCAN {
+func configUnimportantCANFrame() *unimportantCAN {
 	ucPeriod, ucDeadline := randomUnimportantCAN()
 
 	// Use configured data size if available
