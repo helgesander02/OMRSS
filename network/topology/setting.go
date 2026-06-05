@@ -1,10 +1,6 @@
 package topology
 
-import "src/internal/random"
-
-const (
-	CANNodeCount = 5
-)
+import "src/pkg/random"
 
 var rng *random.Generator
 

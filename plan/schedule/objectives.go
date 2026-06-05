@@ -2,9 +2,10 @@ package schedule
 
 import (
 	"fmt"
-	"src/internal/config"
 	"src/network"
 	"src/network/flow/tt"
+	"src/pkg/config"
+	"src/pkg/logger"
 	"src/plan/routes"
 
 	"time"
@@ -29,7 +30,7 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KTreesSet, II *
 	for nth, route := range II_prime.TSNTrees {
 		schedulability := schedulability(0, S_prime.TSNFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		tsn_failed_count += 1 - schedulability
-		//fmt.Printf("BackGround TSN route%d: %b \n", nth, schedulability)
+		//logger.Printf("BackGround TSN route%d: %b \n", nth, schedulability)
 	}
 
 	// O2 and O4
@@ -38,7 +39,7 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KTreesSet, II *
 		avb_wcd_sum += wcd
 		schedulability := schedulability(wcd, S_prime.AVBFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		avb_failed_count += 1 - schedulability
-		//fmt.Printf("BackGround AVB route%d: %b \n", nth, schedulability)
+		//logger.Printf("BackGround AVB route%d: %b \n", nth, schedulability)
 	}
 	// O3 ... pass
 
@@ -47,7 +48,7 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KTreesSet, II *
 	for nth, route := range II.TSNTrees {
 		schedulability := schedulability(0, S.TSNFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		tsn_failed_count += 1 - schedulability
-		//fmt.Printf("Input TSN route%d: %b \n", nth, schedulability)
+		//logger.Printf("Input TSN route%d: %b \n", nth, schedulability)
 	}
 
 	// O2 and O4
@@ -56,7 +57,7 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KTreesSet, II *
 		avb_wcd_sum += wcd
 		schedulability := schedulability(wcd, S.AVBFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		avb_failed_count += 1 - schedulability
-		//fmt.Printf("Input AVB route%d: %b \n", nth, schedulability)
+		//logger.Printf("Input AVB route%d: %b \n", nth, schedulability)
 	}
 	// O3 ... pass
 
@@ -70,7 +71,7 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KTreesSet, II *
 	cost += int(avb_wcd_sum/time.Microsecond) * costSetting[3] // O4
 
 	if showflow {
-		fmt.Println(linkmap)
+		logger.Println(linkmap)
 	}
 
 	return obj, cost

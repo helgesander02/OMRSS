@@ -1,8 +1,6 @@
 package routes
 
-import (
-	"fmt"
-)
+import "src/pkg/logger"
 
 func (v2v *V2V) Show_V2Vs() {
 	for _, v2vedge := range v2v.V2VEdges {
@@ -12,22 +10,22 @@ func (v2v *V2V) Show_V2Vs() {
 
 func (v2vedge *V2VEdge) Show_VertexToVertex() {
 	for _, graph := range v2vedge.Graphs {
-		fmt.Printf("From Vertex: %d\n", v2vedge.FromVertex)
+		logger.Printf("From Vertex: %d\n", v2vedge.FromVertex)
 		graph.Show_Path()
 	}
 }
 
 func (graph *Graph) Show_Path() {
-	fmt.Printf("To Vertex: %d\n", graph.ToVertex)
+	logger.Printf("To Vertex: %d\n", graph.ToVertex)
 	for _, path := range graph.Path {
-		fmt.Printf("%v\n", path)
+		logger.Printf("%v\n", path)
 	}
 }
 
 func (trees *KTreesSet) Show_kTrees_Set() {
 	tsn := 1
 	for _, ktrees := range trees.TSNTrees {
-		fmt.Printf("\nTSN Tree %d \n", tsn)
+		logger.Printf("\nTSN Tree %d \n", tsn)
 		ktrees.ShowKTrees()
 		tsn++
 
@@ -35,7 +33,7 @@ func (trees *KTreesSet) Show_kTrees_Set() {
 	}
 	avb := 1
 	for _, ktrees := range trees.AVBTrees {
-		fmt.Printf("\nAVB Tree %d \n", avb)
+		logger.Printf("\nAVB Tree %d \n", avb)
 		ktrees.ShowKTrees()
 		avb++
 
@@ -46,7 +44,7 @@ func (trees *KTreesSet) Show_kTrees_Set() {
 func (trees *TreesSet) Show_Trees_Set() {
 	tsn := 1
 	for _, tree := range trees.TSNTrees {
-		fmt.Printf("\nTSN Tree %d \n", tsn)
+		logger.Printf("\nTSN Tree %d \n", tsn)
 		tree.Show_Tree()
 		tsn++
 
@@ -54,7 +52,7 @@ func (trees *TreesSet) Show_Trees_Set() {
 	}
 	avb := 1
 	for _, tree := range trees.AVBTrees {
-		fmt.Printf("\nAVB Tree %d \n", avb)
+		logger.Printf("\nAVB Tree %d \n", avb)
 		tree.Show_Tree()
 		avb++
 
@@ -64,17 +62,17 @@ func (trees *TreesSet) Show_Trees_Set() {
 
 func (Ktrees *KTrees) ShowKTrees() {
 	for index, tree := range Ktrees.Trees {
-		fmt.Printf("tree%d \n", index)
-		fmt.Printf("tree weight: %d \n", tree.Weight)
+		logger.Printf("tree%d \n", index)
+		logger.Printf("tree weight: %d \n", tree.Weight)
 		tree.Show_Tree()
 	}
 }
 
 func (tree *Tree) Show_Tree() {
 	for _, node := range tree.Nodes {
-		fmt.Println(node.ID)
+		logger.Println(node.ID)
 		for _, c := range node.Connections {
-			fmt.Printf("%d --> %d \n", c.FromNodeID, c.ToNodeID)
+			logger.Printf("%d --> %d \n", c.FromNodeID, c.ToNodeID)
 		}
 	}
 }
@@ -82,11 +80,11 @@ func (tree *Tree) Show_Tree() {
 func (tree *Tree) Show_Cycle() {
 	b, cyclelist := tree.FindCycle()
 	if b {
-		fmt.Println("The MST has cycle")
-		fmt.Println(cyclelist)
+		logger.Println("The MST has cycle")
+		logger.Println(cyclelist)
 
 	} else {
-		fmt.Println("The MST has no cycle")
+		logger.Println("The MST has no cycle")
 	}
 }
 
@@ -94,21 +92,21 @@ func (tree *Tree) Show_Cycle() {
 func (kpaths *KPathsSet) Show_KPaths_Set() {
 	tsn := 1
 	for _, kpath := range kpaths.TSNPaths {
-		fmt.Printf("\nTSN K-Path %d \n", tsn)
+		logger.Printf("\nTSN K-Path %d \n", tsn)
 		kpath.Show_KPath()
 		tsn++
 		break
 	}
 	avb := 1
 	for _, kpath := range kpaths.AVBPaths {
-		fmt.Printf("\nAVB K-Path %d \n", avb)
+		logger.Printf("\nAVB K-Path %d \n", avb)
 		kpath.Show_KPath()
 		avb++
 		break
 	}
 	can := 1
 	for _, kpath := range kpaths.CAN2TSNPaths {
-		fmt.Printf("\nCAN2TSN K-Path %d (Method: %s)\n", can, kpath.Method)
+		logger.Printf("\nCAN2TSN K-Path %d (Method: %s)\n", can, kpath.Method)
 		kpath.Show_KPath()
 		can++
 		break
@@ -118,21 +116,21 @@ func (kpaths *KPathsSet) Show_KPaths_Set() {
 func (paths *PathsSet) Show_Paths_Set() {
 	tsn := 1
 	for _, path := range paths.TSNPaths {
-		fmt.Printf("\nTSN Path %d \n", tsn)
+		logger.Printf("\nTSN Path %d \n", tsn)
 		path.Show_PathStruct()
 		tsn++
 		break
 	}
 	avb := 1
 	for _, path := range paths.AVBPaths {
-		fmt.Printf("\nAVB Path %d \n", avb)
+		logger.Printf("\nAVB Path %d \n", avb)
 		path.Show_PathStruct()
 		avb++
 		break
 	}
 	can := 1
 	for _, path := range paths.CAN2TSNPaths {
-		fmt.Printf("\nCAN2TSN Path %d (Method: %s)\n", can, path.Method)
+		logger.Printf("\nCAN2TSN Path %d (Method: %s)\n", can, path.Method)
 		path.Show_PathStruct()
 		can++
 		break
@@ -141,18 +139,18 @@ func (paths *PathsSet) Show_Paths_Set() {
 
 func (kpath *KPath) Show_KPath() {
 	for index, path := range kpath.Paths {
-		fmt.Printf("Path %d (Weight: %.2f)\n", index, path.Weight)
+		logger.Printf("Path %d (Weight: %.2f)\n", index, path.Weight)
 		path.Show_PathStruct()
 	}
 }
 
 func (path *Path) Show_PathStruct() {
-	fmt.Printf("Path IDs: %v\n", path.IDs)
-	fmt.Printf("Weight: %.2f\n", path.Weight)
+	logger.Printf("Path IDs: %v\n", path.IDs)
+	logger.Printf("Weight: %.2f\n", path.Weight)
 	for _, node := range path.Nodes {
-		fmt.Printf("Node %d:\n", node.ID)
+		logger.Printf("Node %d:\n", node.ID)
 		for _, c := range node.Connections {
-			fmt.Printf("  %d --> %d\n", c.FromNodeID, c.ToNodeID)
+			logger.Printf("  %d --> %d\n", c.FromNodeID, c.ToNodeID)
 		}
 	}
 }

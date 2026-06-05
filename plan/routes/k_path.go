@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"fmt"
-	"src/internal/config"
 	"src/network"
 	"src/network/topology"
+	"src/pkg/config"
+	"src/pkg/logger"
 )
 
 // Get_KPath_Routing computes K shortest paths for all flows in OSRO network
@@ -17,7 +17,7 @@ func Get_KPath_Routing(network *network.Network, cfg *config.Config, shortestPat
 		kpath := BuildKPath(K, flow.Source, dest, network.GraphSet.TSNGraphs[nth], cfg.Network.ByteRate)
 		kpaths_set.TSNPaths = append(kpaths_set.TSNPaths, kpath)
 	}
-	fmt.Printf("Finish K-Path %d TSN streams routing (K=%d)\n", len(kpaths_set.TSNPaths), K)
+	logger.Printf("Finish K-Path %d TSN streams routing (K=%d)\n", len(kpaths_set.TSNPaths), K)
 
 	// AVB flows
 	for nth, flow := range network.FlowSet.AVBFlows {
@@ -25,7 +25,7 @@ func Get_KPath_Routing(network *network.Network, cfg *config.Config, shortestPat
 		kpath := BuildKPath(K, flow.Source, dest, network.GraphSet.AVBGraphs[nth], cfg.Network.ByteRate)
 		kpaths_set.AVBPaths = append(kpaths_set.AVBPaths, kpath)
 	}
-	fmt.Printf("Finish K-Path %d AVB streams routing (K=%d)\n", len(kpaths_set.AVBPaths), K)
+	logger.Printf("Finish K-Path %d AVB streams routing (K=%d)\n", len(kpaths_set.AVBPaths), K)
 
 	// CAN2TSN flows - avoid redundant computation
 	type sd struct{ s, d int }
@@ -52,7 +52,7 @@ func Get_KPath_Routing(network *network.Network, cfg *config.Config, shortestPat
 			}
 		}
 	}
-	fmt.Printf("Finish K-Path %d CAN2TSN streams routing (K=%d)\n", len(kpaths_set.CAN2TSNPaths), K)
+	logger.Printf("Finish K-Path %d CAN2TSN streams routing (K=%d)\n", len(kpaths_set.CAN2TSNPaths), K)
 
 	return kpaths_set
 }

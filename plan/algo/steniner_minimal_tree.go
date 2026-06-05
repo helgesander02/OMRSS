@@ -1,8 +1,8 @@
 package algo
 
 import (
-	"src/internal/config"
 	"src/network"
+	"src/pkg/config"
 	"src/plan/routes"
 )
 

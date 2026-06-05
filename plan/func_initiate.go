@@ -1,34 +1,34 @@
 package plan
 
 import (
-	"fmt"
-	"src/internal/config"
+	"src/pkg/config"
+	"src/pkg/logger"
 	"src/plan/schedule"
 )
 
 func (plan *OMACO) InitiatePlan(costSetting [4]int, cfg *config.Config) {
 	// algo run
-	fmt.Println("Steiner Tree")
-	fmt.Println("----------------------------------------")
+	logger.Println("Steiner Tree")
+	logger.Println("----------------------------------------")
 	plan.SMT.SMT_Run(plan.Network, cfg)
 
-	fmt.Println()
-	fmt.Println("MDTC")
-	fmt.Println("----------------------------------------")
+	logger.Println()
+	logger.Println("MDTC")
+	logger.Println("----------------------------------------")
 	plan.MDTC.MDTC_Run(plan.Network, cfg)
 
-	fmt.Println()
-	fmt.Println("OSACO")
-	fmt.Println("----------------------------------------")
+	logger.Println()
+	logger.Println("OSACO")
+	logger.Println("----------------------------------------")
 	plan.OSACO.OSACO_Initial_Settings(plan.Network, cfg, plan.SMT.Trees)
 	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
 	for i := 0; i < 5; i++ {
 		plan.OSACO.Objs_osaco[i] = plan.OSACO.OSACO_Run(plan.Network, cfg, i, costSetting)
 	}
 
-	fmt.Println()
-	fmt.Println("OSACO_APTED")
-	fmt.Println("----------------------------------------")
+	logger.Println()
+	logger.Println("OSACO_APTED")
+	logger.Println("----------------------------------------")
 	plan.OSACO_APTED.OSACO_Initial_Settings(plan.Network, cfg, plan.SMT.Trees)
 	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
 	for i := 0; i < 5; i++ {
@@ -66,13 +66,13 @@ func (plan *OMACO) InitiatePlan(costSetting [4]int, cfg *config.Config) {
 
 func (plan *OSRO) InitiatePlan(costSetting [4]int, cfg *config.Config) {
 	// algo run
-	fmt.Println("Shortest Path")
-	fmt.Println("----------------------------------------")
+	logger.Println("Shortest Path")
+	logger.Println("----------------------------------------")
 	plan.SP.SP_Run(plan.Network, cfg)
 
-	fmt.Println()
-	fmt.Println("OSACO (Path-based)")
-	fmt.Println("----------------------------------------")
+	logger.Println()
+	logger.Println("OSACO (Path-based)")
+	logger.Println("----------------------------------------")
 	plan.OSACO_Path.OSACO_Initial_Settings_Path(plan.Network, cfg, plan.SP.Paths)
 
 	// The timeout of each run is set as 100~1000 ms (200ms, 400ms, 600ms, 800ms, 1000ms)
@@ -84,5 +84,5 @@ func (plan *OSRO) InitiatePlan(costSetting [4]int, cfg *config.Config) {
 	// This will be added when path-based scheduling is completed
 	plan.SP.Objs_sp = [4]float64{0, 0, 0, 0}
 
-	fmt.Println("OSRO InitiatePlan completed")
+	logger.Println("OSRO InitiatePlan completed")
 }

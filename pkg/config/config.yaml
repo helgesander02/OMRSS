@@ -17,6 +17,10 @@ network:
   bandwidth: 1000000000
   
   flows:
+    # Routing mode for TT flows:
+    #   - "tree": each flow has multiple destinations (multicast), used by OMACO
+    #   - "path": each flow has a single destination (unicast), used by OSRO
+    routing_mode: "tree"
     # TSN (Time-Sensitive Networking) flows
     tsn:
       input: 35       # Number of TSN input flows
@@ -40,6 +44,7 @@ network:
     
     # CAN (Controller Area Network) flows
     can:
+      nodes: 5        # Number of CAN nodes randomly selected from topology
       important: 5    # Number of CAN important flows
       unimportant: 25 # Number of CAN unimportant flows
       

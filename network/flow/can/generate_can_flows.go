@@ -2,22 +2,24 @@ package can
 
 import (
 	"fmt"
+	"src/pkg/config"
+	"src/pkg/logger"
 )
 
-func GenerateCANFlows(CANnode []int, importantCAN int, unimportantCAN int, hyperPeriod int) ([]*Flow, []*Flow) {
+func GenerateCANFlows(can config.CANFlowConfig, hyperperiod int, CANnode []int) ([]*Flow, []*Flow) {
 	// Generate CAN Flows
-	importantCANFlows := GenerateImportantCANFlow(CANnode, importantCAN, hyperPeriod)
-	unimportantCANFlows := GenerateUnimportantCANFlow(CANnode, unimportantCAN, hyperPeriod)
-	fmt.Println("Important CAN:", len(importantCANFlows), "Unimportant CAN:", len(unimportantCANFlows), "Complete generating CAN flows.")
+	importantCANFlows := GenerateImportantCANFlow(can.Important, hyperperiod, CANnode)
+	unimportantCANFlows := GenerateUnimportantCANFlow(can.Unimportant, hyperperiod, CANnode)
+	logger.Println("Important CAN:", len(importantCANFlows), "Unimportant CAN:", len(unimportantCANFlows), "Complete generating CAN flows.")
 
 	return importantCANFlows, unimportantCANFlows
 }
 
-func GenerateImportantCANFlow(CANnode []int, impcan int, hyperPeriod int) []*Flow {
+func GenerateImportantCANFlow(impcan int, hyperPeriod int, CANnode []int) []*Flow {
 	importantCANFlows := []*Flow{}
-	for flow := 0; flow < impcan; flow++ {
+	for range impcan {
 		importantCAN := configImportantCANFrame()
-		source, destination := randomCANDevicesForPath(CANnode)
+		source, destination := randomCANDevices(CANnode)
 
 		canFlow := GenerateCANFrames(importantCAN.Period, importantCAN.Deadline, importantCAN.DataSize, hyperPeriod)
 		canFlow.Source = source
@@ -29,13 +31,13 @@ func GenerateImportantCANFlow(CANnode []int, impcan int, hyperPeriod int) []*Flo
 	return importantCANFlows
 }
 
-func GenerateUnimportantCANFlow(CANnode []int, umimpcan int, hyperPeriod int) []*Flow {
+func GenerateUnimportantCANFlow(umimpcan int, hyperPeriod int, CANnode []int) []*Flow {
 	unimportantCANFlows := []*Flow{}
-	for flow := 0; flow < umimpcan; flow++ {
+	for range umimpcan {
 		unimportantCAN := configUnimportantCANFrame()
 
 		// Random End Devices 1. source(Talker) 2. destinations(listener)
-		source, destination := randomCANDevicesForPath(CANnode)
+		source, destination := randomCANDevices(CANnode)
 
 		canFlow := GenerateCANFrames(unimportantCAN.Period, unimportantCAN.Deadline, unimportantCAN.DataSize, hyperPeriod)
 		canFlow.Source = source

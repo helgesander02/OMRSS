@@ -1,11 +1,11 @@
 package network
 
 import (
-	"fmt"
-	"src/internal/config"
 	"src/network/flow"
 	"src/network/graph"
 	"src/network/topology"
+	"src/pkg/config"
+	"src/pkg/logger"
 )
 
 func GenerateNetwork(cfg *config.Config) *Network {
@@ -17,7 +17,7 @@ func GenerateNetwork(cfg *config.Config) *Network {
 	case "osro":
 		networkInstance.generateOsroNetwork(cfg)
 	default:
-		fmt.Printf("Unknown algorithm: %s\n", cfg.Algorithm.Name)
+		logger.Printf("Unknown algorithm: %s\n", cfg.Algorithm.Name)
 	}
 
 	return networkInstance
@@ -25,82 +25,74 @@ func GenerateNetwork(cfg *config.Config) *Network {
 
 func (network *Network) generateOmacoNetwork(cfg *config.Config) {
 	// Generate topology
-	fmt.Println("Generate Topology")
-	fmt.Println("----------------------------------------")
+	logger.Println("Generate Topology")
+	logger.Println("----------------------------------------")
 	network.Topology = topology.GenerateTopology(
 		cfg.Network.Topology,
 		cfg.Network.ByteRate,
 	)
-	fmt.Println("Complete Generating Topology.")
-	fmt.Println()
+	logger.Println("Complete Generating Topology.")
+	logger.Println()
 
 	// Generate flows
-	fmt.Println("Generate Flows")
-	fmt.Println("----------------------------------------")
+	logger.Println("Generate Flows")
+	logger.Println("----------------------------------------")
 	network.FlowSet = flow.GenerateOmacoFlows(
-		len(network.Topology.Nodes),
-		cfg.Network.Flows.TSN.Background,
-		cfg.Network.Flows.AVB.Background,
-		cfg.Network.Flows.TSN.Input,
-		cfg.Network.Flows.AVB.Input,
+		cfg.Network.Flows,
 		cfg.Network.Hyperperiod,
+		len(network.Topology.Nodes),
 	)
-	fmt.Println("Complete Generating Flows.")
-	fmt.Println()
+	logger.Println("Complete Generating Flows.")
+	logger.Println()
 
 	// Simulating graphs using flows in topology
-	fmt.Println("Simulating Graphs")
-	fmt.Println("----------------------------------------")
-	network.GraphSet = graph.GenerateOMACOGraphs(
+	logger.Println("Simulating Graphs")
+	logger.Println("----------------------------------------")
+	network.GraphSet = graph.GenerateOmacoGraphs(
 		network.Topology,
 		network.FlowSet,
 		cfg.Network.ByteRate,
 	)
-	fmt.Println("Complete Simulating Graphs.")
-	fmt.Println()
+	logger.Println("Complete Simulating Graphs.")
+	logger.Println()
 }
 
 func (network *Network) generateOsroNetwork(cfg *config.Config) {
 	// Generate topology
-	fmt.Println("Generate Topology")
-	fmt.Println("----------------------------------------")
+	logger.Println("Generate Topology")
+	logger.Println("----------------------------------------")
 	network.Topology = topology.GenerateTopology(
 		cfg.Network.Topology,
 		cfg.Network.ByteRate,
 	)
-	fmt.Println("Complete Generating Topology.")
-	fmt.Println()
+	logger.Println("Complete Generating Topology.")
+	logger.Println()
 
 	// Select CAN node
-	canNodeSet := network.Topology.SelectCANNodes()
-	fmt.Printf("CAN nodes: %v", canNodeSet)
-	fmt.Println()
+	canNodeSet := network.Topology.SelectCANNodes(cfg.Network.Flows.CAN.Nodes)
+	logger.Printf("CAN nodes: %v", canNodeSet)
+	logger.Println()
 
 	// Generate flows
-	fmt.Println("Generate Flows")
-	fmt.Println("----------------------------------------")
+	logger.Println("Generate Flows")
+	logger.Println("----------------------------------------")
 	network.FlowSet = flow.GenerateOsroFlows(
-		len(network.Topology.Nodes),
-		cfg.Network.Flows.TSN.Background,
-		cfg.Network.Flows.AVB.Background,
-		cfg.Network.Flows.TSN.Input,
-		cfg.Network.Flows.AVB.Input,
+		cfg.Network.Flows,
 		cfg.Network.Hyperperiod,
+		len(network.Topology.Nodes),
 		canNodeSet,
-		cfg.Network.Flows.CAN.Important,
-		cfg.Network.Flows.CAN.Unimportant,
 	)
-	fmt.Println("Complete Generating Flows.")
-	fmt.Println()
+	logger.Println("Complete Generating Flows.")
+	logger.Println()
 
 	// Simulating graphs using flows in topology
-	fmt.Println("Simulating Graphs")
-	fmt.Println("----------------------------------------")
-	network.GraphSet = graph.GenerateOSROGraphs(
+	logger.Println("Simulating Graphs")
+	logger.Println("----------------------------------------")
+	network.GraphSet = graph.GenerateOsroGraphs(
 		network.Topology,
 		network.FlowSet,
 		cfg.Network.ByteRate,
 	)
-	fmt.Println("Complete Simulating Graphs.")
-	fmt.Println()
+	logger.Println("Complete Simulating Graphs.")
+	logger.Println()
 }

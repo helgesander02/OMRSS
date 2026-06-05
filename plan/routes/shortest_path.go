@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"fmt"
-	"src/internal/config"
 	"src/network"
 	"src/network/topology"
+	"src/pkg/config"
+	"src/pkg/logger"
 )
 
 var v2v_path *V2V = &V2V{} // v2v for shortest path calculation
@@ -20,7 +20,7 @@ func Get_ShortestPath_Routing(network *network.Network, cfg *config.Config) *Pat
 		path := ShortestPath(v2v_path, network.GraphSet.TSNGraphs[nth], flow.Source, dest, cfg.Network.ByteRate)
 		paths_set.TSNPaths = append(paths_set.TSNPaths, path)
 	}
-	fmt.Printf("Finish Shortest Path %d TSN streams routing\n", len(paths_set.TSNPaths))
+	logger.Printf("Finish Shortest Path %d TSN streams routing\n", len(paths_set.TSNPaths))
 
 	// AVB flows - point-to-point
 	for nth, flow := range network.FlowSet.AVBFlows {
@@ -28,7 +28,7 @@ func Get_ShortestPath_Routing(network *network.Network, cfg *config.Config) *Pat
 		path := ShortestPath(v2v_path, network.GraphSet.AVBGraphs[nth], flow.Source, dest, cfg.Network.ByteRate)
 		paths_set.AVBPaths = append(paths_set.AVBPaths, path)
 	}
-	fmt.Printf("Finish Shortest Path %d AVB streams routing\n", len(paths_set.AVBPaths))
+	logger.Printf("Finish Shortest Path %d AVB streams routing\n", len(paths_set.AVBPaths))
 
 	// CAN2TSN flows - encapsulated flows
 	type sd struct{ s, d int }
@@ -55,7 +55,7 @@ func Get_ShortestPath_Routing(network *network.Network, cfg *config.Config) *Pat
 			}
 		}
 	}
-	fmt.Printf("Finish Shortest Path %d CAN2TSN streams routing\n", len(paths_set.CAN2TSNPaths))
+	logger.Printf("Finish Shortest Path %d CAN2TSN streams routing\n", len(paths_set.CAN2TSNPaths))
 
 	return paths_set
 }
@@ -97,7 +97,7 @@ func ConvertIDsToPath(ids []int, topo *topology.Topology, cost float64) *Path {
 	for i, id := range ids {
 		realNode := topo.GetNodeByID(id)
 		if realNode == nil {
-			fmt.Printf("Warning: Node with ID=%d not found in topology\n", id)
+			logger.Printf("Warning: Node with ID=%d not found in topology\n", id)
 			continue
 		}
 

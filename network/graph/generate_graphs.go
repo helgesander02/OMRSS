@@ -1,12 +1,12 @@
 package graph
 
 import (
-	"fmt"
 	"src/network/flow"
 	"src/network/topology"
+	"src/pkg/logger"
 )
 
-func GenerateOMACOGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesRate float64) *Graphs {
+func GenerateOmacoGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesRate float64) *Graphs {
 	// Constructing Graph structures
 	graphs := newGraphs()
 
@@ -16,7 +16,7 @@ func GenerateOMACOGraphs(topology *topology.Topology, flows *flow.FlowSet, bytes
 		t.AddN2S2N_For_Tree(flow.Source, flow.Destinations, bytesRate) // Undirected Graph
 		graphs.TSNGraphs = append(graphs.TSNGraphs, t)
 	}
-	fmt.Println(len(graphs.TSNGraphs), " TSN Graphs generated.")
+	logger.Println(len(graphs.TSNGraphs), " TSN Graphs generated.")
 
 	// Generating AVB Graphs
 	for _, flow := range flows.AVBFlows {
@@ -24,12 +24,12 @@ func GenerateOMACOGraphs(topology *topology.Topology, flows *flow.FlowSet, bytes
 		t.AddN2S2N_For_Tree(flow.Source, flow.Destinations, bytesRate) // Undirected Graph
 		graphs.AVBGraphs = append(graphs.AVBGraphs, t)
 	}
-	fmt.Println(len(graphs.AVBGraphs), " AVB Graphs generated.")
+	logger.Println(len(graphs.AVBGraphs), " AVB Graphs generated.")
 
 	return graphs
 }
 
-func GenerateOSROGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesRate float64) *Graphs {
+func GenerateOsroGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesRate float64) *Graphs {
 	// Constructing Graph structures
 	graphs := newGraphs()
 
@@ -39,7 +39,7 @@ func GenerateOSROGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesR
 		t.AddN2S2N_For_Path(flow.Source, flow.Destinations[0], bytesRate) // Undirected Graph
 		graphs.TSNGraphs = append(graphs.TSNGraphs, t)
 	}
-	fmt.Println(len(graphs.TSNGraphs), " TSN Graphs generated.")
+	logger.Println(len(graphs.TSNGraphs), " TSN Graphs generated.")
 
 	// Generating AVB Graphs
 	for _, flow := range flows.AVBFlows {
@@ -47,7 +47,7 @@ func GenerateOSROGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesR
 		t.AddN2S2N_For_Path(flow.Source, flow.Destinations[0], bytesRate) // Undirected Graph
 		graphs.AVBGraphs = append(graphs.AVBGraphs, t)
 	}
-	fmt.Println(len(graphs.AVBGraphs), " AVB Graphs generated.")
+	logger.Println(len(graphs.AVBGraphs), " AVB Graphs generated.")
 
 	// Generating CAN2TT Graphs
 	for _, method := range flows.EncapsulateMethod {
@@ -61,7 +61,7 @@ func GenerateOSROGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesR
 
 		}
 	}
-	fmt.Println(len(graphs.CAN2TSNGraphs), " CAN2TT Graphs generated.")
+	logger.Println(len(graphs.CAN2TSNGraphs), " CAN2TT Graphs generated.")
 
 	return graphs
 }

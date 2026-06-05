@@ -1,8 +1,8 @@
 package topology
 
 import (
-	"log"
 	"os"
+	"src/pkg/logger"
 
 	"gopkg.in/yaml.v2"
 )
@@ -12,12 +12,12 @@ func GenerateTopology(topologyName string, cost float64) *Topology {
 	// Create and parse YAML into the Data
 	data, err := os.ReadFile("yaml/" + topologyName + ".yaml")
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		logger.Fatalf("error: %v", err)
 	}
 	d := Data{}
 	err = yaml.Unmarshal([]byte(data), &d)
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		logger.Fatalf("error: %v", err)
 	}
 
 	// Devices(EndStations) Switchs(Bridges)

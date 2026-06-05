@@ -1,13 +1,15 @@
 package can
 
 import (
-	"fmt"
 	"time"
+
+	"src/pkg/config"
+	"src/pkg/logger"
 )
 
-func GenerateCAN2TTFlows(CANnode []int, importantCAN int, unimportantCAN int, hyperperiod int) []*Method {
+func GenerateCAN2TTFlows(can config.CANFlowConfig, hyperperiod int, CANnode []int) []*Method {
 	// step 1: generate CAN flows
-	importantCANFlows, unimportantCANFlows := GenerateCANFlows(CANnode, importantCAN, unimportantCAN, hyperperiod)
+	importantCANFlows, unimportantCANFlows := GenerateCANFlows(can, hyperperiod, CANnode)
 
 	// step2: prepare method list
 	var methodList = []string{"fifo", "priority", "obo", "wst", "mao"}
@@ -90,7 +92,7 @@ func (forwardingEngine *ForwardingEngine) addNewBus(f *Flow) {
 }
 
 func (forwardingEngine *ForwardingEngine) ShowForwardingEngine() {
-	fmt.Println("CAN2TT Traffic Router:")
+	logger.Println("CAN2TT Traffic Router:")
 	for _, canBUS := range forwardingEngine.BUSs {
 		canBUS.ShowCANBUS()
 	}
@@ -115,6 +117,6 @@ func (canBUS *CANBUS) getFramesByCurrentTime(currentTime int) []*Frame {
 }
 
 func (canBUS *CANBUS) ShowCANBUS() {
-	fmt.Printf("Queue (%d→%d) frames=%d\n", canBUS.Source, canBUS.Destination, len(canBUS.Frames))
-	fmt.Printf("Period: %v  ,Deadline: %v ,Datasize: %v\n", canBUS.Period, canBUS.Deadline, canBUS.DataSize)
+	logger.Printf("Queue (%d→%d) frames=%d\n", canBUS.Source, canBUS.Destination, len(canBUS.Frames))
+	logger.Printf("Period: %v  ,Deadline: %v ,Datasize: %v\n", canBUS.Period, canBUS.Deadline, canBUS.DataSize)
 }

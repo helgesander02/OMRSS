@@ -12,7 +12,7 @@ func WCD(z *routes.Tree, KTreesSet *routes.KTreesSet, flow *tt.Flow, flowSet *fl
 	end2end := time.Duration(0)
 	node := z.GetNodeByID(flow.Source)
 	wcd := end2endDelay(node, -1, end2end, z, KTreesSet, flow, flowSet)
-	//fmt.Printf("max wcd: %v \n", wcd)
+	//logger.Printf("max wcd: %v \n", wcd)
 
 	return wcd
 }
@@ -20,7 +20,7 @@ func WCD(z *routes.Tree, KTreesSet *routes.KTreesSet, flow *tt.Flow, flowSet *fl
 // Use DFS to find all dataflow paths in the Route
 // Calculate the End to End Delay for each dataflow path and select the maximum one
 func end2endDelay(node *routes.Node, parentID int, end2end time.Duration, z *routes.Tree, KTreesSet *routes.KTreesSet, flow *tt.Flow, flowSet *flow.FlowSet) time.Duration {
-	//fmt.Printf("%d: %v \n", node.ID, end2end)
+	//logger.Printf("%d: %v \n", node.ID, end2end)
 	maxE2E := end2end
 	for _, link := range node.Connections {
 		per_hop := time.Duration(0)

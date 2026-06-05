@@ -3,6 +3,7 @@ network:
   hyperperiod: 6000
   bandwidth: 1e9
   flows:
+    routing_mode: "tree"
     tsn:
       input: 35
       background: 35
@@ -17,6 +18,7 @@ network:
         deadline: 2000
         datasizes: [1000, 1100, 1200, 1300, 1400, 1500]
     can:
+      nodes: 5       
       important: 5
       unimportant: 25
       params:

@@ -1,7 +1,7 @@
 package plan
 
 import (
-	"src/internal/random"
+	"src/pkg/random"
 	"src/plan/algo"
 	"src/plan/routes"
 )

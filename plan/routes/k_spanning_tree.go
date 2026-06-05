@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"fmt"
 	"sort"
-	"src/internal/random"
+	"src/pkg/logger"
+	"src/pkg/random"
 )
 
 // Global RNG instance (will be set by plan package)
@@ -76,7 +76,7 @@ func KSpanningTree(v2v *V2V, steninertree *Tree, K int, Source int, Destinations
 		//K_MSTS.SelectMinWeightAndTreeEditDistance(list_of_trees.Trees, K)
 	}
 
-	fmt.Printf("list_of_trees: %d\n", len(list_of_trees.Trees))
+	logger.Printf("list_of_trees: %d\n", len(list_of_trees.Trees))
 	//K_MSTS.ShowKTrees()
 
 	return K_MSTS
@@ -159,13 +159,13 @@ func In_ListOfTrees(list_of_trees *KTrees, MST *Tree) bool {
 
 // 1. Select the minimum weight KTrees [0, 1, 2, 3]
 func (K_MSTS *KTrees) SelectMinWeight(list_of_trees []*Tree, K int) {
-	//fmt.Printf("list_of_trees: %d  K: %d\n", len(list_of_trees.Trees), K)
+	//logger.Printf("list_of_trees: %d  K: %d\n", len(list_of_trees.Trees), K)
 	if len(list_of_trees) >= K {
 		treesmap := make(map[int][]*Tree)
 		w := list_of_trees[0].Weight
 		for _, tree := range list_of_trees {
 			treesmap[tree.Weight] = append(treesmap[tree.Weight], tree)
-			//fmt.Printf("Tree Weight %d \n", tree.Weight)
+			//logger.Printf("Tree Weight %d \n", tree.Weight)
 		}
 
 		for len(K_MSTS.Trees) != K {
@@ -199,7 +199,7 @@ func (K_MSTS *KTrees) SelectMinWeight(list_of_trees []*Tree, K int) {
 
 // 2. Select Increasing Arithmetic Sequence Weight KTrees [1, 3 ,5 ,7] or [0, 2, 4, 6], up=2
 func (K_MSTS *KTrees) SelectIncreasingArithmeticSequenceWeight(list_of_trees []*Tree, K int) {
-	//fmt.Printf("list_of_trees: %d  K: %d\n", len(list_of_trees.Trees), K)
+	//logger.Printf("list_of_trees: %d  K: %d\n", len(list_of_trees.Trees), K)
 	var ArithmeticSequence int = 2
 	if len(list_of_trees) >= K {
 		if len(list_of_trees) >= ArithmeticSequence*(K-1) {
@@ -270,8 +270,8 @@ func (K_MSTS *KTrees) SelectTreeEditDistance(list_of_trees []*Tree, K int) {
 		if maxIdx != -1 {
 			K_MSTS.Trees = append(K_MSTS.Trees, list_of_trees[maxIdx])
 			selectedIndices[maxIdx] = true
-			//fmt.Println(cumulative)
-			//fmt.Print("Selected: ", maxIdx, " ", maxScore, "\n")
+			//logger.Println(cumulative)
+			//logger.Print("Selected: ", maxIdx, " ", maxScore, "\n")
 		} else {
 			break
 		}

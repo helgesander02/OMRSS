@@ -1,11 +1,11 @@
 package algo
 
 import (
-	"fmt"
 	"math"
-	"src/internal/config"
 	"src/network"
 	"src/network/flow"
+	"src/pkg/config"
+	"src/pkg/logger"
 	"src/plan/algo_timer"
 	"src/plan/routes"
 	"time"
@@ -44,16 +44,16 @@ func (osaco *OSACO_Path) OSACO_Run_Path(network *network.Network, timeoutIndex i
 	initialobj := [4]float64{0, 0, 0, 0}
 	initialcost := 0
 
-	fmt.Println()
-	fmt.Printf("initial value: %d \n", initialcost)
-	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", initialobj[0], initialobj[1], initialobj[3])
+	logger.Println()
+	logger.Printf("initial value: %d \n", initialcost)
+	logger.Printf("O1: %f O2: %f O3: pass O4: %f \n", initialobj[0], initialobj[1], initialobj[3])
 
 	timeout := time.Duration(osaco.Timeout) * time.Millisecond
 	startTime := time.Now()
 	i := 1
 
 	for {
-		fmt.Printf("\nepoch%d:\n", i)
+		logger.Printf("\nepoch%d:\n", i)
 		osaco.Timer[timeoutIndex].TimerStart()
 		II := epochPath(network, osaco, timeoutIndex, costSetting)
 		osaco.Timer[timeoutIndex].TimerStop()
@@ -64,7 +64,7 @@ func (osaco *OSACO_Path) OSACO_Run_Path(network *network.Network, timeoutIndex i
 
 		if cost1 < cost2 {
 			osaco.InputPaths = II
-			fmt.Println("Change the selected routing !!")
+			logger.Println("Change the selected routing !!")
 		}
 		i += 1
 
@@ -76,10 +76,10 @@ func (osaco *OSACO_Path) OSACO_Run_Path(network *network.Network, timeoutIndex i
 	resultobj := [4]float64{0, 0, 0, 0}
 	resultcost := 0
 
-	fmt.Println()
-	fmt.Printf("result value: %d \n", resultcost)
-	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
-	fmt.Println()
+	logger.Println()
+	logger.Printf("result value: %d \n", resultcost)
+	logger.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
+	logger.Println()
 
 	if resultobj[0] != 0 || resultobj[1] != 0 {
 		osaco.Timer[timeoutIndex].TimerMax()
@@ -275,7 +275,7 @@ func probabilityPath(osaco *OSACO_Path) (*routes.PathsSet, *routes.PathsSet, [3]
 func epochPath(network *network.Network, osaco *OSACO_Path, timeoutIndex int, costSetting [4]int) *routes.PathsSet {
 	II, _, input_k_location, _ := probabilityPath(osaco)
 
-	fmt.Printf("Select input routing %v \n", input_k_location)
+	logger.Printf("Select input routing %v \n", input_k_location)
 
 	osaco.Timer[timeoutIndex].TimerStop()
 

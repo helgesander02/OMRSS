@@ -1,7 +1,7 @@
 package algo_timer
 
 import (
-	"fmt"
+	"src/pkg/logger"
 	"time"
 )
 
@@ -59,7 +59,7 @@ func (t *Timer) TimerMax() {
 
 // Export data
 func (t *Timer) TimerExportData() {
-	fmt.Printf(" %v \n", t.total)
+	logger.Printf(" %v \n", t.total)
 }
 
 // Output data
@@ -70,7 +70,7 @@ func (t *Timer) TimerOutputData() time.Duration {
 // Merge the timer
 func (t1 *Timer) TimerMerge(t2 *Timer) {
 	if t1.mission {
-		fmt.Println(t1.total, t2.total)
+		logger.Println(t1.total, t2.total)
 		t1.total = t1.total + t2.total
 
 		// Mix limit 1000ms

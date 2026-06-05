@@ -16,11 +16,11 @@ func (t1 *Topology) TopologyDeepCopy() *Topology {
 	}
 }
 
-func (t *Topology) SelectCANNodes() []int {
-	result := make([]int, 0, CANNodeCount)
+func (t *Topology) SelectCANNodes(count int) []int {
+	result := make([]int, 0, count)
 	used := make(map[int]bool)
 
-	for len(result) < CANNodeCount {
+	for len(result) < count {
 		index := rng.IntN(len(t.Nodes))
 		node := t.Nodes[index]
 

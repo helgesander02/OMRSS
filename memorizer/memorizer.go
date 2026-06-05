@@ -1,8 +1,8 @@
 package memorizer
 
 import (
-	"log"
 	"os"
+	"src/pkg/logger"
 	"src/plan"
 )
 
@@ -35,21 +35,21 @@ func createFolder(dirName string) {
 	_, err := os.Stat(dirName)
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Printf("Creating directory %s\n", dirName)
+			logger.Printf("Creating directory %s\n", dirName)
 			err := os.MkdirAll(dirName, os.ModePerm)
 			if err != nil {
-				log.Fatalf("Failed to create directory %s: %v\n", dirName, err)
+				logger.Fatalf("Failed to create directory %s: %v\n", dirName, err)
 			}
 		} else {
-			log.Fatalf("Failed to check directory %s: %v\n", dirName, err)
+			logger.Fatalf("Failed to check directory %s: %v\n", dirName, err)
 		}
 	}
 }
 
 func switchWorkingPath(dirName string) {
-	log.Printf("Switching to directory %s\n", dirName)
+	logger.Printf("Switching to directory %s\n", dirName)
 	err := os.Chdir(dirName)
 	if err != nil {
-		log.Fatalf("Failed to switch to directory %s: %v\n", dirName, err)
+		logger.Fatalf("Failed to switch to directory %s: %v\n", dirName, err)
 	}
 }

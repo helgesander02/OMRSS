@@ -21,20 +21,9 @@ type AVB struct {
 }
 
 func newAVB(aDatasize float64) *AVB {
-	// Use config values if set, otherwise use defaults
-	period := avbPeriod
-	if period == 0 {
-		period = 125
-	}
-
-	deadline := avbDeadline
-	if deadline == 0 {
-		deadline = 2000
-	}
-
 	return &AVB{
-		Period:   period,
-		Deadline: deadline,
+		Period:   avbPeriod,
+		Deadline: avbDeadline,
 		DataSize: aDatasize,
 	}
 }

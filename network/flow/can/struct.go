@@ -10,19 +10,11 @@ type importantCAN struct {
 	DataSize float64
 }
 
-func newImportantCAN() *importantCAN {
+func newImportantCANWithParams() *importantCAN {
 	return &importantCAN{
-		Period:   5000, // 5000us (default)
-		Deadline: 5000, // Period = Deadline (default)
-		DataSize: 16,   // 16bytes (default)
-	}
-}
-
-func newImportantCANWithParams(period int, deadline int, dataSize float64) *importantCAN {
-	return &importantCAN{
-		Period:   period,
-		Deadline: deadline,
-		DataSize: dataSize,
+		Period:   importantcanPeriods,   // 5000us
+		Deadline: importantcanDeadlines, // Period = Deadline
+		DataSize: importantcanDataSizes, // 16bytes
 	}
 }
 
@@ -32,11 +24,11 @@ type unimportantCAN struct {
 	DataSize float64
 }
 
-func newUnimportantCAN(ucPeriod int, ucDeadline int) *unimportantCAN {
+func newUnimportantCAN(period int, deadline int) *unimportantCAN {
 	return &unimportantCAN{
-		Period:   ucPeriod,   // 50000~150000us up 50000us
-		Deadline: ucDeadline, // 10000~20000us up 2000us
-		DataSize: 16,         // 16bytes
+		Period:   period,                  // 50000~150000us up 50000us
+		Deadline: deadline,                // 10000~20000us up 2000us
+		DataSize: unimportantcanDataSizes, // 16bytes
 	}
 }
 

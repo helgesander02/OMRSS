@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"src/pkg/logger"
 	"time"
 
 	"github.com/spf13/viper"
@@ -24,9 +25,13 @@ type NetworkConfig struct {
 }
 
 type FlowsConfig struct {
-	TSN TSNFlowConfig `mapstructure:"tsn"`
-	AVB AVBFlowConfig `mapstructure:"avb"`
-	CAN CANFlowConfig `mapstructure:"can"`
+	// RoutingMode controls the shape of TT flow destinations:
+	//   - "tree": flow has multiple destinations (multicast), used by OMACO
+	//   - "path": flow has a single destination (unicast),   used by OSRO
+	RoutingMode string        `mapstructure:"routing_mode"`
+	TSN         TSNFlowConfig `mapstructure:"tsn"`
+	AVB         AVBFlowConfig `mapstructure:"avb"`
+	CAN         CANFlowConfig `mapstructure:"can"`
 }
 
 type TSNFlowConfig struct {
@@ -53,6 +58,7 @@ type AVBFlowParamsConfig struct {
 }
 
 type CANFlowConfig struct {
+	Nodes       int                 `mapstructure:"nodes"` // Number of CAN nodes randomly selected from topology
 	Important   int                 `mapstructure:"important"`
 	Unimportant int                 `mapstructure:"unimportant"`
 	Params      CANFlowParamsConfig `mapstructure:"params"`
@@ -113,7 +119,7 @@ func Load(configName string) (*Config, error) {
 	v := viper.New()
 
 	v.SetConfigType("yaml")
-	v.AddConfigPath("./internal/config")
+	v.AddConfigPath("./pkg/config")
 
 	switch configName {
 	case "omaco":
@@ -131,9 +137,9 @@ func Load(configName string) (*Config, error) {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			return nil, fmt.Errorf("failed to read config file: %w", err)
 		}
-		fmt.Printf("Config file (%s) not found, using defaults\n", configName)
+		logger.Printf("Config file (%s) not found, using defaults\n", configName)
 	} else {
-		fmt.Printf("Using config file: %s\n", v.ConfigFileUsed())
+		logger.Printf("Using config file: %s\n", v.ConfigFileUsed())
 	}
 
 	var cfg Config
@@ -191,6 +197,17 @@ func (c *Config) Validate() error {
 
 	if c.Algorithm.OSACO.KTrees <= 0 {
 		return fmt.Errorf("osaco k_trees must be positive, got: %d", c.Algorithm.OSACO.KTrees)
+	}
+
+	// OSRO is the only algorithm that consumes CAN nodes, so only enforce
+	// the positivity check when it is selected.
+	if c.Algorithm.Name == "osro" && c.Network.Flows.CAN.Nodes <= 0 {
+		return fmt.Errorf("network.flows.can.nodes must be positive, got: %d", c.Network.Flows.CAN.Nodes)
+	}
+
+	validRoutingModes := map[string]bool{"tree": true, "path": true}
+	if !validRoutingModes[c.Network.Flows.RoutingMode] {
+		return fmt.Errorf("invalid network.flows.routing_mode: %q (valid options: tree, path)", c.Network.Flows.RoutingMode)
 	}
 
 	return nil

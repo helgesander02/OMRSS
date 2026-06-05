@@ -4,9 +4,9 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
+	"src/pkg/logger"
 	"strconv"
 )
 
@@ -19,18 +19,18 @@ func (OC *OmacoMemorizer) MStoreFile(fileName string) {
 
 	// Try to open the file in append mode first
 	txtName := fileName + ".txt"
-	log.Printf("Opening file %s in append mode\n", txtName)
+	logger.Printf("Opening file %s in append mode\n", txtName)
 	file, err := os.OpenFile(txtName, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		// If it fails, create the file
-		log.Printf("File not found, creating file %s\n", txtName)
+		logger.Printf("File not found, creating file %s\n", txtName)
 		file, err = os.OpenFile(txtName, os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			log.Fatalf("Failed to create or open file %s: %v\n", txtName, err)
+			logger.Fatalf("Failed to create or open file %s: %v\n", txtName, err)
 		}
 	}
 	defer file.Close()
-	log.Printf("Writing text to file %s\n", txtName)
+	logger.Printf("Writing text to file %s\n", txtName)
 	fmt.Fprintln(file, text)
 
 	switchWorkingPath("..")
@@ -45,18 +45,18 @@ func (OS *OsroMemorizer) MStoreFile(fileName string) {
 
 	// Try to open the file in append mode first
 	txtName := fileName + ".txt"
-	log.Printf("Opening file %s in append mode\n", txtName)
+	logger.Printf("Opening file %s in append mode\n", txtName)
 	file, err := os.OpenFile(txtName, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		// If it fails, create the file
-		log.Printf("File not found, creating file %s\n", txtName)
+		logger.Printf("File not found, creating file %s\n", txtName)
 		file, err = os.OpenFile(txtName, os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			log.Fatalf("Failed to create or open file %s: %v\n", txtName, err)
+			logger.Fatalf("Failed to create or open file %s: %v\n", txtName, err)
 		}
 	}
 	defer file.Close()
-	log.Printf("Writing text to file %s\n", txtName)
+	logger.Printf("Writing text to file %s\n", txtName)
 	fmt.Fprintln(file, text)
 
 	switchWorkingPath("..")
@@ -97,7 +97,7 @@ func getAverageData(fileName string) (map[string]float64, int) {
 
 	files, err := os.ReadDir(dir)
 	if err != nil {
-		log.Fatalf("Error reading directory: %v", err)
+		logger.Fatalf("Error reading directory: %v", err)
 	}
 
 	testcaseNumbers := 0
@@ -107,10 +107,10 @@ func getAverageData(fileName string) (map[string]float64, int) {
 		}
 
 		filePath := filepath.Join(dir, file.Name())
-		fmt.Printf("Reading file: %s\n", filePath)
+		logger.Printf("Reading file: %s\n", filePath)
 		csvFile, err := os.Open(filePath)
 		if err != nil {
-			log.Printf("Error opening file %s: %v", filePath, err)
+			logger.Printf("Error opening file %s: %v", filePath, err)
 			continue
 		}
 		defer csvFile.Close()
@@ -125,7 +125,7 @@ func getAverageData(fileName string) (map[string]float64, int) {
 				break
 			}
 			if err != nil {
-				log.Printf("Error reading CSV from file %s: %v", filePath, err)
+				logger.Printf("Error reading CSV from file %s: %v", filePath, err)
 				continue
 			}
 			if len(columns) == 0 {
@@ -246,7 +246,7 @@ func getAverageData_OSRO(fileName string) (map[string]float64, int) {
 
 	files, err := os.ReadDir(dir)
 	if err != nil {
-		log.Fatalf("Error reading directory: %v", err)
+		logger.Fatalf("Error reading directory: %v", err)
 	}
 
 	testcaseNumbers := 0
@@ -256,10 +256,10 @@ func getAverageData_OSRO(fileName string) (map[string]float64, int) {
 		}
 
 		filePath := filepath.Join(dir, file.Name())
-		fmt.Printf("Reading file: %s\n", filePath)
+		logger.Printf("Reading file: %s\n", filePath)
 		csvFile, err := os.Open(filePath)
 		if err != nil {
-			log.Printf("Error opening file %s: %v", filePath, err)
+			logger.Printf("Error opening file %s: %v", filePath, err)
 			continue
 		}
 		defer csvFile.Close()
@@ -274,7 +274,7 @@ func getAverageData_OSRO(fileName string) (map[string]float64, int) {
 				break
 			}
 			if err != nil {
-				log.Printf("Error reading CSV from file %s: %v", filePath, err)
+				logger.Printf("Error reading CSV from file %s: %v", filePath, err)
 				continue
 			}
 			if len(columns) == 0 {

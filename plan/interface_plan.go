@@ -1,8 +1,8 @@
 package plan
 
 import (
-	"src/internal/config"
 	"src/network"
+	"src/pkg/config"
 )
 
 type Plans interface {

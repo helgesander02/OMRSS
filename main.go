@@ -4,22 +4,22 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"src/internal/config"
-	"src/internal/random"
 	"src/memorizer"
 	"src/network"
+	"src/pkg/config"
+	"src/pkg/logger"
+	"src/pkg/random"
 	"src/plan"
 )
 
 func main() {
 	if err := run(); err != nil {
-		log.Fatalf("Error: %v\n", err)
+		logger.Fatalf("Error: %v\n", err)
 	}
 }
 
@@ -33,15 +33,26 @@ func run() error {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
 
+	// Initialise the execution-flow logger as soon as we know the
+	// experiment name so every subsequent print is captured on disk.
+	if err := logger.Init(cfg.GetExperimentName()); err != nil {
+		return fmt.Errorf("failed to initialise logger: %w", err)
+	}
+	defer func() {
+		if cerr := logger.Close(); cerr != nil {
+			fmt.Fprintf(os.Stderr, "failed to close logger: %v\n", cerr)
+		}
+	}()
+
 	// Display configuration summary
-	fmt.Println("========================================")
-	fmt.Println("Configuration Summary")
-	fmt.Println("========================================")
-	fmt.Printf("Topology: %s\n", cfg.Network.Topology)
-	fmt.Printf("Algorithm: %s\n", cfg.Algorithm.Name)
-	fmt.Printf("Test Cases: %d\n", cfg.Experiment.TestCases)
-	fmt.Println("========================================")
-	fmt.Println()
+	logger.Println("========================================")
+	logger.Println("Configuration Summary")
+	logger.Println("========================================")
+	logger.Printf("Topology: %s\n", cfg.Network.Topology)
+	logger.Printf("Algorithm: %s\n", cfg.Algorithm.Name)
+	logger.Printf("Test Cases: %d\n", cfg.Experiment.TestCases)
+	logger.Println("========================================")
+	logger.Println()
 
 	// Graceful shutdown
 	ctx, stop := signal.NotifyContext(
@@ -53,12 +64,12 @@ func run() error {
 
 	go func() {
 		<-ctx.Done()
-		log.Println("\nReceived shutdown signal, cleaning up...")
+		logger.Println("\nReceived shutdown signal, cleaning up...")
 	}()
 
 	// Initialize random number generator
 	rng := random.New(cfg.Experiment.RandomSeed)
-	log.Printf("Initialized RNG with seed: %d\n", cfg.Experiment.RandomSeed)
+	logger.Printf("Initialized RNG with seed: %d\n", cfg.Experiment.RandomSeed)
 
 	network.FillRNG(rng)
 	network.FillTTParams(cfg)
@@ -80,7 +91,7 @@ func runExperiments(ctx context.Context, cfg *config.Config) error {
 		return fmt.Errorf("unknown algorithm: %s", cfg.Algorithm.Name)
 	}
 
-	log.Printf(
+	logger.Printf(
 		"Starting %d test cases with algorithm: %s\n",
 		cfg.Experiment.TestCases,
 		cfg.Algorithm.Name,
@@ -91,13 +102,13 @@ func runExperiments(ctx context.Context, cfg *config.Config) error {
 
 		select {
 		case <-ctx.Done():
-			log.Println("\nExperiment interrupted by user")
+			logger.Println("\nExperiment interrupted by user")
 			return ctx.Err()
 		default:
 		}
 
-		fmt.Printf("\nTestCase %d/%d\n", ts+1, cfg.Experiment.TestCases)
-		fmt.Println("****************************************")
+		logger.Printf("\nTestCase %d/%d\n", ts+1, cfg.Experiment.TestCases)
+		logger.Println("****************************************")
 
 		// 1. Generate Network
 		networkInstance := network.GenerateNetwork(cfg)
@@ -118,12 +129,12 @@ func runExperiments(ctx context.Context, cfg *config.Config) error {
 		// 4. Accumulate Results
 		memorizer.MCumulative(planInstance)
 
-		fmt.Println("****************************************")
+		logger.Println("****************************************")
 	}
 
 	elapsed := time.Since(startTime)
 
-	log.Printf(
+	logger.Printf(
 		"\nCompleted %d test cases in %v\n",
 		cfg.Experiment.TestCases,
 		elapsed,
@@ -141,7 +152,7 @@ func runExperiments(ctx context.Context, cfg *config.Config) error {
 	memorizer.MStoreData(experimentName, cfg.Experiment.TestCases)
 	memorizer.MStoreFile(experimentName)
 
-	log.Printf("Results saved as: %s\n", experimentName)
+	logger.Printf("Results saved as: %s\n", experimentName)
 
 	return nil
 }

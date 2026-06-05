@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"fmt"
 	"math"
+	"src/pkg/logger"
 	"strconv"
 )
 
@@ -140,7 +140,7 @@ func APTED(t1, t2 *Tree) float64 {
 		}
 	}
 	if root1 == nil || root2 == nil {
-		fmt.Println("At least one tree has no root node (ID must start with 100)")
+		logger.Println("At least one tree has no root node (ID must start with 100)")
 		return -1
 	}
 

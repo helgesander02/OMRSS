@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"fmt"
-	"src/internal/config"
 	"src/network"
+	"src/pkg/config"
+	"src/pkg/logger"
 )
 
 var v2v *V2V = &V2V{} // v2v is all paths connecting multiple terminals to terminals.
@@ -15,13 +15,13 @@ func Get_SteninerTree_Routing(network *network.Network, cfg *config.Config) *Tre
 		tree := SteninerTree(v2v, network.GraphSet.TSNGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
 		TreesSet.TSNTrees = append(TreesSet.TSNTrees, tree)
 	}
-	fmt.Printf("Finish Steniner Tree %d TSN streams routing\n", len(TreesSet.TSNTrees))
+	logger.Printf("Finish Steniner Tree %d TSN streams routing\n", len(TreesSet.TSNTrees))
 
 	for nth, flow := range network.FlowSet.AVBFlows {
 		tree := SteninerTree(v2v, network.GraphSet.AVBGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
 		TreesSet.AVBTrees = append(TreesSet.AVBTrees, tree)
 	}
-	fmt.Printf("Finish Steniner Tree %d AVB streams routing\n", len(TreesSet.AVBTrees))
+	logger.Printf("Finish Steniner Tree %d AVB streams routing\n", len(TreesSet.AVBTrees))
 
 	return TreesSet
 }
@@ -33,13 +33,13 @@ func Get_DistanceTree_Routing(network *network.Network, cfg *config.Config) *Tre
 		tree := DistanceTree(network.GraphSet.TSNGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
 		TreesSet.TSNTrees = append(TreesSet.TSNTrees, tree)
 	}
-	fmt.Printf("Finish Distance Tree %d TSN streams routing\n", len(TreesSet.TSNTrees))
+	logger.Printf("Finish Distance Tree %d TSN streams routing\n", len(TreesSet.TSNTrees))
 
 	for nth, flow := range network.FlowSet.AVBFlows {
 		tree := DistanceTree(network.GraphSet.AVBGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
 		TreesSet.AVBTrees = append(TreesSet.AVBTrees, tree)
 	}
-	fmt.Printf("Finish Distance Tree %d AVB streams routing\n", len(TreesSet.AVBTrees))
+	logger.Printf("Finish Distance Tree %d AVB streams routing\n", len(TreesSet.AVBTrees))
 
 	return TreesSet
 }
@@ -69,13 +69,13 @@ func Get_OSACO_Routing(network *network.Network, cfg *config.Config, SMT *TreesS
 		Ktrees := KSpanningTree(v2v, SMT.TSNTrees[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
 		ktrees_set.TSNTrees = append(ktrees_set.TSNTrees, Ktrees)
 	}
-	fmt.Printf("Finish OSACO %d TSN streams routing\n", len(ktrees_set.TSNTrees))
+	logger.Printf("Finish OSACO %d TSN streams routing\n", len(ktrees_set.TSNTrees))
 
 	for nth, flow := range network.FlowSet.AVBFlows {
 		Ktrees := KSpanningTree(v2v, SMT.AVBTrees[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
 		ktrees_set.AVBTrees = append(ktrees_set.AVBTrees, Ktrees)
 	}
-	fmt.Printf("Finish OSACO %d AVB streams routing\n", len(ktrees_set.AVBTrees))
+	logger.Printf("Finish OSACO %d AVB streams routing\n", len(ktrees_set.AVBTrees))
 
 	return ktrees_set
 }

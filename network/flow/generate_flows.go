@@ -3,13 +3,31 @@ package flow
 import (
 	"src/network/flow/can"
 	"src/network/flow/tt"
+	"src/pkg/config"
 )
 
-func GenerateOmacoFlows(nnodeLength int, bgTSN int, bgAVB int, inputTSN int, inputAVB int, hyperPeriod int) *FlowSet {
+var (
+	bgTSNFlowsEnd int
+	bgAVBFlowsEnd int
+)
 
-	fillFlowBreakpoint(bgTSN, bgAVB)
+// use the breakpoint to separate input and background flows
+func fillFlowBreakpoint(bgTSN int, bgAVB int) {
+	bgTSNFlowsEnd = bgTSN
+	bgAVBFlowsEnd = bgAVB
+}
 
-	tsnFlows, avbFlows := tt.GenerateTTFlows(nnodeLength, bgTSN, bgAVB, inputTSN, inputAVB, hyperPeriod)
+func GenerateOmacoFlows(flows config.FlowsConfig, hyperPeriod int, nnodeLength int) *FlowSet {
+
+	fillFlowBreakpoint(flows.TSN.Background, flows.AVB.Background)
+
+	tsnFlows, avbFlows := tt.GenerateTTFlows(
+		flows.TSN,
+		flows.AVB,
+		hyperPeriod,
+		nnodeLength,
+		flows.RoutingMode,
+	)
 
 	flowSet := newFlowSet()
 	flowSet.TSNFlows = tsnFlows
@@ -18,12 +36,22 @@ func GenerateOmacoFlows(nnodeLength int, bgTSN int, bgAVB int, inputTSN int, inp
 	return flowSet
 }
 
-func GenerateOsroFlows(nnodeLength int, bgTSN int, bgAVB int, inputTSN int, inputAVB int, hyperPeriod int, CANnode []int, importantCAN int, unimportantCAN int) *FlowSet {
+func GenerateOsroFlows(flows config.FlowsConfig, hyperPeriod int, nnodeLength int, CANnode []int) *FlowSet {
 
-	fillFlowBreakpoint(bgTSN, bgAVB)
+	fillFlowBreakpoint(flows.TSN.Background, flows.AVB.Background)
 
-	tsnFlows, avbFlows := tt.GenerateTTFlows(nnodeLength, bgTSN, bgAVB, inputTSN, inputAVB, hyperPeriod)
-	methodSet := can.GenerateCAN2TTFlows(CANnode, importantCAN, unimportantCAN, hyperPeriod)
+	tsnFlows, avbFlows := tt.GenerateTTFlows(
+		flows.TSN,
+		flows.AVB,
+		hyperPeriod,
+		nnodeLength,
+		flows.RoutingMode,
+	)
+	methodSet := can.GenerateCAN2TTFlows(
+		flows.CAN,
+		hyperPeriod,
+		CANnode,
+	)
 
 	flowSet := newFlowSet()
 	flowSet.TSNFlows = tsnFlows

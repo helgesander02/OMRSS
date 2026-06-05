@@ -1,11 +1,11 @@
 package network
 
 import (
-	"src/internal/config"
-	"src/internal/random"
 	"src/network/flow/can"
 	"src/network/flow/tt"
 	"src/network/topology"
+	"src/pkg/config"
+	"src/pkg/random"
 )
 
 func FillRNG(r *random.Generator) {

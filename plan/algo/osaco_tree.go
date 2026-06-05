@@ -1,12 +1,12 @@
 package algo
 
 import (
-	"fmt"
 	"math"
-	"src/internal/config"
-	"src/internal/random"
 	"src/network"
 	"src/network/flow"
+	"src/pkg/config"
+	"src/pkg/logger"
+	"src/pkg/random"
 	"src/plan/algo_timer"
 	"src/plan/routes"
 	"src/plan/schedule"
@@ -57,15 +57,15 @@ func (osaco *OSACO) OSACO_Initial_Settings(network *network.Network, cfg *config
 func (osaco *OSACO) OSACO_Run(network *network.Network, cfg *config.Config, timeoutIndex int, costSetting [4]int) [4]float64 {
 	// Repeat the execution of epochs within the timeout
 	initialobj, initialcost := schedule.OBJ(network, cfg, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, costSetting, false)
-	fmt.Println()
-	fmt.Printf("initial value: %d \n", initialcost)
-	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", initialobj[0], initialobj[1], initialobj[3])
+	logger.Println()
+	logger.Printf("initial value: %d \n", initialcost)
+	logger.Printf("O1: %f O2: %f O3: pass O4: %f \n", initialobj[0], initialobj[1], initialobj[3])
 
 	timeout := time.Duration(osaco.Timeout) * time.Millisecond
 	startTime := time.Now()
 	i := 1
 	for {
-		fmt.Printf("\nepoch%d:\n", i)
+		logger.Printf("\nepoch%d:\n", i)
 		osaco.Timer[timeoutIndex].TimerStart()
 		II := epoch(network, cfg, osaco, timeoutIndex, costSetting)
 		osaco.Timer[timeoutIndex].TimerStop()
@@ -75,7 +75,7 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, cfg *config.Config, time
 
 		if cost1 < cost2 {
 			osaco.InputTrees = II
-			fmt.Println("Change the selected routing !!")
+			logger.Println("Change the selected routing !!")
 		}
 		i += 1
 
@@ -85,10 +85,10 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, cfg *config.Config, time
 	}
 
 	resultobj, resultcost := schedule.OBJ(network, cfg, osaco.KTrees, osaco.InputTrees, osaco.BGTrees, costSetting, true)
-	fmt.Println()
-	fmt.Printf("result value: %d \n", resultcost)
-	fmt.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
-	fmt.Println()
+	logger.Println()
+	logger.Printf("result value: %d \n", resultcost)
+	logger.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
+	logger.Println()
 
 	if resultobj[0] != 0 || resultobj[1] != 0 {
 		osaco.Timer[timeoutIndex].TimerMax()
@@ -161,12 +161,12 @@ func computeVb(X *routes.KTreesSet, flowSet *flow.FlowSet) *Visibility {
 			}
 
 			if nth >= bgAVB {
-				//fmt.Printf("Input flow%d tree%d \n", nth, kth)
+				//logger.Printf("Input flow%d tree%d \n", nth, kth)
 				value := mult / float64(schedule.WCD(z, X, Input_flowSet.AVBFlows[nth-bgAVB], flowSet))
 				v = append(v, value)
 
 			} else {
-				//fmt.Printf("Backgourd flow%d tree%d \n", nth, kth)
+				//logger.Printf("Backgourd flow%d tree%d \n", nth, kth)
 				value := mult / float64(schedule.WCD(z, X, BG_flowSet.AVBFlows[nth], flowSet))
 				v = append(v, value)
 			}
@@ -247,8 +247,8 @@ func probability(osaco *OSACO) (*routes.TreesSet, *routes.TreesSet, [2][]int, [2
 func epoch(network *network.Network, cfg *config.Config, osaco *OSACO, timeoutIndex int, costSetting [4]int) *routes.TreesSet {
 	II, _, input_k_location, _ := probability(osaco)
 	//II, II_prime, input_k_location, bg_k_location := Probability(osaco.KTrees, osaco.VB, osaco.PRM) // BG ... pass
-	fmt.Printf("Select input routing %v \n", input_k_location)
-	//fmt.Printf("Select background routing %v \n", bg_k_location) // BG ... pass
+	logger.Printf("Select input routing %v \n", input_k_location)
+	//logger.Printf("Select background routing %v \n", bg_k_location) // BG ... pass
 	osaco.Timer[timeoutIndex].TimerStop()
 	obj_list, cost := schedule.OBJ(network, cfg, osaco.KTrees, II, osaco.BGTrees, costSetting, false)
 	//obj, cost := Obj(network, X, II, II_prime) // BG ... pass
