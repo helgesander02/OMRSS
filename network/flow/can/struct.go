@@ -91,7 +91,7 @@ type Method struct {
 	TTFrameCount  int
 	CAN2TTO1Drop  int
 	CANAreaO1Drop int
-	CAN2TSNDelay  time.Duration
+	CAN2TTDelay   time.Duration
 }
 
 func newMethod(methodName string) *Method {

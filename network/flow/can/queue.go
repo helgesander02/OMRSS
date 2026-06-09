@@ -59,6 +59,15 @@ func (q *Queue) sortQueue(method string, currentTime int) {
 			return ti < tj
 		})
 
+	case "wst_mar":
+		// MAR (Multi-tier Adaptive Release) uses EDF order so the head of
+		// the queue is always the most urgent frame. We sort by FinishTime
+		// directly because currentTime is uniform within a step, so subtracting
+		// it from every key would not change the order.
+		sort.Slice(q.Frames, func(i, j int) bool {
+			return q.Frames[i].FinishTime < q.Frames[j].FinishTime
+		})
+
 	case "mao":
 		// deadline (small → large)
 		sort.Slice(q.Frames, func(i, j int) bool {
@@ -71,13 +80,4 @@ func (q *Queue) sortQueue(method string, currentTime int) {
 			return q.Frames[i].ArrivalTime < q.Frames[j].ArrivalTime
 		})
 	}
-}
-
-func (q *Queue) hasImminent(now, safe int) bool {
-	for _, f := range q.Frames {
-		if f.FinishTime-now <= safe {
-			return true
-		}
-	}
-	return false
 }

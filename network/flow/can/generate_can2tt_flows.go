@@ -7,108 +7,121 @@ import (
 	"src/pkg/logger"
 )
 
+const (
+	MethodFIFO     = "fifo"
+	MethodPriority = "priority"
+	MethodOBO      = "obo"
+	MethodWST      = "wst"
+	MethodMAO      = "mao"
+	MethodWSTMAR   = "wst_mar" // Multi-tier Adaptive Release: EDF order + slack-tiered emit + peek-ahead merge
+)
+
+var methodList = []string{
+	MethodFIFO,
+	MethodPriority,
+	MethodOBO,
+	MethodWST,
+	MethodMAO,
+	MethodWSTMAR,
+}
+
 func GenerateCAN2TTFlows(can config.CANFlowConfig, hyperperiod int, CANnode []int) []*Method {
 	// step 1: generate CAN flows
 	importantCANFlows, unimportantCANFlows := GenerateCANFlows(can, hyperperiod, CANnode)
 
-	// step2: prepare method list
-	var methodList = []string{"fifo", "priority", "obo", "wst", "mao"}
-
-	// step3: according to different encapsulation methods, generate CAN2TT flows
+	// step 2: aggregate CAN frames per encapsulation method,
+	// then run the encapsulation pass for each.
 	methodSet := newMethodSet()
 	for _, methodName := range methodList {
-		forwardingEngine := newForwardingEngine()
+		agg := newCAN2TTAggregator()
 
-		if methodName == "mao" {
+		if methodName == MethodMAO {
+			// MAO needs frames split per (Period, Source, Destination).
 			for _, impf := range importantCANFlows {
-				flowCopy := impf.deepCopyFlow()
-				forwardingEngine.aggregateCANFrameByPeriodAndDomain(flowCopy)
+				agg.aggregateByPeriodAndSrcDst(impf.deepCopyFlow())
 			}
 			for _, unimpf := range unimportantCANFlows {
-				flowCopy := unimpf.deepCopyFlow()
-				forwardingEngine.aggregateCANFrameByPeriodAndDomain(flowCopy)
+				agg.aggregateByPeriodAndSrcDst(unimpf.deepCopyFlow())
 			}
-
 		} else {
+			// All other strategies aggregate per (Source, Destination).
 			for _, impf := range importantCANFlows {
-				flowCopy := impf.deepCopyFlow()
-				forwardingEngine.aggregateCANFrameByDomain(flowCopy)
+				agg.aggregateBySrcDst(impf.deepCopyFlow())
 			}
 			for _, unimpf := range unimportantCANFlows {
-				flowCopy := unimpf.deepCopyFlow()
-				forwardingEngine.aggregateCANFrameByDomain(flowCopy)
+				agg.aggregateBySrcDst(unimpf.deepCopyFlow())
 			}
 		}
 
 		start := time.Now()
 		method := newMethod(methodName)
-		method.EncapsulateCAN2TT(forwardingEngine)
-		method.CAN2TSNDelay = time.Since(start)
+		method.EncapsulateCAN2TT(agg)
+		method.CAN2TTDelay = time.Since(start)
 		methodSet = append(methodSet, method)
 	}
 
 	return methodSet
 }
 
-type ForwardingEngine struct {
-	BUSs []*CANBUS
+type CAN2TTAggregator struct {
+	Groups []*CANFrameGroup
 }
 
-func newForwardingEngine() *ForwardingEngine {
-	return &ForwardingEngine{}
+func newCAN2TTAggregator() *CAN2TTAggregator {
+	return &CAN2TTAggregator{}
 }
 
-func (forwardingEngine *ForwardingEngine) aggregateCANFrameByDomain(f *Flow) {
-	for _, canBUS := range forwardingEngine.BUSs {
-		if canBUS.Source == f.Source && canBUS.Destination == f.Destination {
-			canBUS.Frames = append(canBUS.Frames, f.Frames...)
+func (agg *CAN2TTAggregator) aggregateBySrcDst(f *Flow) {
+	for _, group := range agg.Groups {
+		if group.Source == f.Source && group.Destination == f.Destination {
+			group.Frames = append(group.Frames, f.Frames...)
 			return
 		}
 	}
-	forwardingEngine.addNewBus(f)
+	agg.addGroup(f)
 }
 
-func (forwardingEngine *ForwardingEngine) aggregateCANFrameByPeriodAndDomain(f *Flow) {
-	for _, canBUS := range forwardingEngine.BUSs {
-		if canBUS.Period == f.Period && canBUS.Source == f.Source && canBUS.Destination == f.Destination {
-			canBUS.Frames = append(canBUS.Frames, f.Frames...)
+func (agg *CAN2TTAggregator) aggregateByPeriodAndSrcDst(f *Flow) {
+	for _, group := range agg.Groups {
+		if group.Period == f.Period && group.Source == f.Source && group.Destination == f.Destination {
+			group.Frames = append(group.Frames, f.Frames...)
 			return
 		}
 	}
-	forwardingEngine.addNewBus(f)
+	agg.addGroup(f)
 }
 
-func (forwardingEngine *ForwardingEngine) addNewBus(f *Flow) {
-	canBUS := newCANBUS()
-	canBUS.Source = f.Source
-	canBUS.Destination = f.Destination
-	canBUS.Period = f.Period
-	canBUS.Deadline = f.Deadline
-	canBUS.DataSize = f.DataSize
-	canBUS.HyperPeriod = f.HyperPeriod
-	canBUS.Frames = append(canBUS.Frames, f.Frames...)
+func (agg *CAN2TTAggregator) addGroup(f *Flow) {
+	group := newCANFrameGroup()
+	group.Source = f.Source
+	group.Destination = f.Destination
+	group.Period = f.Period
+	group.Deadline = f.Deadline
+	group.DataSize = f.DataSize
+	group.HyperPeriod = f.HyperPeriod
+	group.Frames = append(group.Frames, f.Frames...)
 
-	forwardingEngine.BUSs = append(forwardingEngine.BUSs, canBUS)
+	agg.Groups = append(agg.Groups, group)
 }
 
-func (forwardingEngine *ForwardingEngine) ShowForwardingEngine() {
-	logger.Println("CAN2TT Traffic Router:")
-	for _, canBUS := range forwardingEngine.BUSs {
-		canBUS.ShowCANBUS()
+func (agg *CAN2TTAggregator) Show() {
+	logger.Println("CAN2TT Aggregator:")
+	for _, group := range agg.Groups {
+		group.Show()
 	}
 }
 
-type CANBUS struct {
+type CANFrameGroup struct {
 	Flow
 }
 
-func newCANBUS() *CANBUS {
-	return &CANBUS{}
+func newCANFrameGroup() *CANFrameGroup {
+	return &CANFrameGroup{}
 }
 
-func (canBUS *CANBUS) getFramesByCurrentTime(currentTime int) []*Frame {
+func (group *CANFrameGroup) getFramesByCurrentTime(currentTime int) []*Frame {
 	frames := []*Frame{}
-	for _, frame := range canBUS.Frames {
+	for _, frame := range group.Frames {
 		if frame.ArrivalTime == currentTime {
 			frames = append(frames, frame)
 		}
@@ -116,7 +129,23 @@ func (canBUS *CANBUS) getFramesByCurrentTime(currentTime int) []*Frame {
 	return frames
 }
 
-func (canBUS *CANBUS) ShowCANBUS() {
-	logger.Printf("Queue (%d→%d) frames=%d\n", canBUS.Source, canBUS.Destination, len(canBUS.Frames))
-	logger.Printf("Period: %v  ,Deadline: %v ,Datasize: %v\n", canBUS.Period, canBUS.Deadline, canBUS.DataSize)
+// nextArrivalAfter returns the earliest ArrivalTime in the group that is
+// strictly greater than currentTime. Used by MAR's peek-ahead merge.
+// Returns -1 when no future arrival exists.
+func (group *CANFrameGroup) nextArrivalAfter(currentTime int) int {
+	next := -1
+	for _, frame := range group.Frames {
+		if frame.ArrivalTime <= currentTime {
+			continue
+		}
+		if next == -1 || frame.ArrivalTime < next {
+			next = frame.ArrivalTime
+		}
+	}
+	return next
+}
+
+func (group *CANFrameGroup) Show() {
+	logger.Printf("Group (%d→%d) frames=%d\n", group.Source, group.Destination, len(group.Frames))
+	logger.Printf("Period: %v  ,Deadline: %v ,Datasize: %v\n", group.Period, group.Deadline, group.DataSize)
 }

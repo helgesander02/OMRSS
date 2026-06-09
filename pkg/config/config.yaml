@@ -108,14 +108,20 @@ experiment:
   # Set to 0 to use current timestamp (random each run)
   random_seed: 42
 
+  # Skip plan + memorizer; only generate and dump the network.
+  # Useful for inspecting CAN-to-TT encapsulation without paying for scheduling.
+  network_only: false
+
 # Output Control
 # --------------
 output:
-  # Display comprehensive network information
+  # Verbose network dump: topology cost matrix, per-frame timing, per-emit CAN
+  # detail, per-flow routing graphs. The CAN encap summary + comparison table
+  # always prints in network-only mode regardless.
   show_network: false
-  
+
   # Display comprehensive plan information
   show_plan: false
-  
+
   # Logging level: debug, info, warn, error
   log_level: "info"

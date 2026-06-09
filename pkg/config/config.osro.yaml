@@ -1,6 +1,6 @@
 network:
   topology: "typical_complex"
-  hyperperiod: 6000
+  hyperperiod: 60000
   bandwidth: 1e9
   flows:
     routing_mode: "path" 
@@ -19,8 +19,8 @@ network:
         datasizes: [1000, 1100, 1200, 1300, 1400, 1500]
     can:
       nodes: 5         
-      important: 5
-      unimportant: 25
+      important: 500
+      unimportant: 2500
       params:
         important_params:
           period: 5000
@@ -47,10 +47,11 @@ schedule:
     o4: 1
 
 experiment:
-  test_cases: 100
+  test_cases: 1
   random_seed: 1
+  network_only: true     
 
 output:
-  show_network: false
+  show_network: false 
   show_plan: false
   log_level: "info"

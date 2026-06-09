@@ -76,11 +76,46 @@ func run() error {
 	network.FillCANParams(cfg)
 	plan.FillRNG(rng)
 
+	// Network-only mode: stop after generating + showing the network so we
+	// can inspect the encapsulation result without paying for plan/memorizer.
+	if cfg.Experiment.NetworkOnly {
+		return runNetworkOnly(ctx, cfg)
+	}
+
 	// Run experiments
 	if err := runExperiments(ctx, cfg); err != nil {
 		return fmt.Errorf("experiment execution failed: %w", err)
 	}
 
+	return nil
+}
+
+func runNetworkOnly(ctx context.Context, cfg *config.Config) error {
+	logger.Printf(
+		"Network-only mode: %d test case(s), algorithm: %s\n",
+		cfg.Experiment.TestCases,
+		cfg.Algorithm.Name,
+	)
+
+	startTime := time.Now()
+	for ts := 0; ts < cfg.Experiment.TestCases; ts++ {
+		select {
+		case <-ctx.Done():
+			logger.Println("\nNetwork-only run interrupted by user")
+			return ctx.Err()
+		default:
+		}
+
+		logger.Printf("\nTestCase %d/%d\n", ts+1, cfg.Experiment.TestCases)
+		logger.Println("****************************************")
+
+		networkInstance := network.GenerateNetwork(cfg)
+		networkInstance.ShowNetwork(cfg.Output.ShowNetwork)
+
+		logger.Println("****************************************")
+	}
+
+	logger.Printf("\nFinished network-only run in %v\n", time.Since(startTime))
 	return nil
 }
 
@@ -113,7 +148,7 @@ func runExperiments(ctx context.Context, cfg *config.Config) error {
 		// 1. Generate Network
 		networkInstance := network.GenerateNetwork(cfg)
 		if cfg.Output.ShowNetwork {
-			networkInstance.ShowNetwork()
+			networkInstance.ShowNetwork(true)
 		}
 
 		// 2. Create Plan

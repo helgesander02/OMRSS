@@ -49,8 +49,9 @@ schedule:
 experiment:
   test_cases: 1
   random_seed: 1
+  network_only: false    
 
 output:
-  show_network: false
+  show_network: false   
   show_plan: false
   log_level: "info"

@@ -1,11 +1,14 @@
 package can
 
-// ============================================================================
-// Harmonic Merge 相關輔助函數
-// ============================================================================
+// Stage 2 of the MAO algorithm (Yan et al. 2024, Algorithm 1, lines 24-29):
+// take the Stage 1 TSN messages that did NOT fill up to MTU/2 (the paper's
+// set F') and merge those sharing src/dst with harmonic periods into a
+// single denser TSN message. Merged-flow properties follow paper Eqs (5)-(7):
+//   Period   = gcd(periods)
+//   Deadline = min(deadlines)
+//   DataSize = sum(payload sizes)
 
-// gcd 計算兩個整數的最大公約數 (Greatest Common Divisor)
-// 使用歐幾里得算法
+// gcd returns the greatest common divisor of two positive integers.
 func gcd(a, b int) int {
 	for b != 0 {
 		a, b = b, a%b
@@ -13,55 +16,19 @@ func gcd(a, b int) int {
 	return a
 }
 
-// gcdMultiple 計算多個整數的最大公約數
-func gcdMultiple(nums []int) int {
-	if len(nums) == 0 {
-		return 0
+// isHarmonicPeriod reports whether one period is an integer multiple of
+// the other. Equal periods count as harmonic.
+func isHarmonicPeriod(p1, p2 int) bool {
+	if p1 == 0 || p2 == 0 {
+		return false
 	}
-	result := nums[0]
-	for i := 1; i < len(nums); i++ {
-		result = gcd(result, nums[i])
+	if p1 < p2 {
+		p1, p2 = p2, p1
 	}
-	return result
+	return p1%p2 == 0
 }
 
-// isHarmonicPeriod 檢查兩個週期是否為調和關係
-// 調和週期：一個週期是另一個週期的整數倍
-func isHarmonicPeriod(period1, period2 int) bool {
-	if period1 == 0 || period2 == 0 {
-		return false
-	}
-	larger := period1
-	smaller := period2
-	if period2 > period1 {
-		larger = period2
-		smaller = period1
-	}
-	return larger%smaller == 0
-}
-
-// canMergeFlows 檢查兩個Flow是否可以合併
-// 條件：相同源域、相同目的域、調和週期、合併後不超過MTU
-func canMergeFlows(flow1, flow2 *Flow, MTU float64) bool {
-	// 檢查源域和目的域
-	if flow1.Source != flow2.Source || flow1.Destination != flow2.Destination {
-		return false
-	}
-
-	// 檢查調和週期
-	if !isHarmonicPeriod(flow1.Period, flow2.Period) {
-		return false
-	}
-
-	// 檢查合併後的大小
-	if flow1.DataSize+flow2.DataSize > MTU {
-		return false
-	}
-
-	return true
-}
-
-// FlowGroup 用於表示可以合併的Flow組
+// FlowGroup is a working set of flows being considered for harmonic merge.
 type FlowGroup struct {
 	Flows       []*Flow
 	TotalSize   float64
@@ -69,67 +36,73 @@ type FlowGroup struct {
 	GCDPeriod   int
 }
 
-// harmonicMerge 實現論文第二階段的Harmonic Merge算法
-// 1. 識別效率差的TSN消息 (DataSize < MTU/2)
-// 2. 尋找具有相同源域、目的域和調和週期的消息
-// 3. 重新聚合並更新Flow的屬性
-func (method *Method) harmonicMerge(MTU float64) {
-	threshold := MTU / 2.0 // 750 bytes
-
-	// 步驟1: 識別需要優化的Flow（DataSize < MTU/2）
-	inefficientFlows := make([]*Flow, 0)
-	efficientFlows := make([]*Flow, 0)
-
+// harmonicMerge runs the second aggregation pass of MAO. maxPayload is the
+// per-TSN-message payload cap (paper invariant: MTU/2). Only flows whose
+// Stage 1 per-emit payload is below maxPayload (i.e., the paper's set F')
+// are candidates for merging.
+func (method *Method) harmonicMerge(maxPayload float64) {
+	// Snapshot each flow's real Stage 1 per-emit payload into flow.DataSize
+	// so the "inefficient" classification below reflects the actual emit
+	// size, not the original CAN frame size (which is what
+	// organizeCAN2TTFlows initialised DataSize to).
 	for _, flow := range method.CAN2TTFlows {
-		if flow.DataSize < threshold {
-			inefficientFlows = append(inefficientFlows, flow)
-		} else {
-			efficientFlows = append(efficientFlows, flow)
+		if len(flow.Frames) == 0 {
+			continue
 		}
+		var totalPayload float64
+		for _, frame := range flow.Frames {
+			totalPayload += frame.DataSize - HeaderBytes
+		}
+		flow.DataSize = totalPayload / float64(len(flow.Frames))
 	}
 
-	// 如果沒有效率差的Flow，直接返回
-	if len(inefficientFlows) == 0 {
+	// 1. Partition flows into efficient (>= maxPayload) and inefficient
+	//    (< maxPayload). Only inefficient flows are merge candidates.
+	inefficient := make([]*Flow, 0)
+	efficient := make([]*Flow, 0)
+	for _, flow := range method.CAN2TTFlows {
+		if flow.DataSize < maxPayload {
+			inefficient = append(inefficient, flow)
+		} else {
+			efficient = append(efficient, flow)
+		}
+	}
+	if len(inefficient) == 0 {
 		return
 	}
 
-	// 步驟2: 尋找可合併的Flow組
-	mergeGroups := method.findMergeableGroups(inefficientFlows, MTU)
+	// 2. Greedily group mergeable inefficient flows.
+	groups := method.findMergeableGroups(inefficient, maxPayload)
 
-	// 步驟3: 執行合併
+	// 3. For each group with at least two flows, build one merged flow.
+	merged := make(map[*Flow]bool)
 	newFlows := make([]*Flow, 0)
-	merged := make(map[*Flow]bool) // 記錄已經合併的Flow
-
-	for _, group := range mergeGroups {
+	for _, group := range groups {
 		if len(group.Flows) > 1 {
-			// 合併這組Flow
-			mergedFlow := method.mergeFlowGroup(group)
-			newFlows = append(newFlows, mergedFlow)
-
-			// 標記已合併的Flow
+			newFlows = append(newFlows, method.mergeFlowGroup(group))
 			for _, flow := range group.Flows {
 				merged[flow] = true
 			}
 		}
 	}
 
-	// 步驟4: 重建CAN2TTFlows列表
-	// 保留效率高的Flow和未被合併的Flow
-	finalFlows := make([]*Flow, 0)
-	finalFlows = append(finalFlows, efficientFlows...)
-
-	for _, flow := range inefficientFlows {
+	// 4. Rebuild CAN2TTFlows: efficient flows stay, ungrouped inefficient
+	//    flows stay, merged results are appended.
+	final := make([]*Flow, 0, len(method.CAN2TTFlows))
+	final = append(final, efficient...)
+	for _, flow := range inefficient {
 		if !merged[flow] {
-			finalFlows = append(finalFlows, flow)
+			final = append(final, flow)
 		}
 	}
-
-	finalFlows = append(finalFlows, newFlows...)
-	method.CAN2TTFlows = finalFlows
+	final = append(final, newFlows...)
+	method.CAN2TTFlows = final
 }
 
-// findMergeableGroups 尋找所有可合併的Flow組
-func (method *Method) findMergeableGroups(flows []*Flow, MTU float64) []*FlowGroup {
+// findMergeableGroups greedily collects flows into groups where every pair
+// shares (src, dst), all periods are pairwise harmonic, and the cumulative
+// payload stays within maxPayload.
+func (method *Method) findMergeableGroups(flows []*Flow, maxPayload float64) []*FlowGroup {
 	groups := make([]*FlowGroup, 0)
 	processed := make(map[*Flow]bool)
 
@@ -138,7 +111,6 @@ func (method *Method) findMergeableGroups(flows []*Flow, MTU float64) []*FlowGro
 			continue
 		}
 
-		// 創建新組
 		group := &FlowGroup{
 			Flows:       []*Flow{flows[i]},
 			TotalSize:   flows[i].DataSize,
@@ -147,20 +119,16 @@ func (method *Method) findMergeableGroups(flows []*Flow, MTU float64) []*FlowGro
 		}
 		processed[flows[i]] = true
 
-		// 嘗試添加其他可合併的Flow
 		for j := i + 1; j < len(flows); j++ {
 			if processed[flows[j]] {
 				continue
 			}
-
-			// 檢查是否可以加入這個組
-			if method.canAddToGroup(group, flows[j], MTU) {
+			if method.canAddToGroup(group, flows[j], maxPayload) {
 				group.Flows = append(group.Flows, flows[j])
 				group.TotalSize += flows[j].DataSize
 				if flows[j].Deadline < group.MinDeadline {
 					group.MinDeadline = flows[j].Deadline
 				}
-				// 更新GCD
 				group.GCDPeriod = gcd(group.GCDPeriod, flows[j].Period)
 				processed[flows[j]] = true
 			}
@@ -172,76 +140,70 @@ func (method *Method) findMergeableGroups(flows []*Flow, MTU float64) []*FlowGro
 	return groups
 }
 
-// canAddToGroup 檢查Flow是否可以加入組
-func (method *Method) canAddToGroup(group *FlowGroup, flow *Flow, MTU float64) bool {
+// canAddToGroup checks whether flow may join group: identical (src, dst),
+// pairwise harmonic period with every existing member, and the combined
+// payload stays within maxPayload (paper invariant PAY <= MTU/2).
+func (method *Method) canAddToGroup(group *FlowGroup, flow *Flow, maxPayload float64) bool {
 	if len(group.Flows) == 0 {
 		return false
 	}
 
-	// 檢查源域和目的域
-	firstFlow := group.Flows[0]
-	if flow.Source != firstFlow.Source || flow.Destination != firstFlow.Destination {
+	first := group.Flows[0]
+	if flow.Source != first.Source || flow.Destination != first.Destination {
 		return false
 	}
 
-	// 檢查調和週期（與組中所有Flow的週期）
-	for _, groupFlow := range group.Flows {
-		if !isHarmonicPeriod(flow.Period, groupFlow.Period) {
+	for _, member := range group.Flows {
+		if !isHarmonicPeriod(flow.Period, member.Period) {
 			return false
 		}
 	}
 
-	// 檢查大小限制
-	if group.TotalSize+flow.DataSize > MTU {
+	if group.TotalSize+flow.DataSize > maxPayload {
 		return false
 	}
 
 	return true
 }
 
-// mergeFlowGroup 合併一組Flow成為一個新的Flow
+// mergeFlowGroup builds the merged Flow from a group, then regenerates the
+// Frames at the merged (GCD) period. The original Stage 1 Frames are
+// discarded by design — the merged Flow represents the post-MAO logical
+// view consumed by the downstream scheduler; BytesSent / TTFrameCount on
+// the Method still account for the actual Stage 1 emission cost.
 func (method *Method) mergeFlowGroup(group *FlowGroup) *Flow {
 	if len(group.Flows) == 0 {
 		return nil
 	}
 
-	// 計算合併後的屬性
-	firstFlow := group.Flows[0]
-	periods := make([]int, len(group.Flows))
-	for i, flow := range group.Flows {
-		periods[i] = flow.Period
-	}
-
-	mergedFlow := &Flow{
-		Source:      firstFlow.Source,
-		Destination: firstFlow.Destination,
-		Period:      gcdMultiple(periods),  // 新週期 = GCD(所有週期)
-		Deadline:    group.MinDeadline,     // 最小截止時間
-		DataSize:    group.TotalSize,       // 總數據大小
-		HyperPeriod: firstFlow.HyperPeriod, // 保持相同的HyperPeriod
+	first := group.Flows[0]
+	merged := &Flow{
+		Source:      first.Source,
+		Destination: first.Destination,
+		Period:      group.GCDPeriod,   // paper Eq (5)
+		Deadline:    group.MinDeadline, // paper Eq (6)
+		DataSize:    group.TotalSize,   // paper Eq (7), payload only
+		HyperPeriod: first.HyperPeriod,
 		Frames:      make([]*Frame, 0),
 	}
-
-	// 合併所有Frame（根據新的週期重新生成）
-	mergedFlow.Frames = method.regenerateFrames(group, mergedFlow.Period, mergedFlow.HyperPeriod)
-
-	return mergedFlow
+	merged.Frames = method.regenerateFrames(group, merged.Period, merged.HyperPeriod)
+	return merged
 }
 
-// regenerateFrames 根據新的週期重新生成Frame
+// regenerateFrames produces one Frame per period boundary in the
+// hyperperiod, each carrying the full aggregated payload. This is the
+// paper's conservative reservation model (Eq (5) + Eq (7)): bandwidth is
+// reserved at the GCD rate even when not every component flow has data
+// to send at every tick.
 func (method *Method) regenerateFrames(group *FlowGroup, newPeriod int, hyperPeriod int) []*Frame {
 	frames := make([]*Frame, 0)
-
-	// 按照新週期生成Frame實例
 	for currentTime := 0; currentTime < hyperPeriod; currentTime += newPeriod {
-		frame := &Frame{
+		frames = append(frames, &Frame{
 			ArrivalTime: currentTime,
 			Deadline:    group.MinDeadline,
 			DataSize:    group.TotalSize,
 			FinishTime:  currentTime + group.MinDeadline,
-		}
-		frames = append(frames, frame)
+		})
 	}
-
 	return frames
 }

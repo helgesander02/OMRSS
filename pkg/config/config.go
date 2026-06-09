@@ -105,12 +105,13 @@ type CostObjectives struct {
 }
 
 type ExperimentConfig struct {
-	TestCases  int   `mapstructure:"test_cases"`
-	RandomSeed int64 `mapstructure:"random_seed"`
+	TestCases   int   `mapstructure:"test_cases"`
+	RandomSeed  int64 `mapstructure:"random_seed"`
+	NetworkOnly bool  `mapstructure:"network_only"` // skip plan + memorizer, only dump network
 }
 
 type OutputConfig struct {
-	ShowNetwork bool   `mapstructure:"show_network"`
+	ShowNetwork bool   `mapstructure:"show_network"` // verbose dump (topology, per-frame, graphs)
 	ShowPlan    bool   `mapstructure:"show_plan"`
 	LogLevel    string `mapstructure:"log_level"`
 }
