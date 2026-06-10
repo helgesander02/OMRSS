@@ -16,7 +16,7 @@ func NewPlans(nw *network.Network, cfg *config.Config) Plans {
 		return newOMACOPlan(
 			nw,
 			cfg.Algorithm.OSACO.Timeout,
-			cfg.Algorithm.OSACO.KTrees,
+			cfg.Algorithm.OSACO.K,
 			cfg.Algorithm.OSACO.PheromoneEvaporation,
 		)
 
@@ -24,7 +24,7 @@ func NewPlans(nw *network.Network, cfg *config.Config) Plans {
 		return newOSROPlan(
 			nw,
 			cfg.Algorithm.OSACO.Timeout,
-			cfg.Algorithm.OSACO.KTrees,
+			cfg.Algorithm.OSACO.K,
 			cfg.Algorithm.OSACO.PheromoneEvaporation,
 		)
 

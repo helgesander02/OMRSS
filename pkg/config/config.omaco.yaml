@@ -35,7 +35,7 @@ algorithm:
   name: "omaco"
   osaco:
     timeout: 200
-    k_trees: 5
+    k: 5
     pheromone_evaporation: 0.7
     method_number: -1
 

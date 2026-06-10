@@ -1,18 +1,14 @@
 package graph
 
+import "src/pkg/logger"
+
 func (graphs *Graphs) ShowGraphs() {
-	for _, graph := range graphs.TSNGraphs {
-		graph.ShowTopology()
-		break
-	}
-
-	for _, graph := range graphs.AVBGraphs {
-		graph.ShowTopology()
-		break
-	}
-
-	for _, graph := range graphs.CAN2TSNGraphs {
-		graph.ShowTopology()
-		break
+	for i, entry := range graphs.Entries {
+		if i >= 3 {
+			break
+		}
+		logger.Printf("Graph entry %d  src=%d  dst=%v\n",
+			i+1, entry.Source, entry.Destinations)
+		entry.Graph.ShowTopology()
 	}
 }

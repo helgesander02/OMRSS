@@ -149,7 +149,7 @@ func (method *Method) canAddToGroup(group *FlowGroup, flow *Flow, maxPayload flo
 	}
 
 	first := group.Flows[0]
-	if flow.Source != first.Source || flow.Destination != first.Destination {
+	if flow.Source != first.Source || !sameDestinations(flow.Destinations, first.Destinations) {
 		return false
 	}
 
@@ -178,10 +178,10 @@ func (method *Method) mergeFlowGroup(group *FlowGroup) *Flow {
 
 	first := group.Flows[0]
 	merged := &Flow{
-		Source:      first.Source,
-		Destination: first.Destination,
-		Period:      group.GCDPeriod,   // paper Eq (5)
-		Deadline:    group.MinDeadline, // paper Eq (6)
+		Source:       first.Source,
+		Destinations: append([]int{}, first.Destinations...),
+		Period:       group.GCDPeriod,   // paper Eq (5)
+		Deadline:     group.MinDeadline, // paper Eq (6)
 		DataSize:    group.TotalSize,   // paper Eq (7), payload only
 		HyperPeriod: first.HyperPeriod,
 		Frames:      make([]*Frame, 0),

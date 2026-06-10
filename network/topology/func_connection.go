@@ -13,7 +13,7 @@ func (topology *Topology) AddnullN2S(fromNodeID int, toNodeID int, cost float64)
 }
 
 // Undirected Graph function
-func (topology *Topology) AddN2S2N_For_Tree(source int, destinations []int, cost float64) {
+func (topology *Topology) AddN2S2N(source int, destinations []int, cost float64) {
 	id := source % 1000
 	fromNode := topology.GetNodeByID(id + 3000)
 	fromNode.ID = source
@@ -22,7 +22,6 @@ func (topology *Topology) AddN2S2N_For_Tree(source int, destinations []int, cost
 
 	toNodeID := fromNode.Links[0].ToNodeID
 	connection2 := NewLink(toNodeID, source, cost)
-
 	topology.Switch[toNodeID].Links = append(topology.Switch[toNodeID].Links, connection2)
 
 	for i := 0; i < len(destinations); i++ {
@@ -36,30 +35,6 @@ func (topology *Topology) AddN2S2N_For_Tree(source int, destinations []int, cost
 		connection1 := NewLink(toNodeID, destinations[i], cost)
 		topology.Switch[toNodeID].Links = append(topology.Switch[toNodeID].Links, connection1)
 	}
-}
-
-func (topology *Topology) AddN2S2N_For_Path(source int, destinations int, cost float64) {
-	sid := source % 1000
-	sfromNode := topology.GetNodeByID(sid + 3000)
-	sfromNode.ID = source
-	sfromNode.Links[0].FromNodeID = source
-	topology.Talker = append(topology.Talker, sfromNode)
-
-	stoNodeID := sfromNode.Links[0].ToNodeID
-	connection2 := NewLink(stoNodeID, source, cost)
-
-	topology.Switch[stoNodeID].Links = append(topology.Switch[stoNodeID].Links, connection2)
-
-	did := destinations % 1000
-	dfromNode := topology.GetNodeByID(did + 3000)
-	dfromNode.ID = destinations
-	dfromNode.Links[0].FromNodeID = destinations
-	topology.Listener = append(topology.Listener, dfromNode)
-
-	dtoNodeID := dfromNode.Links[0].ToNodeID
-	connection1 := NewLink(dtoNodeID, destinations, cost)
-	topology.Switch[dtoNodeID].Links = append(topology.Switch[dtoNodeID].Links, connection1)
-
 }
 
 // Directed Graph function

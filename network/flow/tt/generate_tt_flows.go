@@ -7,9 +7,6 @@ import (
 	"src/pkg/logger"
 )
 
-// GenerateTTFlows builds the TSN/AVB flow sets. `mode` selects the destination
-// shape used by randomTTDevices: "tree" (multicast, OMACO) or "path"
-// (unicast, OSRO). It is provided via cfg.Network.Flows.RoutingMode.
 func GenerateTTFlows(tsn config.TSNFlowConfig, avb config.AVBFlowConfig, hyperPeriod int, nnodeLength int, mode string) ([]*Flow, []*Flow) {
 	tsnFlows := newTSNFlows()
 	avbFlows := newAVBFlows()

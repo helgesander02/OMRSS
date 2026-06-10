@@ -23,7 +23,7 @@ func GenerateImportantCANFlow(impcan int, hyperPeriod int, CANnode []int) []*Flo
 
 		canFlow := GenerateCANFrames(importantCAN.Period, importantCAN.Deadline, importantCAN.DataSize, hyperPeriod)
 		canFlow.Source = source
-		canFlow.Destination = destination
+		canFlow.Destinations = []int{destination}
 
 		importantCANFlows = append(importantCANFlows, canFlow)
 	}
@@ -41,7 +41,7 @@ func GenerateUnimportantCANFlow(umimpcan int, hyperPeriod int, CANnode []int) []
 
 		canFlow := GenerateCANFrames(unimportantCAN.Period, unimportantCAN.Deadline, unimportantCAN.DataSize, hyperPeriod)
 		canFlow.Source = source
-		canFlow.Destination = destination
+		canFlow.Destinations = []int{destination}
 
 		unimportantCANFlows = append(unimportantCANFlows, canFlow)
 	}

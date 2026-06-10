@@ -36,10 +36,10 @@ func (method *Method) EncapsulateCAN2TT(agg *CAN2TTAggregator) {
 // in their aggregator, so the extra period dimension is a no-op for them.
 func (method *Method) organizeCAN2TTFlows(agg *CAN2TTAggregator) {
 	for _, group := range agg.Groups {
-		if !method.flowExists(group.Source, group.Destination, group.Period) {
+		if !method.flowExists(group.Source, group.Destinations, group.Period) {
 			can2ttFlow := newCAN2TTFlow()
 			can2ttFlow.Source = group.Source
-			can2ttFlow.Destination = group.Destination
+			can2ttFlow.Destinations = append([]int{}, group.Destinations...)
 			can2ttFlow.Period = group.Period
 			can2ttFlow.Deadline = group.Deadline
 			can2ttFlow.DataSize = group.DataSize
@@ -50,24 +50,24 @@ func (method *Method) organizeCAN2TTFlows(agg *CAN2TTAggregator) {
 	}
 }
 
-// getCAN2TTFlow returns the flow whose key matches (src, dst, period).
-func (method *Method) getCAN2TTFlow(source int, destination int, period int) *Flow {
+// getCAN2TTFlow returns the flow whose key matches (src, destinations, period).
+func (method *Method) getCAN2TTFlow(source int, destinations []int, period int) *Flow {
 	for _, flow := range method.CAN2TTFlows {
-		if flow.Source == source && flow.Destination == destination && flow.Period == period {
+		if flow.Source == source && sameDestinations(flow.Destinations, destinations) && flow.Period == period {
 			return flow
 		}
 	}
 	return nil
 }
 
-func (method *Method) flowExists(source int, destination int, period int) bool {
-	return method.getCAN2TTFlow(source, destination, period) != nil
+func (method *Method) flowExists(source int, destinations []int, period int) bool {
+	return method.getCAN2TTFlow(source, destinations, period) != nil
 }
 
 func (method *Method) encapFIFOOrPriority(agg *CAN2TTAggregator) {
 	for _, group := range agg.Groups {
 		queue := newQueue()
-		can2ttFlow := method.getCAN2TTFlow(group.Source, group.Destination, group.Period)
+		can2ttFlow := method.getCAN2TTFlow(group.Source, group.Destinations, group.Period)
 
 		deadline := 0
 		payloadBytes := 0.
@@ -124,7 +124,7 @@ func (method *Method) encapFIFOOrPriority(agg *CAN2TTAggregator) {
 func (method *Method) encapOBO(agg *CAN2TTAggregator) {
 	for _, group := range agg.Groups {
 		queue := newQueue()
-		can2ttFlow := method.getCAN2TTFlow(group.Source, group.Destination, group.Period)
+		can2ttFlow := method.getCAN2TTFlow(group.Source, group.Destinations, group.Period)
 
 		for currentTime := 0; currentTime < can2ttFlow.HyperPeriod; currentTime += Step {
 			queue.appendQueue(group.getFramesByCurrentTime(currentTime))
@@ -151,7 +151,7 @@ func (method *Method) encapWST(agg *CAN2TTAggregator) {
 
 	for _, group := range agg.Groups {
 		queue := newQueue()
-		can2ttFlow := method.getCAN2TTFlow(group.Source, group.Destination, group.Period)
+		can2ttFlow := method.getCAN2TTFlow(group.Source, group.Destinations, group.Period)
 
 		payloadBytes := 0.
 		deadline := 0      // min relative deadline of batched frames (written into the emitted TT frame)
@@ -234,7 +234,7 @@ func (method *Method) encapMAO(agg *CAN2TTAggregator) {
 	// step1: MAO Aggregation
 	for _, group := range agg.Groups {
 		queue := newQueue()
-		can2ttFlow := method.getCAN2TTFlow(group.Source, group.Destination, group.Period)
+		can2ttFlow := method.getCAN2TTFlow(group.Source, group.Destinations, group.Period)
 
 		deadline := 0
 		payloadBytes := 0.
@@ -322,7 +322,7 @@ func (method *Method) encapWSTMAR(agg *CAN2TTAggregator) {
 
 	for _, group := range agg.Groups {
 		queue := newQueue()
-		can2ttFlow := method.getCAN2TTFlow(group.Source, group.Destination, group.Period)
+		can2ttFlow := method.getCAN2TTFlow(group.Source, group.Destinations, group.Period)
 
 		payloadBytes := 0.0
 		deadline := 0      // min relative deadline of batched frames

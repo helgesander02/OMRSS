@@ -41,9 +41,8 @@ type Visibility struct {
 }
 
 type Pheromone struct {
-	TSN_PRM     [][]float64
-	AVB_PRM     [][]float64
-	CAN2TSN_PRM [][]float64
+	TSN_PRM [][]float64
+	AVB_PRM [][]float64
 }
 
 // OSRO structures (Path-based routing)

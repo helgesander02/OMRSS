@@ -88,7 +88,7 @@ type AlgorithmConfig struct {
 
 type OSACOConfig struct {
 	Timeout              int     `mapstructure:"timeout"`
-	KTrees               int     `mapstructure:"k_trees"`
+	K                    int     `mapstructure:"k"`
 	PheromoneEvaporation float64 `mapstructure:"pheromone_evaporation"`
 	MethodNumber         int     `mapstructure:"method_number"`
 }
@@ -196,8 +196,8 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("osaco timeout must be positive, got: %d", c.Algorithm.OSACO.Timeout)
 	}
 
-	if c.Algorithm.OSACO.KTrees <= 0 {
-		return fmt.Errorf("osaco k_trees must be positive, got: %d", c.Algorithm.OSACO.KTrees)
+	if c.Algorithm.OSACO.K <= 0 {
+		return fmt.Errorf("osaco k must be positive, got: %d", c.Algorithm.OSACO.K)
 	}
 
 	// OSRO is the only algorithm that consumes CAN nodes, so only enforce
@@ -233,7 +233,7 @@ func (c *Config) GetExperimentName() string {
 		c.Network.Flows.TSN.Input,
 		c.Network.Flows.AVB.Input,
 		c.Algorithm.Name,
-		c.Algorithm.OSACO.KTrees,
+		c.Algorithm.OSACO.K,
 		c.Algorithm.OSACO.PheromoneEvaporation,
 		c.Algorithm.OSACO.Timeout,
 	)

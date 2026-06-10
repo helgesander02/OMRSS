@@ -51,6 +51,7 @@ func GenerateOsroFlows(flows config.FlowsConfig, hyperPeriod int, nnodeLength in
 		flows.CAN,
 		hyperPeriod,
 		CANnode,
+		flows.RoutingMode,
 	)
 
 	flowSet := newFlowSet()

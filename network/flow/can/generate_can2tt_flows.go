@@ -25,7 +25,7 @@ var methodList = []string{
 	MethodWSTMAR,
 }
 
-func GenerateCAN2TTFlows(can config.CANFlowConfig, hyperperiod int, CANnode []int) []*Method {
+func GenerateCAN2TTFlows(can config.CANFlowConfig, hyperperiod int, CANnode []int, mode string) []*Method {
 	// step 1: generate CAN flows
 	importantCANFlows, unimportantCANFlows := GenerateCANFlows(can, hyperperiod, CANnode)
 
@@ -73,7 +73,7 @@ func newCAN2TTAggregator() *CAN2TTAggregator {
 
 func (agg *CAN2TTAggregator) aggregateBySrcDst(f *Flow) {
 	for _, group := range agg.Groups {
-		if group.Source == f.Source && group.Destination == f.Destination {
+		if group.Source == f.Source && sameDestinations(group.Destinations, f.Destinations) {
 			group.Frames = append(group.Frames, f.Frames...)
 			return
 		}
@@ -83,7 +83,7 @@ func (agg *CAN2TTAggregator) aggregateBySrcDst(f *Flow) {
 
 func (agg *CAN2TTAggregator) aggregateByPeriodAndSrcDst(f *Flow) {
 	for _, group := range agg.Groups {
-		if group.Period == f.Period && group.Source == f.Source && group.Destination == f.Destination {
+		if group.Period == f.Period && group.Source == f.Source && sameDestinations(group.Destinations, f.Destinations) {
 			group.Frames = append(group.Frames, f.Frames...)
 			return
 		}
@@ -94,7 +94,7 @@ func (agg *CAN2TTAggregator) aggregateByPeriodAndSrcDst(f *Flow) {
 func (agg *CAN2TTAggregator) addGroup(f *Flow) {
 	group := newCANFrameGroup()
 	group.Source = f.Source
-	group.Destination = f.Destination
+	group.Destinations = append([]int{}, f.Destinations...) // defensive copy
 	group.Period = f.Period
 	group.Deadline = f.Deadline
 	group.DataSize = f.DataSize
@@ -102,6 +102,21 @@ func (agg *CAN2TTAggregator) addGroup(f *Flow) {
 	group.Frames = append(group.Frames, f.Frames...)
 
 	agg.Groups = append(agg.Groups, group)
+}
+
+// sameDestinations compares two destination lists for aggregator keying.
+// Order matters because tt.Flow / graph entries treat destination order as
+// significant; staying consistent here avoids surprising merges.
+func sameDestinations(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func (agg *CAN2TTAggregator) Show() {
@@ -146,6 +161,6 @@ func (group *CANFrameGroup) nextArrivalAfter(currentTime int) int {
 }
 
 func (group *CANFrameGroup) Show() {
-	logger.Printf("Group (%d→%d) frames=%d\n", group.Source, group.Destination, len(group.Frames))
+	logger.Printf("Group (%d→%v) frames=%d\n", group.Source, group.Destinations, len(group.Frames))
 	logger.Printf("Period: %v  ,Deadline: %v ,Datasize: %v\n", group.Period, group.Deadline, group.DataSize)
 }

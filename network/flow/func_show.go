@@ -65,9 +65,6 @@ func (flows *FlowSet) ShowTTFlow() {
 	}
 }
 
-// ShowCANFlow dumps every encapsulation method's CAN2TT flow set.
-// Summary stats and the cross-method comparison table always print.
-// When verbose is true, also dumps per-flow params and per-emit TT frame details.
 func (flows *FlowSet) ShowCANFlow(verbose bool) {
 	if len(flows.EncapsulateMethod) == 0 {
 		return
@@ -78,7 +75,6 @@ func (flows *FlowSet) ShowCANFlow(verbose bool) {
 	for _, method := range flows.EncapsulateMethod {
 		logger.Println()
 		logger.Printf("Method: %s\n", method.MethodName)
-		// All Method fields, drops first because that's what matters for AR.
 		logger.Printf("  CAN2TTO1Drop  : %d   (CAN frames overdue while waiting in gateway queue)\n", method.CAN2TTO1Drop)
 		logger.Printf("  CANAreaO1Drop : %d   (CAN-side drops; not tracked yet, always 0)\n", method.CANAreaO1Drop)
 		logger.Printf("  CAN2TTFlows   : %d\n", len(method.CAN2TTFlows))
@@ -91,9 +87,8 @@ func (flows *FlowSet) ShowCANFlow(verbose bool) {
 		}
 		for i, flow := range method.CAN2TTFlows {
 			name := fmt.Sprint("CAN2TTflow", i+1)
-			logger.Printf("  %s  src=%d → dst=%d  period=%d us  deadline=%d us  avg_payload=%.1f B  emits=%d\n",
-				name, flow.Source, flow.Destination, flow.Period, flow.Deadline, flow.DataSize, len(flow.Frames))
-			// Per-emit detail: payload = frame.DataSize - HeaderBytes (42).
+			logger.Printf("  %s  src=%d → dst=%v  period=%d us  deadline=%d us  avg_payload=%.1f B  emits=%d\n",
+				name, flow.Source, flow.Destinations, flow.Period, flow.Deadline, flow.DataSize, len(flow.Frames))
 			for j, frame := range flow.Frames {
 				logger.Printf("      emit#%d  t=%d us  size=%.0f B (payload=%.0f)  deadline=%d  finish=%d\n",
 					j+1, frame.ArrivalTime, frame.DataSize, frame.DataSize-can.HeaderBytes, frame.Deadline, frame.FinishTime)
@@ -127,7 +122,6 @@ func (flows *FlowSet) ShowCANFlow(verbose bool) {
 }
 
 func (flows *FlowSet) ShowFlows() {
-	// Display all flows.
 	logger.Printf("Total Flows:%d ( TSN Flows:%d  AVB Flows:%d )\n",
 		len(flows.TSNFlows)+len(flows.AVBFlows), len(flows.TSNFlows), len(flows.AVBFlows))
 }

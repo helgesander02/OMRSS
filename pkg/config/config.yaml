@@ -73,8 +73,8 @@ algorithm:
     # Timeout in milliseconds
     timeout: 200
     
-    # Select K trees with different weights
-    k_trees: 5
+    # Select K candidates with different weights (trees for OMACO, paths for OSRO)
+    k: 5
     
     # Pheromone evaporation coefficient (0.0 - 1.0)
     # The pheromone value of each routing path starts to evaporate

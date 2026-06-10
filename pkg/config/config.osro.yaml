@@ -35,7 +35,7 @@ algorithm:
   name: "osro"
   osaco:
     timeout: 200
-    k_trees: 5
+    k: 5
     pheromone_evaporation: 0.7
     method_number: 0
 
@@ -49,7 +49,7 @@ schedule:
 experiment:
   test_cases: 1
   random_seed: 1
-  network_only: true     
+  network_only: false     
 
 output:
   show_network: false 

@@ -62,13 +62,13 @@ func createCAN2TTFrame(arrivalTime int, deadline int, datasize float64) *Frame {
 }
 
 type Flow struct {
-	Period      int
-	Deadline    int
-	DataSize    float64
-	HyperPeriod int
-	Source      int
-	Destination int
-	Frames      []*Frame
+	Period       int
+	Deadline     int
+	DataSize     float64
+	HyperPeriod  int
+	Source       int
+	Destinations []int
+	Frames       []*Frame
 }
 
 func newCANFlow(period int, deadline int, datasize float64, hyperPeriod int) *Flow {

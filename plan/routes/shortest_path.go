@@ -13,19 +13,23 @@ var v2v_path *V2V = &V2V{} // v2v for shortest path calculation
 func Get_ShortestPath_Routing(network *network.Network, cfg *config.Config) *PathsSet {
 	paths_set := newPathsSet()
 
-	// TSN flows - point-to-point (source to first destination)
-	// Note: For OSRO, we use point-to-point paths, not multicast trees
-	for nth, flow := range network.FlowSet.TSNFlows {
-		dest := flow.Destinations[0] // Use first destination for point-to-point
-		path := ShortestPath(v2v_path, network.GraphSet.TSNGraphs[nth], flow.Source, dest, cfg.Network.ByteRate)
+	// TSN flows - point-to-point (source to first destination).
+	// OSRO routes single paths instead of multicast trees, so we always
+	// look up the prepared topology by (source, first-destination) in the
+	// unified graph store.
+	for _, flow := range network.FlowSet.TSNFlows {
+		dest := flow.Destinations[0]
+		topo := network.GraphSet.Get(flow.Source, flow.Destinations[:1])
+		path := ShortestPath(v2v_path, topo, flow.Source, dest, cfg.Network.ByteRate)
 		paths_set.TSNPaths = append(paths_set.TSNPaths, path)
 	}
 	logger.Printf("Finish Shortest Path %d TSN streams routing\n", len(paths_set.TSNPaths))
 
 	// AVB flows - point-to-point
-	for nth, flow := range network.FlowSet.AVBFlows {
-		dest := flow.Destinations[0] // Use first destination for point-to-point
-		path := ShortestPath(v2v_path, network.GraphSet.AVBGraphs[nth], flow.Source, dest, cfg.Network.ByteRate)
+	for _, flow := range network.FlowSet.AVBFlows {
+		dest := flow.Destinations[0]
+		topo := network.GraphSet.Get(flow.Source, flow.Destinations[:1])
+		path := ShortestPath(v2v_path, topo, flow.Source, dest, cfg.Network.ByteRate)
 		paths_set.AVBPaths = append(paths_set.AVBPaths, path)
 	}
 	logger.Printf("Finish Shortest Path %d AVB streams routing\n", len(paths_set.AVBPaths))
@@ -36,7 +40,8 @@ func Get_ShortestPath_Routing(network *network.Network, cfg *config.Config) *Pat
 
 	for _, method := range network.FlowSet.EncapsulateMethod {
 		for _, flow := range method.CAN2TTFlows {
-			key := sd{flow.Source, flow.Destination}
+			dest := flow.Destinations[0]
+			key := sd{flow.Source, dest}
 
 			if existingPath, ok := usedPath[key]; ok {
 				// Path already computed, clone and set method
@@ -45,8 +50,8 @@ func Get_ShortestPath_Routing(network *network.Network, cfg *config.Config) *Pat
 				paths_set.CAN2TSNPaths = append(paths_set.CAN2TSNPaths, newPath)
 			} else {
 				// Compute new path
-				topo := network.GraphSet.GetGarphBySD(flow.Source, flow.Destination)
-				path := ShortestPath(v2v_path, topo, flow.Source, flow.Destination, cfg.Network.ByteRate)
+				topo := network.GraphSet.Get(flow.Source, flow.Destinations[:1])
+				path := ShortestPath(v2v_path, topo, flow.Source, dest, cfg.Network.ByteRate)
 				if path != nil {
 					path.Method = method.MethodName
 				}

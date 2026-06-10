@@ -12,17 +12,19 @@ func Get_KPath_Routing(network *network.Network, cfg *config.Config, shortestPat
 	kpaths_set := newKPathsSet()
 
 	// TSN flows
-	for nth, flow := range network.FlowSet.TSNFlows {
+	for _, flow := range network.FlowSet.TSNFlows {
 		dest := flow.Destinations[0]
-		kpath := BuildKPath(K, flow.Source, dest, network.GraphSet.TSNGraphs[nth], cfg.Network.ByteRate)
+		topo := network.GraphSet.Get(flow.Source, flow.Destinations[:1])
+		kpath := BuildKPath(K, flow.Source, dest, topo, cfg.Network.ByteRate)
 		kpaths_set.TSNPaths = append(kpaths_set.TSNPaths, kpath)
 	}
 	logger.Printf("Finish K-Path %d TSN streams routing (K=%d)\n", len(kpaths_set.TSNPaths), K)
 
 	// AVB flows
-	for nth, flow := range network.FlowSet.AVBFlows {
+	for _, flow := range network.FlowSet.AVBFlows {
 		dest := flow.Destinations[0]
-		kpath := BuildKPath(K, flow.Source, dest, network.GraphSet.AVBGraphs[nth], cfg.Network.ByteRate)
+		topo := network.GraphSet.Get(flow.Source, flow.Destinations[:1])
+		kpath := BuildKPath(K, flow.Source, dest, topo, cfg.Network.ByteRate)
 		kpaths_set.AVBPaths = append(kpaths_set.AVBPaths, kpath)
 	}
 	logger.Printf("Finish K-Path %d AVB streams routing (K=%d)\n", len(kpaths_set.AVBPaths), K)
@@ -33,7 +35,8 @@ func Get_KPath_Routing(network *network.Network, cfg *config.Config, shortestPat
 
 	for _, method := range network.FlowSet.EncapsulateMethod {
 		for _, flow := range method.CAN2TTFlows {
-			key := sd{flow.Source, flow.Destination}
+			dest := flow.Destinations[0]
+			key := sd{flow.Source, dest}
 
 			if existingKPath, ok := usedKPath[key]; ok {
 				// KPath already computed, clone and set method
@@ -42,8 +45,8 @@ func Get_KPath_Routing(network *network.Network, cfg *config.Config, shortestPat
 				kpaths_set.CAN2TSNPaths = append(kpaths_set.CAN2TSNPaths, newKPath)
 			} else {
 				// Compute new KPath
-				topo := network.GraphSet.GetGarphBySD(flow.Source, flow.Destination)
-				kpath := BuildKPath(K, flow.Source, flow.Destination, topo, cfg.Network.ByteRate)
+				topo := network.GraphSet.Get(flow.Source, flow.Destinations[:1])
+				kpath := BuildKPath(K, flow.Source, dest, topo, cfg.Network.ByteRate)
 				if kpath != nil {
 					kpath.Method = method.MethodName
 				}

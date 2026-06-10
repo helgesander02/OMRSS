@@ -3,9 +3,13 @@ package graph
 import "src/network/topology"
 
 type Graphs struct {
-	TSNGraphs     []*topology.Topology
-	AVBGraphs     []*topology.Topology
-	CAN2TSNGraphs []*topology.Topology
+	Entries []*GraphEntry
+}
+
+type GraphEntry struct {
+	Source       int
+	Destinations []int
+	Graph        *topology.Topology
 }
 
 func newGraphs() *Graphs {

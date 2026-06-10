@@ -6,80 +6,69 @@ import (
 	"src/pkg/logger"
 )
 
-func GenerateOmacoGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesRate float64) *Graphs {
-	// Constructing Graph structures
+func (g *Graphs) addGraph(topo *topology.Topology, source int, destinations []int, bytesRate float64) {
+	if g.Get(source, destinations) != nil {
+		return
+	}
+	t := topo.TopologyDeepCopy()
+	t.AddN2S2N(source, destinations, bytesRate)
+	g.Entries = append(g.Entries, &GraphEntry{
+		Source:       source,
+		Destinations: append([]int{}, destinations...), // defensive copy
+		Graph:        t,
+	})
+}
+
+func GenerateOmacoGraphs(topo *topology.Topology, flows *flow.FlowSet, bytesRate float64) *Graphs {
 	graphs := newGraphs()
 
-	// Generating TSN Graphs
-	for _, flow := range flows.TSNFlows {
-		t := topology.TopologyDeepCopy()                               // Duplicate of Topology
-		t.AddN2S2N_For_Tree(flow.Source, flow.Destinations, bytesRate) // Undirected Graph
-		graphs.TSNGraphs = append(graphs.TSNGraphs, t)
+	for _, f := range flows.TSNFlows {
+		graphs.addGraph(topo, f.Source, f.Destinations, bytesRate)
 	}
-	logger.Println(len(graphs.TSNGraphs), " TSN Graphs generated.")
-
-	// Generating AVB Graphs
-	for _, flow := range flows.AVBFlows {
-		t := topology.TopologyDeepCopy()                               // Duplicate of Topology
-		t.AddN2S2N_For_Tree(flow.Source, flow.Destinations, bytesRate) // Undirected Graph
-		graphs.AVBGraphs = append(graphs.AVBGraphs, t)
+	for _, f := range flows.AVBFlows {
+		graphs.addGraph(topo, f.Source, f.Destinations, bytesRate)
 	}
-	logger.Println(len(graphs.AVBGraphs), " AVB Graphs generated.")
 
+	logger.Println(len(graphs.Entries), " unique graphs generated (OMACO).")
 	return graphs
 }
 
-func GenerateOsroGraphs(topology *topology.Topology, flows *flow.FlowSet, bytesRate float64) *Graphs {
-	// Constructing Graph structures
+func GenerateOsroGraphs(topo *topology.Topology, flows *flow.FlowSet, bytesRate float64) *Graphs {
 	graphs := newGraphs()
 
-	// Generating TSN Graphs
-	for _, flow := range flows.TSNFlows {
-		t := topology.TopologyDeepCopy()                                  // Duplicate of Topology
-		t.AddN2S2N_For_Path(flow.Source, flow.Destinations[0], bytesRate) // Undirected Graph
-		graphs.TSNGraphs = append(graphs.TSNGraphs, t)
+	for _, f := range flows.TSNFlows {
+		graphs.addGraph(topo, f.Source, f.Destinations[:1], bytesRate)
 	}
-	logger.Println(len(graphs.TSNGraphs), " TSN Graphs generated.")
-
-	// Generating AVB Graphs
-	for _, flow := range flows.AVBFlows {
-		t := topology.TopologyDeepCopy()                                  // Duplicate of Topology
-		t.AddN2S2N_For_Path(flow.Source, flow.Destinations[0], bytesRate) // Undirected Graph
-		graphs.AVBGraphs = append(graphs.AVBGraphs, t)
+	for _, f := range flows.AVBFlows {
+		graphs.addGraph(topo, f.Source, f.Destinations[:1], bytesRate)
 	}
-	logger.Println(len(graphs.AVBGraphs), " AVB Graphs generated.")
-
-	// Generating CAN2TT Graphs
 	for _, method := range flows.EncapsulateMethod {
-		for _, can2tsnflow := range method.CAN2TTFlows {
-			if !graphs.checkListenerAndTalker(can2tsnflow.Source, can2tsnflow.Destination) {
-				t := topology.TopologyDeepCopy()                                            // Duplicate of Topology
-				t.AddN2S2N_For_Path(can2tsnflow.Source, can2tsnflow.Destination, bytesRate) // Undirected Graph
-				graphs.CAN2TSNGraphs = append(graphs.CAN2TSNGraphs, t)
-
-			}
-
+		for _, f := range method.CAN2TTFlows {
+			graphs.addGraph(topo, f.Source, f.Destinations[:1], bytesRate)
 		}
 	}
-	logger.Println(len(graphs.CAN2TSNGraphs), " CAN2TT Graphs generated.")
 
+	logger.Println(len(graphs.Entries), " unique graphs generated (OSRO).")
 	return graphs
 }
 
-func (graph *Graphs) checkListenerAndTalker(source int, destination int) bool {
-	for _, g := range graph.CAN2TSNGraphs {
-		if g.GetListenerAndTalker(source, destination) {
-			return true
-		}
-	}
-	return false
-}
-
-func (graph *Graphs) GetGarphBySD(source int, destination int) *topology.Topology {
-	for _, g := range graph.CAN2TSNGraphs {
-		if g.GetListenerAndTalker(source, destination) {
-			return g
+func (g *Graphs) Get(source int, destinations []int) *topology.Topology {
+	for _, entry := range g.Entries {
+		if entry.Source == source && sameIntSlice(entry.Destinations, destinations) {
+			return entry.Graph
 		}
 	}
 	return nil
+}
+
+func sameIntSlice(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }

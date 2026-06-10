@@ -11,14 +11,16 @@ var v2v *V2V = &V2V{} // v2v is all paths connecting multiple terminals to termi
 func Get_SteninerTree_Routing(network *network.Network, cfg *config.Config) *TreesSet {
 	TreesSet := newTreesSet()
 
-	for nth, flow := range network.FlowSet.TSNFlows {
-		tree := SteninerTree(v2v, network.GraphSet.TSNGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
+	for _, flow := range network.FlowSet.TSNFlows {
+		topo := network.GraphSet.Get(flow.Source, flow.Destinations)
+		tree := SteninerTree(v2v, topo, flow.Source, flow.Destinations, cfg.Network.ByteRate)
 		TreesSet.TSNTrees = append(TreesSet.TSNTrees, tree)
 	}
 	logger.Printf("Finish Steniner Tree %d TSN streams routing\n", len(TreesSet.TSNTrees))
 
-	for nth, flow := range network.FlowSet.AVBFlows {
-		tree := SteninerTree(v2v, network.GraphSet.AVBGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
+	for _, flow := range network.FlowSet.AVBFlows {
+		topo := network.GraphSet.Get(flow.Source, flow.Destinations)
+		tree := SteninerTree(v2v, topo, flow.Source, flow.Destinations, cfg.Network.ByteRate)
 		TreesSet.AVBTrees = append(TreesSet.AVBTrees, tree)
 	}
 	logger.Printf("Finish Steniner Tree %d AVB streams routing\n", len(TreesSet.AVBTrees))
@@ -29,14 +31,16 @@ func Get_SteninerTree_Routing(network *network.Network, cfg *config.Config) *Tre
 func Get_DistanceTree_Routing(network *network.Network, cfg *config.Config) *TreesSet {
 	TreesSet := newTreesSet()
 
-	for nth, flow := range network.FlowSet.TSNFlows {
-		tree := DistanceTree(network.GraphSet.TSNGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
+	for _, flow := range network.FlowSet.TSNFlows {
+		topo := network.GraphSet.Get(flow.Source, flow.Destinations)
+		tree := DistanceTree(topo, flow.Source, flow.Destinations, cfg.Network.ByteRate)
 		TreesSet.TSNTrees = append(TreesSet.TSNTrees, tree)
 	}
 	logger.Printf("Finish Distance Tree %d TSN streams routing\n", len(TreesSet.TSNTrees))
 
-	for nth, flow := range network.FlowSet.AVBFlows {
-		tree := DistanceTree(network.GraphSet.AVBGraphs[nth], flow.Source, flow.Destinations, cfg.Network.ByteRate)
+	for _, flow := range network.FlowSet.AVBFlows {
+		topo := network.GraphSet.Get(flow.Source, flow.Destinations)
+		tree := DistanceTree(topo, flow.Source, flow.Destinations, cfg.Network.ByteRate)
 		TreesSet.AVBTrees = append(TreesSet.AVBTrees, tree)
 	}
 	logger.Printf("Finish Distance Tree %d AVB streams routing\n", len(TreesSet.AVBTrees))
