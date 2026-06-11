@@ -8,96 +8,204 @@ import (
 
 var v2v *V2V = &V2V{} // v2v is all paths connecting multiple terminals to terminals.
 
-func Get_SteninerTree_Routing(network *network.Network, cfg *config.Config) *TreesSet {
-	TreesSet := newTreesSet()
+func Get_SteninerTree_Routing(network *network.Network, cfg *config.Config) *RouteSet {
+	TreesSet := newRouteSet()
 
 	for _, flow := range network.FlowSet.TSNFlows {
-		topo := network.GraphSet.Get(flow.Source, flow.Destinations)
-		tree := SteninerTree(v2v, topo, flow.Source, flow.Destinations, cfg.Network.ByteRate)
-		TreesSet.TSNTrees = append(TreesSet.TSNTrees, tree)
+		graph := network.GraphSet.Get(flow.Source, flow.Destinations)
+		tree := SteninerTree(v2v, graph, flow.Source, flow.Destinations, cfg.Network.ByteRate)
+		TreesSet.TSNRoutes = append(TreesSet.TSNRoutes, tree)
 	}
-	logger.Printf("Finish Steniner Tree %d TSN streams routing\n", len(TreesSet.TSNTrees))
+	logger.Printf("Finish Steniner Tree %d TSN streams routing\n", len(TreesSet.TSNRoutes))
 
 	for _, flow := range network.FlowSet.AVBFlows {
-		topo := network.GraphSet.Get(flow.Source, flow.Destinations)
-		tree := SteninerTree(v2v, topo, flow.Source, flow.Destinations, cfg.Network.ByteRate)
-		TreesSet.AVBTrees = append(TreesSet.AVBTrees, tree)
+		graph := network.GraphSet.Get(flow.Source, flow.Destinations)
+		tree := SteninerTree(v2v, graph, flow.Source, flow.Destinations, cfg.Network.ByteRate)
+		TreesSet.AVBRoutes = append(TreesSet.AVBRoutes, tree)
 	}
-	logger.Printf("Finish Steniner Tree %d AVB streams routing\n", len(TreesSet.AVBTrees))
+	logger.Printf("Finish Steniner Tree %d AVB streams routing\n", len(TreesSet.AVBRoutes))
 
 	return TreesSet
 }
 
-func Get_DistanceTree_Routing(network *network.Network, cfg *config.Config) *TreesSet {
-	TreesSet := newTreesSet()
+func Get_DistanceTree_Routing(network *network.Network, cfg *config.Config) *RouteSet {
+	TreesSet := newRouteSet()
 
 	for _, flow := range network.FlowSet.TSNFlows {
-		topo := network.GraphSet.Get(flow.Source, flow.Destinations)
-		tree := DistanceTree(topo, flow.Source, flow.Destinations, cfg.Network.ByteRate)
-		TreesSet.TSNTrees = append(TreesSet.TSNTrees, tree)
+		graph := network.GraphSet.Get(flow.Source, flow.Destinations)
+		tree := DistanceTree(graph, flow.Source, flow.Destinations, cfg.Network.ByteRate)
+		TreesSet.TSNRoutes = append(TreesSet.TSNRoutes, tree)
 	}
-	logger.Printf("Finish Distance Tree %d TSN streams routing\n", len(TreesSet.TSNTrees))
+	logger.Printf("Finish Distance Tree %d TSN streams routing\n", len(TreesSet.TSNRoutes))
 
 	for _, flow := range network.FlowSet.AVBFlows {
-		topo := network.GraphSet.Get(flow.Source, flow.Destinations)
-		tree := DistanceTree(topo, flow.Source, flow.Destinations, cfg.Network.ByteRate)
-		TreesSet.AVBTrees = append(TreesSet.AVBTrees, tree)
+		graph := network.GraphSet.Get(flow.Source, flow.Destinations)
+		tree := DistanceTree(graph, flow.Source, flow.Destinations, cfg.Network.ByteRate)
+		TreesSet.AVBRoutes = append(TreesSet.AVBRoutes, tree)
 	}
-	logger.Printf("Finish Distance Tree %d AVB streams routing\n", len(TreesSet.AVBTrees))
+	logger.Printf("Finish Distance Tree %d AVB streams routing\n", len(TreesSet.AVBRoutes))
 
 	return TreesSet
 }
 
-func (trees_set *TreesSet) InputTreeSet(bg_tsn_end int, bg_avb_end int) *TreesSet {
-	Input_tree_set := newTreesSet()
-
-	Input_tree_set.TSNTrees = append(Input_tree_set.TSNTrees, trees_set.TSNTrees[bg_tsn_end:]...)
-	Input_tree_set.AVBTrees = append(Input_tree_set.AVBTrees, trees_set.AVBTrees[bg_avb_end:]...)
-
-	return Input_tree_set
+// InputRouteSet returns the input partition of the route set — TSN / AVB
+// routes after the background boundary, plus all CAN2TT routes (which are
+// always input-side because CAN-to-TT does not carry a background slice).
+func (rs *RouteSet) InputRouteSet(bgTSN, bgAVB int) *RouteSet {
+	out := newRouteSet()
+	out.TSNRoutes = append(out.TSNRoutes, rs.TSNRoutes[bgTSN:]...)
+	out.AVBRoutes = append(out.AVBRoutes, rs.AVBRoutes[bgAVB:]...)
+	out.CAN2TTRoutes = append(out.CAN2TTRoutes, rs.CAN2TTRoutes...)
+	return out
 }
 
-func (trees_set *TreesSet) BGTreeSet(bg_tsn_end int, bg_avb_end int) *TreesSet {
-	BG_tree_set := newTreesSet()
-
-	BG_tree_set.TSNTrees = append(BG_tree_set.TSNTrees, trees_set.TSNTrees[:bg_tsn_end]...)
-	BG_tree_set.AVBTrees = append(BG_tree_set.AVBTrees, trees_set.AVBTrees[:bg_avb_end]...)
-
-	return BG_tree_set
+// BGRouteSet returns the background partition — TSN / AVB routes before
+// the background boundary. CAN2TT is intentionally left out because all
+// CAN-derived TT traffic is treated as foreground input.
+func (rs *RouteSet) BGRouteSet(bgTSN, bgAVB int) *RouteSet {
+	out := newRouteSet()
+	out.TSNRoutes = append(out.TSNRoutes, rs.TSNRoutes[:bgTSN]...)
+	out.AVBRoutes = append(out.AVBRoutes, rs.AVBRoutes[:bgAVB]...)
+	return out
 }
 
-func Get_OSACO_Routing(network *network.Network, cfg *config.Config, SMT *TreesSet, K int, Method_Number int) *KTreesSet {
-	ktrees_set := newKTreesSet()
+func Get_OSACO_Routing(network *network.Network, cfg *config.Config, SMT *RouteSet, K int, Method_Number int) *KRouteSet {
+	ktrees_set := newKRouteSet()
 
 	for nth, flow := range network.FlowSet.TSNFlows {
-		Ktrees := KSpanningTree(v2v, SMT.TSNTrees[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
-		ktrees_set.TSNTrees = append(ktrees_set.TSNTrees, Ktrees)
+		Ktrees := KSpanningTree(v2v, SMT.TSNRoutes[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
+		ktrees_set.TSNRoutes = append(ktrees_set.TSNRoutes, Ktrees)
 	}
-	logger.Printf("Finish OSACO %d TSN streams routing\n", len(ktrees_set.TSNTrees))
+	logger.Printf("Finish OSACO %d TSN streams routing\n", len(ktrees_set.TSNRoutes))
 
 	for nth, flow := range network.FlowSet.AVBFlows {
-		Ktrees := KSpanningTree(v2v, SMT.AVBTrees[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
-		ktrees_set.AVBTrees = append(ktrees_set.AVBTrees, Ktrees)
+		Ktrees := KSpanningTree(v2v, SMT.AVBRoutes[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
+		ktrees_set.AVBRoutes = append(ktrees_set.AVBRoutes, Ktrees)
 	}
-	logger.Printf("Finish OSACO %d AVB streams routing\n", len(ktrees_set.AVBTrees))
+	logger.Printf("Finish OSACO %d AVB streams routing\n", len(ktrees_set.AVBRoutes))
 
 	return ktrees_set
 }
 
-func (ktrees_set *KTreesSet) Input_ktree_set(bg_tsn_end int, bg_avb_end int) *KTreesSet {
-	Input_ktree_set := newKTreesSet()
-
-	Input_ktree_set.TSNTrees = append(Input_ktree_set.TSNTrees, ktrees_set.TSNTrees[bg_tsn_end:]...)
-	Input_ktree_set.AVBTrees = append(Input_ktree_set.AVBTrees, ktrees_set.AVBTrees[bg_tsn_end:]...)
-
-	return Input_ktree_set
+// InputKRouteSet returns the input partition of the K-route set, mirroring
+// the RouteSet variant. CAN2TT alternatives are always included.
+func (krs *KRouteSet) InputKRouteSet(bgTSN, bgAVB int) *KRouteSet {
+	out := newKRouteSet()
+	out.TSNRoutes = append(out.TSNRoutes, krs.TSNRoutes[bgTSN:]...)
+	out.AVBRoutes = append(out.AVBRoutes, krs.AVBRoutes[bgAVB:]...)
+	out.CAN2TTRoutes = append(out.CAN2TTRoutes, krs.CAN2TTRoutes...)
+	return out
 }
 
-func (ktrees_set *KTreesSet) BG_ktree_set(bg_tsn_end int, bg_avb_end int) *KTreesSet {
-	BG_ktree_set := newKTreesSet()
-
-	BG_ktree_set.TSNTrees = append(BG_ktree_set.TSNTrees, ktrees_set.TSNTrees[:bg_tsn_end]...)
-	BG_ktree_set.AVBTrees = append(BG_ktree_set.AVBTrees, ktrees_set.AVBTrees[:bg_tsn_end]...)
-
-	return BG_ktree_set
+// BGKRouteSet returns the background partition of the K-route set.
+// CAN2TT alternatives are foreground-only and excluded here.
+func (krs *KRouteSet) BGKRouteSet(bgTSN, bgAVB int) *KRouteSet {
+	out := newKRouteSet()
+	out.TSNRoutes = append(out.TSNRoutes, krs.TSNRoutes[:bgTSN]...)
+	out.AVBRoutes = append(out.AVBRoutes, krs.AVBRoutes[:bgAVB]...)
+	return out
 }
+
+func Get_ShortestPath_Routing(network *network.Network, cfg *config.Config) *RouteSet {
+	paths_set := newRouteSet()
+
+	for _, flow := range network.FlowSet.TSNFlows {
+		dest := flow.Destinations[0]
+		graph := network.GraphSet.Get(flow.Source, flow.Destinations)
+		path := ShortestPath(v2v, graph, flow.Source, dest, cfg.Network.ByteRate)
+		paths_set.TSNRoutes = append(paths_set.TSNRoutes, path)
+	}
+	logger.Printf("Finish Shortest Path %d TSN streams routing\n", len(paths_set.TSNRoutes))
+
+	for _, flow := range network.FlowSet.AVBFlows {
+		dest := flow.Destinations[0]
+		graph := network.GraphSet.Get(flow.Source, flow.Destinations)
+		path := ShortestPath(v2v, graph, flow.Source, dest, cfg.Network.ByteRate)
+		paths_set.AVBRoutes = append(paths_set.AVBRoutes, path)
+	}
+	logger.Printf("Finish Shortest Path %d AVB streams routing\n", len(paths_set.AVBRoutes))
+
+	// CAN2TSN flows - encapsulated flows
+	type sd struct{ s, d int }
+	usedPath := make(map[sd]*Route)
+
+	for _, method := range network.FlowSet.EncapsulateMethod {
+		for _, flow := range method.CAN2TTFlows {
+			dest := flow.Destinations[0]
+			key := sd{flow.Source, dest}
+
+			if existingPath, ok := usedPath[key]; ok {
+				// Path already computed, clone and set method
+				newPath := CloneRoute(existingPath)
+				newPath.Method = method.MethodName
+				paths_set.CAN2TTRoutes = append(paths_set.CAN2TTRoutes, newPath)
+			} else {
+				// Compute new path
+				graph := network.GraphSet.Get(flow.Source, flow.Destinations)
+				path := ShortestPath(v2v, graph, flow.Source, dest, cfg.Network.ByteRate)
+				if path != nil {
+					path.Method = method.MethodName
+				}
+				paths_set.CAN2TTRoutes = append(paths_set.CAN2TTRoutes, path)
+				usedPath[key] = path
+			}
+		}
+	}
+	logger.Printf("Finish Shortest Path %d CAN2TSN streams routing\n", len(paths_set.CAN2TTRoutes))
+
+	return paths_set
+}
+
+func Get_KPath_Routing(network *network.Network, cfg *config.Config, shortestPaths *RouteSet, K int) *KRouteSet {
+	kpaths_set := newKRouteSet()
+
+	// TSN flows
+	for _, flow := range network.FlowSet.TSNFlows {
+		dest := flow.Destinations[0]
+		topo := network.GraphSet.Get(flow.Source, flow.Destinations)
+		kpath := BuildKRoute(K, flow.Source, dest, topo, cfg.Network.ByteRate)
+		kpaths_set.TSNRoutes = append(kpaths_set.TSNRoutes, kpath)
+	}
+	logger.Printf("Finish K-Path %d TSN streams routing (K=%d)\n", len(kpaths_set.TSNRoutes), K)
+
+	// AVB flows
+	for _, flow := range network.FlowSet.AVBFlows {
+		dest := flow.Destinations[0]
+		topo := network.GraphSet.Get(flow.Source, flow.Destinations)
+		kpath := BuildKRoute(K, flow.Source, dest, topo, cfg.Network.ByteRate)
+		kpaths_set.AVBRoutes = append(kpaths_set.AVBRoutes, kpath)
+	}
+	logger.Printf("Finish K-Path %d AVB streams routing (K=%d)\n", len(kpaths_set.AVBRoutes), K)
+
+	// CAN2TSN flows - avoid redundant computation
+	type sd struct{ s, d int }
+	usedKPath := make(map[sd]*KRoute)
+
+	for _, method := range network.FlowSet.EncapsulateMethod {
+		for _, flow := range method.CAN2TTFlows {
+			dest := flow.Destinations[0]
+			key := sd{flow.Source, dest}
+
+			if existingKPath, ok := usedKPath[key]; ok {
+				// KPath already computed, clone and set method
+				newKRoute := CloneKPath(existingKPath)
+				newKRoute.Method = method.MethodName
+				kpaths_set.CAN2TTRoutes = append(kpaths_set.CAN2TTRoutes, newKRoute)
+			} else {
+				// Compute new KPath
+				topo := network.GraphSet.Get(flow.Source, flow.Destinations)
+				kpath := BuildKRoute(K, flow.Source, dest, topo, cfg.Network.ByteRate)
+				if kpath != nil {
+					kpath.Method = method.MethodName
+				}
+				kpaths_set.CAN2TTRoutes = append(kpaths_set.CAN2TTRoutes, kpath)
+				usedKPath[key] = kpath
+			}
+		}
+	}
+	logger.Printf("Finish K-Path %d CAN2TSN streams routing (K=%d)\n", len(kpaths_set.CAN2TTRoutes), K)
+
+	return kpaths_set
+}
+
+

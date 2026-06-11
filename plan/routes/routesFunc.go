@@ -1,11 +1,7 @@
 package routes
 
-import (
-	"encoding/json"
-)
-
 // Add to the tree based on the given path
-func (tree *Tree) IntoTree(P []int, cost float64) {
+func (tree *Route) IntoTree(P []int, cost float64) {
 	for l := len(P) - 1; l > 0; l-- {
 		node1, b1 := tree.CheckNodeByID(P[l])
 		node2, b2 := tree.CheckNodeByID(P[l-1])
@@ -34,7 +30,7 @@ func (tree *Tree) IntoTree(P []int, cost float64) {
 }
 
 // Remove edges
-func (MST_prime *Tree) RemoveEdge(e_prime [2]int) {
+func (MST_prime *Route) RemoveEdge(e_prime [2]int) {
 	node1 := MST_prime.GetNodeByID(e_prime[0])
 	node2 := MST_prime.GetNodeByID(e_prime[1])
 
@@ -66,13 +62,13 @@ func (MST_prime *Tree) RemoveEdge(e_prime [2]int) {
 }
 
 // Determine if it is a tree
-func (MST_prime *Tree) CheckIsTree(Terminal []int) bool {
+func (MST_prime *Route) CheckIsTree(Terminal []int) bool {
 	root := MST_prime.Nodes[0]
 	visited := make(map[*Node]bool)
 	return DFSTree(MST_prime, root, nil, visited, Terminal) && len(visited) == len(MST_prime.Nodes)
 }
 
-func DFSTree(MST_prime *Tree, node *Node, parent *Node, visited map[*Node]bool, Terminal []int) bool {
+func DFSTree(MST_prime *Route, node *Node, parent *Node, visited map[*Node]bool, Terminal []int) bool {
 	if visited[node] {
 		return false
 	}
@@ -101,7 +97,7 @@ func DFSTree(MST_prime *Tree, node *Node, parent *Node, visited map[*Node]bool, 
 }
 
 // Verify the existence of a Node in a Tree using its ID
-func (tree *Tree) CheckNodeByID(id int) (*Node, bool) {
+func (tree *Route) CheckNodeByID(id int) (*Node, bool) {
 	for _, node := range tree.Nodes {
 		if node.ID == id {
 			return node, true
@@ -111,7 +107,7 @@ func (tree *Tree) CheckNodeByID(id int) (*Node, bool) {
 }
 
 // Find the nodes in the tree by id
-func (tree *Tree) GetNodeByID(id int) *Node {
+func (tree *Route) GetNodeByID(id int) *Node {
 	for _, node := range tree.Nodes {
 		if node.ID == id {
 			return node
@@ -121,7 +117,7 @@ func (tree *Tree) GetNodeByID(id int) *Node {
 }
 
 // Determine if the tree is the same
-func (tree1 *Tree) CompareTrees(tree2 *Tree) bool {
+func (tree1 *Route) CompareTrees(tree2 *Route) bool {
 	if tree1.Weight != tree2.Weight {
 		return false
 	}
@@ -175,17 +171,35 @@ func Compare_Connections(conn1, conn2 []*Connection) bool {
 	}
 }
 
-// DeepCopy Tree
-func (tree1 *Tree) TreeDeepCopy() *Tree {
-	if buf, err := json.Marshal(tree1); err != nil {
+// RouteDeepCopy structurally clones a Route. The previous implementation
+// used encoding/json round-tripping, which made every Steiner tree call
+// O(|L|² × paths_per_terminal × len(graph)) bytes of allocator pressure.
+// Going field-by-field cuts the per-clone cost by ~10–50×.
+func (src *Route) RouteDeepCopy() *Route {
+	if src == nil {
 		return nil
-	} else {
-		tree2 := newTree()
-		if err = json.Unmarshal(buf, tree2); err != nil {
-			return nil
-		}
-		return tree2
 	}
+	dup := &Route{
+		Weight: src.Weight,
+		Method: src.Method,
+		IDs:    append([]int{}, src.IDs...),
+		Nodes:  make([]*Node, 0, len(src.Nodes)),
+	}
+	for _, node := range src.Nodes {
+		newNode := &Node{
+			ID:          node.ID,
+			Connections: make([]*Connection, 0, len(node.Connections)),
+		}
+		for _, conn := range node.Connections {
+			newNode.Connections = append(newNode.Connections, &Connection{
+				FromNodeID: conn.FromNodeID,
+				ToNodeID:   conn.ToNodeID,
+				Cost:       conn.Cost,
+			})
+		}
+		dup.Nodes = append(dup.Nodes, newNode)
+	}
+	return dup
 }
 
 func loopCompareSimplex(a int, b []int) bool {

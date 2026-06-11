@@ -28,7 +28,7 @@ func costRename(n1, n2 *Node) float64 {
 }
 
 // Find a Node in the Tree's Nodes by its ID
-func getNodeByID(t *Tree, id int) *Node {
+func getNodeByID(t *Route, id int) *Node {
 	for _, n := range t.Nodes {
 		if n.ID == id {
 			return n
@@ -40,7 +40,7 @@ func getNodeByID(t *Tree, id int) *Node {
 // Get all "child nodes" from a node's Connections based on undirected graph characteristics.
 // parentID is used to exclude returning to the parent node during DFS,
 // initial call can pass -1.
-func getChildren(node *Node, t *Tree, parentID int) []*Node {
+func getChildren(node *Node, t *Route, parentID int) []*Node {
 	var children []*Node
 	for _, conn := range node.Connections {
 		// Exclude connection pointing to parent node
@@ -56,7 +56,7 @@ func getChildren(node *Node, t *Tree, parentID int) []*Node {
 }
 
 // Recursively Calculate Deletion Cost of Entire Subtree
-func treeCostDelete(n *Node, t *Tree, parentID int) float64 {
+func treeCostDelete(n *Node, t *Route, parentID int) float64 {
 	c := costDelete()
 	children := getChildren(n, t, parentID)
 	for _, child := range children {
@@ -66,7 +66,7 @@ func treeCostDelete(n *Node, t *Tree, parentID int) float64 {
 }
 
 // Recursively Calculate Insertion Cost of Entire Subtree
-func treeCostInsert(n *Node, t *Tree, parentID int) float64 {
+func treeCostInsert(n *Node, t *Route, parentID int) float64 {
 	c := costInsert()
 	children := getChildren(n, t, parentID)
 	for _, child := range children {
@@ -79,7 +79,7 @@ func treeCostInsert(n *Node, t *Tree, parentID int) float64 {
 // and uses dynamic programming to calculate matching costs between two "forests".
 // parent1 and parent2 are the parent node IDs of n1 and n2 respectively,
 // initially passed as -1.
-func treeEditDistance(n1, n2 *Node, t1, t2 *Tree, parent1, parent2 int, memo map[string]float64) float64 {
+func treeEditDistance(n1, n2 *Node, t1, t2 *Route, parent1, parent2 int, memo map[string]float64) float64 {
 	// Create memo key
 	key := strconv.Itoa(n1.ID) + "-" + strconv.Itoa(n2.ID)
 	if v, ok := memo[key]; ok {
@@ -125,7 +125,7 @@ func treeEditDistance(n1, n2 *Node, t1, t2 *Tree, parent1, parent2 int, memo map
 // Assumes root node ID string has prefix "100".
 // This function searches for root nodes in t.Nodes that match this condition,
 // then calculates the edit distance for entire trees.
-func APTED(t1, t2 *Tree) float64 {
+func APTED(t1, t2 *Route) float64 {
 	var root1, root2 *Node
 	for _, n := range t1.Nodes {
 		if n.ID >= 1000 && n.ID <= 1999 {

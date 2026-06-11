@@ -10,6 +10,6 @@ import (
 func (mtdc *MDTC) MDTC_Run(network *network.Network, cfg *config.Config) {
 	mtdc.Timer = algo_timer.NewTimer()
 	mtdc.Timer.TimerStart()
-	mtdc.Trees = routes.Get_DistanceTree_Routing(network, cfg)
+	mtdc.Routes = routes.Get_DistanceTree_Routing(network, cfg)
 	mtdc.Timer.TimerStop()
 }

@@ -5,8 +5,8 @@ import (
 )
 
 // QINGHAN YU et al., "Online Scheduling for Dynamic VM Migration in Multicast Time-Sensitive Networks"
-func DistanceTree(Graph *topology.Topology, Source int, Destinations []int, cost float64) *Tree {
-	MDTC := newTree()
+func DistanceTree(Graph *topology.Topology, Source int, Destinations []int, cost float64) *Route {
+	MDTC := newRoute()
 	for _, destination := range Destinations {
 		MDPC := DP_TSP(Graph, Source, destination)
 		MDTC.IntoTree(MDPC, cost)

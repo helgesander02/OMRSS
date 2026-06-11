@@ -11,6 +11,6 @@ import (
 func (sp *SP) SP_Run(network *network.Network, cfg *config.Config) {
 	sp.Timer = algo_timer.NewTimer()
 	sp.Timer.TimerStart()
-	sp.Paths = routes.Get_ShortestPath_Routing(network, cfg)
+	sp.Routes = routes.Get_ShortestPath_Routing(network, cfg)
 	sp.Timer.TimerStop()
 }

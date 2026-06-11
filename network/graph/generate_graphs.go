@@ -37,14 +37,14 @@ func GenerateOsroGraphs(topo *topology.Topology, flows *flow.FlowSet, bytesRate 
 	graphs := newGraphs()
 
 	for _, f := range flows.TSNFlows {
-		graphs.addGraph(topo, f.Source, f.Destinations[:1], bytesRate)
+		graphs.addGraph(topo, f.Source, f.Destinations, bytesRate)
 	}
 	for _, f := range flows.AVBFlows {
-		graphs.addGraph(topo, f.Source, f.Destinations[:1], bytesRate)
+		graphs.addGraph(topo, f.Source, f.Destinations, bytesRate)
 	}
 	for _, method := range flows.EncapsulateMethod {
 		for _, f := range method.CAN2TTFlows {
-			graphs.addGraph(topo, f.Source, f.Destinations[:1], bytesRate)
+			graphs.addGraph(topo, f.Source, f.Destinations, bytesRate)
 		}
 	}
 

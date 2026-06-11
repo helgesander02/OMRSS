@@ -22,135 +22,68 @@ func (graph *Graph) Show_Path() {
 	}
 }
 
-func (trees *KTreesSet) Show_kTrees_Set() {
-	tsn := 1
-	for _, ktrees := range trees.TSNTrees {
-		logger.Printf("\nTSN Tree %d \n", tsn)
-		ktrees.ShowKTrees()
-		tsn++
-
-		break
-	}
-	avb := 1
-	for _, ktrees := range trees.AVBTrees {
-		logger.Printf("\nAVB Tree %d \n", avb)
-		ktrees.ShowKTrees()
-		avb++
-
-		break
-	}
-}
-
-func (trees *TreesSet) Show_Trees_Set() {
-	tsn := 1
-	for _, tree := range trees.TSNTrees {
-		logger.Printf("\nTSN Tree %d \n", tsn)
-		tree.Show_Tree()
-		tsn++
-
-		break
-	}
-	avb := 1
-	for _, tree := range trees.AVBTrees {
-		logger.Printf("\nAVB Tree %d \n", avb)
-		tree.Show_Tree()
-		avb++
-
-		break
-	}
-}
-
-func (Ktrees *KTrees) ShowKTrees() {
-	for index, tree := range Ktrees.Trees {
-		logger.Printf("tree%d \n", index)
-		logger.Printf("tree weight: %d \n", tree.Weight)
-		tree.Show_Tree()
-	}
-}
-
-func (tree *Tree) Show_Tree() {
-	for _, node := range tree.Nodes {
-		logger.Println(node.ID)
+// Show_Route prints a Route's hop sequence (IDs), weight, and node/edge
+// graph. It is the canonical display for both tree-shaped (multicast)
+// and path-shaped (unicast) routings.
+func (route *Route) Show_Route() {
+	logger.Printf("Route IDs: %v\n", route.IDs)
+	logger.Printf("Weight: %d\n", route.Weight)
+	for _, node := range route.Nodes {
+		logger.Printf("Node %d:\n", node.ID)
 		for _, c := range node.Connections {
-			logger.Printf("%d --> %d \n", c.FromNodeID, c.ToNodeID)
+			logger.Printf("  %d --> %d\n", c.FromNodeID, c.ToNodeID)
 		}
 	}
 }
 
-func (tree *Tree) Show_Cycle() {
-	b, cyclelist := tree.FindCycle()
-	if b {
+// Show_Cycle reports whether the route contains a cycle.
+func (route *Route) Show_Cycle() {
+	hasCycle, cycle := route.FindCycle()
+	if hasCycle {
 		logger.Println("The MST has cycle")
-		logger.Println(cyclelist)
-
+		logger.Println(cycle)
 	} else {
 		logger.Println("The MST has no cycle")
 	}
 }
 
-// Show functions for Path-based structures (OSRO)
-func (kpaths *KPathsSet) Show_KPaths_Set() {
-	tsn := 1
-	for _, kpath := range kpaths.TSNPaths {
-		logger.Printf("\nTSN K-Path %d \n", tsn)
-		kpath.Show_KPath()
-		tsn++
-		break
-	}
-	avb := 1
-	for _, kpath := range kpaths.AVBPaths {
-		logger.Printf("\nAVB K-Path %d \n", avb)
-		kpath.Show_KPath()
-		avb++
-		break
-	}
-	can := 1
-	for _, kpath := range kpaths.CAN2TSNPaths {
-		logger.Printf("\nCAN2TSN K-Path %d (Method: %s)\n", can, kpath.Method)
-		kpath.Show_KPath()
-		can++
-		break
+// Show_KRoute prints every alternative in a K-route bundle.
+func (kr *KRoute) Show_KRoute() {
+	for index, route := range kr.Routes {
+		logger.Printf("Alternative %d (Weight: %d)\n", index, route.Weight)
+		route.Show_Route()
 	}
 }
 
-func (paths *PathsSet) Show_Paths_Set() {
-	tsn := 1
-	for _, path := range paths.TSNPaths {
-		logger.Printf("\nTSN Path %d \n", tsn)
-		path.Show_PathStruct()
-		tsn++
-		break
+// Show_RouteSet samples one route per category (TSN / AVB / CAN2TT) so
+// the user can eyeball the routing shape without dumping everything.
+func (rs *RouteSet) Show_RouteSet() {
+	if len(rs.TSNRoutes) > 0 {
+		logger.Println("\nTSN Route 1")
+		rs.TSNRoutes[0].Show_Route()
 	}
-	avb := 1
-	for _, path := range paths.AVBPaths {
-		logger.Printf("\nAVB Path %d \n", avb)
-		path.Show_PathStruct()
-		avb++
-		break
+	if len(rs.AVBRoutes) > 0 {
+		logger.Println("\nAVB Route 1")
+		rs.AVBRoutes[0].Show_Route()
 	}
-	can := 1
-	for _, path := range paths.CAN2TSNPaths {
-		logger.Printf("\nCAN2TSN Path %d (Method: %s)\n", can, path.Method)
-		path.Show_PathStruct()
-		can++
-		break
+	if len(rs.CAN2TTRoutes) > 0 {
+		logger.Printf("\nCAN2TT Route 1 (Method: %s)\n", rs.CAN2TTRoutes[0].Method)
+		rs.CAN2TTRoutes[0].Show_Route()
 	}
 }
 
-func (kpath *KPath) Show_KPath() {
-	for index, path := range kpath.Paths {
-		logger.Printf("Path %d (Weight: %.2f)\n", index, path.Weight)
-		path.Show_PathStruct()
+// Show_KRouteSet samples one K-bundle per category.
+func (krs *KRouteSet) Show_KRouteSet() {
+	if len(krs.TSNRoutes) > 0 {
+		logger.Println("\nTSN K-Route 1")
+		krs.TSNRoutes[0].Show_KRoute()
 	}
-}
-
-func (path *Path) Show_PathStruct() {
-	logger.Printf("Path IDs: %v\n", path.IDs)
-	logger.Printf("Weight: %.2f\n", path.Weight)
-	for _, node := range path.Nodes {
-		logger.Printf("Node %d:\n", node.ID)
-		for _, c := range node.Connections {
-			logger.Printf("  %d --> %d\n", c.FromNodeID, c.ToNodeID)
-		}
+	if len(krs.AVBRoutes) > 0 {
+		logger.Println("\nAVB K-Route 1")
+		krs.AVBRoutes[0].Show_KRoute()
+	}
+	if len(krs.CAN2TTRoutes) > 0 {
+		logger.Printf("\nCAN2TT K-Route 1 (Method: %s)\n", krs.CAN2TTRoutes[0].Method)
+		krs.CAN2TTRoutes[0].Show_KRoute()
 	}
 }

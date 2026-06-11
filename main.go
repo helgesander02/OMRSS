@@ -155,8 +155,7 @@ func runExperiments(ctx context.Context, cfg *config.Config) error {
 		planInstance := plan.NewPlans(networkInstance, cfg)
 
 		// 3. Initiate Plan
-		costSetting := cfg.GetCostArray()
-		planInstance.InitiatePlan(costSetting, cfg)
+		planInstance.InitiatePlan(cfg)
 		if cfg.Output.ShowPlan {
 			planInstance.ShowPlan()
 		}

@@ -5,9 +5,17 @@ import (
 	"sort"
 )
 
-// Dijkstra’s Algorithm
+// Dijkstra’s Algorithm.
+//
+// NOTE: this is misnamed — it is actually a DFS-with-backtracking that
+// enumerates every simple path from start to terminal and stores them
+// all in graph.Path. The Steiner tree construction relies on having the
+// full set of paths available; ShortestPath only consumes graph.Path[0].
+// See routes/struct.go for the Graph cache layout.
 func Dijkstra(graph *Graph, strat int, terminal int) *Graph {
-	inf := math.MaxInt8
+	// Cost upper bound. The previous implementation used math.MaxInt8
+	// (127), which silently truncated any path longer than 127 hops.
+	inf := math.MaxInt
 
 	for _, vertex := range graph.Vertexs {
 		vertex.Visited = false

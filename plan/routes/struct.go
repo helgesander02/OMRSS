@@ -1,38 +1,61 @@
 package routes
 
-type KTreesSet struct {
-	TSNTrees []*KTrees
-	AVBTrees []*KTrees
-}
-
-func newKTreesSet() *KTreesSet {
-	return &KTreesSet{}
-}
-
-type KTrees struct {
-	Trees []*Tree
-}
-
-func newKTrees() *KTrees {
-	return &KTrees{}
-}
-
-type TreesSet struct {
-	TSNTrees []*Tree
-	AVBTrees []*Tree
-}
-
-func newTreesSet() *TreesSet {
-	return &TreesSet{}
-}
-
-type Tree struct {
+// Route is the single routing structure used everywhere — tree-shaped
+// (multicast Steiner) and path-shaped (unicast linear) routings share
+// the same node/edge graph. The optional IDs and Method fields are
+// populated by path callers (IDs = linear hop sequence; Method = encap
+// method tag for CAN2TT). Tree callers leave them zero.
+type Route struct {
 	Nodes  []*Node
-	Weight int
+	Weight int    // hop count
+	IDs    []int  // path callers only
+	Method string // CAN2TT path callers only
 }
 
-func newTree() *Tree {
-	return &Tree{}
+func newRoute() *Route {
+	return &Route{}
+}
+
+// KRoute holds K candidate Routes for one (Source, Target) stream so
+// OSACO can pick between them via pheromone + visibility.
+type KRoute struct {
+	K      int
+	Source int
+	Target int
+	Method string
+	Routes []*Route
+}
+
+func newKRoute(k int, source, target int) *KRoute {
+	return &KRoute{
+		K:      k,
+		Source: source,
+		Target: target,
+		Routes: []*Route{},
+	}
+}
+
+// RouteSet groups one Route per flow category. CAN2TT is populated only
+// by OSRO; OMACO leaves it empty.
+type RouteSet struct {
+	TSNRoutes    []*Route
+	AVBRoutes    []*Route
+	CAN2TTRoutes []*Route
+}
+
+func newRouteSet() *RouteSet {
+	return &RouteSet{}
+}
+
+// KRouteSet is the K-candidate version of RouteSet.
+type KRouteSet struct {
+	TSNRoutes    []*KRoute
+	AVBRoutes    []*KRoute
+	CAN2TTRoutes []*KRoute
+}
+
+func newKRouteSet() *KRouteSet {
+	return &KRouteSet{}
 }
 
 type Node struct {
@@ -41,7 +64,7 @@ type Node struct {
 }
 
 type Connection struct {
-	FromNodeID int     // strat
+	FromNodeID int     // start
 	ToNodeID   int     // next
 	Cost       float64 // 1Gbps => (750,000 bytes/6ms) 750,000 bytes under 6ms for each link ==> 125 bytes/us
 }
@@ -81,65 +104,4 @@ type Edge struct {
 	Strat int
 	End   int
 	Cost  int
-}
-
-// OSRO Path-based structures
-type KPathsSet struct {
-	TSNPaths     []*KPath
-	AVBPaths     []*KPath
-	CAN2TSNPaths []*KPath
-}
-
-func newKPathsSet() *KPathsSet {
-	return &KPathsSet{}
-}
-
-type KPath struct {
-	K      int
-	Source int
-	Target int
-	Paths  []*Path
-	Method string
-}
-
-func newKPath(k int, source, target int) *KPath {
-	return &KPath{
-		K:      k,
-		Source: source,
-		Target: target,
-		Paths:  []*Path{},
-	}
-}
-
-type PathsSet struct {
-	TSNPaths     []*Path
-	AVBPaths     []*Path
-	CAN2TSNPaths []*Path
-}
-
-func newPathsSet() *PathsSet {
-	return &PathsSet{}
-}
-
-type Path struct {
-	Method string
-	IDs    []int
-	Nodes  []*PathNode
-	Weight float64
-}
-
-func newPath() *Path {
-	return &Path{}
-}
-
-type PathNode struct {
-	ID          int
-	Shape       string
-	Connections []*PathConnection
-}
-
-type PathConnection struct {
-	FromNodeID int
-	ToNodeID   int
-	Cost       float64
 }

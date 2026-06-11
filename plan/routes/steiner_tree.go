@@ -5,7 +5,7 @@ import (
 )
 
 // Bang Ye Wu, Kun-Mao Chao, "Steiner Minimal Trees"
-func SteninerTree(v2v *V2V, t *topology.Topology, Source int, Destinations []int, cost float64) *Tree {
+func SteninerTree(v2v *V2V, t *topology.Topology, Source int, Destinations []int, cost float64) *Route {
 	var Terminal []int
 	Terminal = append(Terminal, Source)
 	Terminal = append(Terminal, Destinations...)
@@ -16,7 +16,7 @@ func SteninerTree(v2v *V2V, t *topology.Topology, Source int, Destinations []int
 	// If there is a vertex, find all shortest paths between the vertex and terminals.
 	// Choose the path with the minimum cost and add all the vertices from this shortest path to the tree.
 	var (
-		tree      *Tree = newTree()
+		tree      *Route = newRoute()
 		used_tmal []int
 	)
 
@@ -66,7 +66,7 @@ func SteninerTree(v2v *V2V, t *topology.Topology, Source int, Destinations []int
 	return tree
 }
 
-func chooseBestPath(BP map[int][][]int, tree *Tree, cost float64) []int {
+func chooseBestPath(BP map[int][][]int, tree *Route, cost float64) []int {
 	var (
 		minPaths [][]int
 		minPath  []int
@@ -92,7 +92,7 @@ func chooseBestPath(BP map[int][][]int, tree *Tree, cost float64) []int {
 
 	} else {
 		for _, path := range minPaths {
-			tree_copy := tree.TreeDeepCopy()
+			tree_copy := tree.RouteDeepCopy()
 			tree_copy.IntoTree(path, cost)
 			if len(minPath) == 0 {
 				minPath = path

@@ -2,7 +2,7 @@ package routes
 
 // Detect Cycle in a an Undirected Graph
 // https://www.tutorialspoint.com/Detect-Cycle-in-a-an-Undirected-Graph
-func (tree *Tree) FindCycle() (bool, []int) {
+func (tree *Route) FindCycle() (bool, []int) {
 	var cyclelist []int
 	for _, node := range tree.Nodes {
 		visited := make(map[int]bool)
@@ -17,7 +17,7 @@ func (tree *Tree) FindCycle() (bool, []int) {
 	}
 }
 
-func DFSCyCle(tree *Tree, node *Node, visited map[int]bool, parentID int, startID int) bool {
+func DFSCyCle(tree *Route, node *Node, visited map[int]bool, parentID int, startID int) bool {
 	visited[node.ID] = true
 	for _, conn := range node.Connections {
 		if conn.ToNodeID == parentID {
@@ -39,7 +39,7 @@ func DFSCyCle(tree *Tree, node *Node, visited map[int]bool, parentID int, startI
 
 // How to find feedback edge set in undirected graph
 // https://stackoverflow.com/questions/10791689/how-to-find-feedback-edge-set-in-undirected-graph
-func (tree *Tree) GetFeedbackEdgeSet(cyclelist []int, E []int) [][2]int {
+func (tree *Route) GetFeedbackEdgeSet(cyclelist []int, E []int) [][2]int {
 	var E_prime [][2]int
 	for _, cycle := range cyclelist {
 		node := tree.GetNodeByID(cycle)

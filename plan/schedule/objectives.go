@@ -11,8 +11,10 @@ import (
 	"time"
 )
 
-// Objectives
-func OBJ(network *network.Network, cfg *config.Config, X *routes.KTreesSet, II *routes.TreesSet, II_prime *routes.TreesSet, costSetting [4]int, showflow bool) ([4]float64, int) {
+// Objectives. costSetting is read from cfg.GetCostArray() so callers no
+// longer thread the same array down through every function level.
+func OBJ(network *network.Network, cfg *config.Config, X *routes.KRouteSet, II *routes.RouteSet, II_prime *routes.RouteSet, showflow bool) ([4]float64, int) {
+	costSetting := cfg.GetCostArray()
 	S := network.FlowSet.InputOMACOFlowSet()
 	S_prime := network.FlowSet.BGOMACOFlowSet()
 	var (
@@ -27,14 +29,14 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KTreesSet, II *
 
 	// Round1: Schedule BG flow
 	// O1
-	for nth, route := range II_prime.TSNTrees {
+	for nth, route := range II_prime.TSNRoutes {
 		schedulability := schedulability(0, S_prime.TSNFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		tsn_failed_count += 1 - schedulability
 		//logger.Printf("BackGround TSN route%d: %b \n", nth, schedulability)
 	}
 
 	// O2 and O4
-	for nth, route := range II_prime.AVBTrees {
+	for nth, route := range II_prime.AVBRoutes {
 		wcd := WCD(route, X, S_prime.AVBFlows[nth], network.FlowSet)
 		avb_wcd_sum += wcd
 		schedulability := schedulability(wcd, S_prime.AVBFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
@@ -45,14 +47,14 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KTreesSet, II *
 
 	// Round2: Schedule Input flow
 	// O1
-	for nth, route := range II.TSNTrees {
+	for nth, route := range II.TSNRoutes {
 		schedulability := schedulability(0, S.TSNFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		tsn_failed_count += 1 - schedulability
 		//logger.Printf("Input TSN route%d: %b \n", nth, schedulability)
 	}
 
 	// O2 and O4
-	for nth, route := range II.AVBTrees {
+	for nth, route := range II.AVBRoutes {
 		wcd := WCD(route, X, S.AVBFlows[nth], network.FlowSet)
 		avb_wcd_sum += wcd
 		schedulability := schedulability(wcd, S.AVBFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
@@ -77,7 +79,7 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KTreesSet, II *
 	return obj, cost
 }
 
-func schedulability(wcd time.Duration, flow *tt.Flow, route *routes.Tree, linkmap map[string]float64, bandwidth float64, hyperPeriod int) int {
+func schedulability(wcd time.Duration, flow *tt.Flow, route *routes.Route, linkmap map[string]float64, bandwidth float64, hyperPeriod int) int {
 	r := wcd <= time.Duration(flow.Deadline)*time.Microsecond
 	node := route.GetNodeByID(flow.Source)
 	schedulable, _ := schedulable(node, -1, flow, route, linkmap, bandwidth, hyperPeriod)
@@ -88,7 +90,7 @@ func schedulability(wcd time.Duration, flow *tt.Flow, route *routes.Tree, linkma
 	return 0
 }
 
-func schedulable(node *routes.Node, parentID int, flow *tt.Flow, route *routes.Tree, linkmap map[string]float64, bandwidth float64, hyperPeriod int) (bool, map[string]float64) {
+func schedulable(node *routes.Node, parentID int, flow *tt.Flow, route *routes.Route, linkmap map[string]float64, bandwidth float64, hyperPeriod int) (bool, map[string]float64) {
 	for _, link := range node.Connections {
 		if link.ToNodeID == parentID {
 			continue

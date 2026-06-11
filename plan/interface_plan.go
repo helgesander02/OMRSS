@@ -6,7 +6,7 @@ import (
 )
 
 type Plans interface {
-	InitiatePlan([4]int, *config.Config)
+	InitiatePlan(*config.Config)
 	ShowPlan()
 }
 
@@ -15,17 +15,13 @@ func NewPlans(nw *network.Network, cfg *config.Config) Plans {
 	case "omaco":
 		return newOMACOPlan(
 			nw,
-			cfg.Algorithm.OSACO.Timeout,
-			cfg.Algorithm.OSACO.K,
-			cfg.Algorithm.OSACO.PheromoneEvaporation,
+			cfg.Algorithm.OSACO,
 		)
 
 	case "osro":
 		return newOSROPlan(
 			nw,
-			cfg.Algorithm.OSACO.Timeout,
-			cfg.Algorithm.OSACO.K,
-			cfg.Algorithm.OSACO.PheromoneEvaporation,
+			cfg.Algorithm.OSACO,
 		)
 
 	default:

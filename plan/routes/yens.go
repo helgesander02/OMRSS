@@ -261,8 +261,8 @@ func BuildGraphFromTopology(topo *topology.Topology) *Graph {
 }
 
 // ConvertIDsToTree converts a path (node IDs) to a Tree structure
-func ConvertIDsToTree(ids []int, topo *topology.Topology, cost float64) *Tree {
-	tree := newTree()
+func ConvertIDsToTree(ids []int, topo *topology.Topology, cost float64) *Route {
+	tree := newRoute()
 
 	for i := 0; i < len(ids)-1; i++ {
 		node1, found1 := tree.CheckNodeByID(ids[i])
