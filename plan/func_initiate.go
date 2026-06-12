@@ -28,7 +28,7 @@ func (plan *OMACO) InitiatePlan(cfg *config.Config) {
 
 	osacoTimer := algo_timer.NewTimer()
 	osacoTimer.TimerStart()
-	osacoKRoutes := routes.Get_OSACO_Routing(plan.Network, cfg, plan.SMT.Routes, plan.OSACO.K, plan.OSACO.Method_Number)
+	osacoKRoutes := routes.Get_KTree_Routing(plan.Network, cfg, plan.SMT.Routes, plan.OSACO.K, plan.OSACO.Method_Number)
 	osacoTimer.TimerEnd()
 
 	plan.OSACO.OSACO_Initial_Settings(plan.Network, cfg, plan.SMT.Routes, osacoKRoutes, timeround, osacoTimer)
@@ -42,7 +42,7 @@ func (plan *OMACO) InitiatePlan(cfg *config.Config) {
 
 	aptedTimer := algo_timer.NewTimer()
 	aptedTimer.TimerStart()
-	aptedKRoutes := routes.Get_OSACO_Routing(plan.Network, cfg, plan.SMT.Routes, plan.OSACO_APTED.K, plan.OSACO_APTED.Method_Number)
+	aptedKRoutes := routes.Get_KTree_Routing(plan.Network, cfg, plan.SMT.Routes, plan.OSACO_APTED.K, plan.OSACO_APTED.Method_Number)
 	aptedTimer.TimerEnd()
 
 	plan.OSACO_APTED.OSACO_Initial_Settings(plan.Network, cfg, plan.SMT.Routes, aptedKRoutes, timeround, aptedTimer)

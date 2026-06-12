@@ -48,64 +48,6 @@ func Get_DistanceTree_Routing(network *network.Network, cfg *config.Config) *Rou
 	return TreesSet
 }
 
-// InputRouteSet returns the input partition of the route set — TSN / AVB
-// routes after the background boundary, plus all CAN2TT routes (which are
-// always input-side because CAN-to-TT does not carry a background slice).
-func (rs *RouteSet) InputRouteSet(bgTSN, bgAVB int) *RouteSet {
-	out := newRouteSet()
-	out.TSNRoutes = append(out.TSNRoutes, rs.TSNRoutes[bgTSN:]...)
-	out.AVBRoutes = append(out.AVBRoutes, rs.AVBRoutes[bgAVB:]...)
-	out.CAN2TTRoutes = append(out.CAN2TTRoutes, rs.CAN2TTRoutes...)
-	return out
-}
-
-// BGRouteSet returns the background partition — TSN / AVB routes before
-// the background boundary. CAN2TT is intentionally left out because all
-// CAN-derived TT traffic is treated as foreground input.
-func (rs *RouteSet) BGRouteSet(bgTSN, bgAVB int) *RouteSet {
-	out := newRouteSet()
-	out.TSNRoutes = append(out.TSNRoutes, rs.TSNRoutes[:bgTSN]...)
-	out.AVBRoutes = append(out.AVBRoutes, rs.AVBRoutes[:bgAVB]...)
-	return out
-}
-
-func Get_OSACO_Routing(network *network.Network, cfg *config.Config, SMT *RouteSet, K int, Method_Number int) *KRouteSet {
-	ktrees_set := newKRouteSet()
-
-	for nth, flow := range network.FlowSet.TSNFlows {
-		Ktrees := KSpanningTree(v2v, SMT.TSNRoutes[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
-		ktrees_set.TSNRoutes = append(ktrees_set.TSNRoutes, Ktrees)
-	}
-	logger.Printf("Finish OSACO %d TSN streams routing\n", len(ktrees_set.TSNRoutes))
-
-	for nth, flow := range network.FlowSet.AVBFlows {
-		Ktrees := KSpanningTree(v2v, SMT.AVBRoutes[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
-		ktrees_set.AVBRoutes = append(ktrees_set.AVBRoutes, Ktrees)
-	}
-	logger.Printf("Finish OSACO %d AVB streams routing\n", len(ktrees_set.AVBRoutes))
-
-	return ktrees_set
-}
-
-// InputKRouteSet returns the input partition of the K-route set, mirroring
-// the RouteSet variant. CAN2TT alternatives are always included.
-func (krs *KRouteSet) InputKRouteSet(bgTSN, bgAVB int) *KRouteSet {
-	out := newKRouteSet()
-	out.TSNRoutes = append(out.TSNRoutes, krs.TSNRoutes[bgTSN:]...)
-	out.AVBRoutes = append(out.AVBRoutes, krs.AVBRoutes[bgAVB:]...)
-	out.CAN2TTRoutes = append(out.CAN2TTRoutes, krs.CAN2TTRoutes...)
-	return out
-}
-
-// BGKRouteSet returns the background partition of the K-route set.
-// CAN2TT alternatives are foreground-only and excluded here.
-func (krs *KRouteSet) BGKRouteSet(bgTSN, bgAVB int) *KRouteSet {
-	out := newKRouteSet()
-	out.TSNRoutes = append(out.TSNRoutes, krs.TSNRoutes[:bgTSN]...)
-	out.AVBRoutes = append(out.AVBRoutes, krs.AVBRoutes[:bgAVB]...)
-	return out
-}
-
 func Get_ShortestPath_Routing(network *network.Network, cfg *config.Config) *RouteSet {
 	paths_set := newRouteSet()
 
@@ -154,6 +96,39 @@ func Get_ShortestPath_Routing(network *network.Network, cfg *config.Config) *Rou
 	logger.Printf("Finish Shortest Path %d CAN2TSN streams routing\n", len(paths_set.CAN2TTRoutes))
 
 	return paths_set
+}
+
+func (rs *RouteSet) InputRouteSet(bgTSN, bgAVB int) *RouteSet {
+	out := newRouteSet()
+	out.TSNRoutes = append(out.TSNRoutes, rs.TSNRoutes[bgTSN:]...)
+	out.AVBRoutes = append(out.AVBRoutes, rs.AVBRoutes[bgAVB:]...)
+	out.CAN2TTRoutes = append(out.CAN2TTRoutes, rs.CAN2TTRoutes...)
+	return out
+}
+
+func (rs *RouteSet) BGRouteSet(bgTSN, bgAVB int) *RouteSet {
+	out := newRouteSet()
+	out.TSNRoutes = append(out.TSNRoutes, rs.TSNRoutes[:bgTSN]...)
+	out.AVBRoutes = append(out.AVBRoutes, rs.AVBRoutes[:bgAVB]...)
+	return out
+}
+
+func Get_KTree_Routing(network *network.Network, cfg *config.Config, SMT *RouteSet, K int, Method_Number int) *KRouteSet {
+	ktrees_set := newKRouteSet()
+
+	for nth, flow := range network.FlowSet.TSNFlows {
+		Ktrees := KSpanningTree(v2v, SMT.TSNRoutes[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
+		ktrees_set.TSNRoutes = append(ktrees_set.TSNRoutes, Ktrees)
+	}
+	logger.Printf("Finish OSACO %d TSN streams routing\n", len(ktrees_set.TSNRoutes))
+
+	for nth, flow := range network.FlowSet.AVBFlows {
+		Ktrees := KSpanningTree(v2v, SMT.AVBRoutes[nth], K, flow.Source, flow.Destinations, cfg.Network.ByteRate, Method_Number)
+		ktrees_set.AVBRoutes = append(ktrees_set.AVBRoutes, Ktrees)
+	}
+	logger.Printf("Finish OSACO %d AVB streams routing\n", len(ktrees_set.AVBRoutes))
+
+	return ktrees_set
 }
 
 func Get_KPath_Routing(network *network.Network, cfg *config.Config, shortestPaths *RouteSet, K int) *KRouteSet {
@@ -208,4 +183,17 @@ func Get_KPath_Routing(network *network.Network, cfg *config.Config, shortestPat
 	return kpaths_set
 }
 
+func (krs *KRouteSet) InputKRouteSet(bgTSN, bgAVB int) *KRouteSet {
+	out := newKRouteSet()
+	out.TSNRoutes = append(out.TSNRoutes, krs.TSNRoutes[bgTSN:]...)
+	out.AVBRoutes = append(out.AVBRoutes, krs.AVBRoutes[bgAVB:]...)
+	out.CAN2TTRoutes = append(out.CAN2TTRoutes, krs.CAN2TTRoutes...)
+	return out
+}
 
+func (krs *KRouteSet) BGKRouteSet(bgTSN, bgAVB int) *KRouteSet {
+	out := newKRouteSet()
+	out.TSNRoutes = append(out.TSNRoutes, krs.TSNRoutes[:bgTSN]...)
+	out.AVBRoutes = append(out.AVBRoutes, krs.AVBRoutes[:bgAVB]...)
+	return out
+}

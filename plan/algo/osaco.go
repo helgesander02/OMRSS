@@ -38,7 +38,7 @@ func (osaco *OSACO) OSACO_Initial_Settings(network *network.Network, cfg *config
 	osaco.InputRoutes = routeSet.InputRouteSet(bgTSN, bgAVB)
 	osaco.BGRoutes = routeSet.BGRouteSet(bgTSN, bgAVB)
 	osaco.PRM = computePrm(osaco.KRoutes)
-	osaco.VB = computeVb(osaco.KRoutes)
+	osaco.VB = computeVb(osaco.KRoutes, network.FlowSet)
 
 	for i := 0; i < timeround; i++ {
 		osaco.Timer[i] = algo_timer.NewTimer()
@@ -134,23 +134,41 @@ func computePrm(X *routes.KRouteSet) *Pheromone {
 	return pheromone
 }
 
-// computeVb seeds the visibility heuristic from each route's weight (hop
-// count). Input streams' first alternative gets a preference bonus to
-// encourage exploitation of the shortest route. Weight-based visibility
-// is consistent across tree-based and path-based OSACO and avoids
-// pulling WCD into the heuristic loop.
-func computeVb(X *routes.KRouteSet) *Visibility {
+// computeVb seeds the visibility heuristic per stream class:
+//
+//   - TSN  / CAN2TT : 1 / exp(hop weight) — cheap and consistent
+//   - AVB           : 1 / WCD(route)      — uses worst-case delay so
+//     trees / paths with the same hop count
+//     but different interference profiles are
+//     told apart. APTED relies on this to
+//     surface tree-shape diversity inside one
+//     K-bundle.
+//
+// Input streams' first alternative gets a preference bonus to encourage
+// exploitation of the shortest route. Background streams stay at 1.0.
+func computeVb(X *routes.KRouteSet, flowSet *flow.FlowSet) *Visibility {
 	const preference = 2.0
+	inputFlows := flowSet.InputOMACOFlowSet()
+	bgFlows := flowSet.BGOMACOFlowSet()
+
 	visibility := &Visibility{}
 
+	// TSN visibility = μ / exp(W₀) where W₀ is the shortest route's hop
+	// count (kr.Routes[0].Weight). All K alternatives share the same
+	// scaling; only the preference bonus at kth == 0 differentiates them.
 	for nth, kr := range X.TSNRoutes {
 		var v []float64
-		for kth, r := range kr.Routes {
+		if len(kr.Routes) == 0 {
+			visibility.TSN_VB = append(visibility.TSN_VB, v)
+			continue
+		}
+		baseWeight := kr.Routes[0].Weight
+		for kth := range kr.Routes {
 			mult := 1.0
 			if nth < bgTSN && kth == 0 {
 				mult = preference
 			}
-			v = append(v, mult/math.Exp(float64(r.Weight)))
+			v = append(v, mult/math.Exp(float64(baseWeight)))
 		}
 		visibility.TSN_VB = append(visibility.TSN_VB, v)
 	}
@@ -162,7 +180,16 @@ func computeVb(X *routes.KRouteSet) *Visibility {
 			if nth < bgAVB && kth == 0 {
 				mult = preference
 			}
-			v = append(v, mult/math.Exp(float64(r.Weight)))
+			var wcd float64
+			if nth < bgAVB {
+				wcd = float64(schedule.WCD(r, X, bgFlows.AVBFlows[nth], flowSet))
+			} else {
+				wcd = float64(schedule.WCD(r, X, inputFlows.AVBFlows[nth-bgAVB], flowSet))
+			}
+			if wcd <= 0 {
+				wcd = 1 // guard against divide-by-zero if WCD ever returns 0
+			}
+			v = append(v, mult/wcd)
 		}
 		visibility.AVB_VB = append(visibility.AVB_VB, v)
 	}
@@ -170,6 +197,7 @@ func computeVb(X *routes.KRouteSet) *Visibility {
 	for _, kr := range X.CAN2TTRoutes {
 		var v []float64
 		for _, r := range kr.Routes {
+			//v = append(v, 1.0/float64(r.Weight))
 			v = append(v, 1.0/math.Exp(float64(r.Weight)))
 		}
 		visibility.CAN2TTVB = append(visibility.CAN2TTVB, v)
@@ -304,7 +332,3 @@ func epoch(network *network.Network, cfg *config.Config, osaco *OSACO, timeoutIn
 
 	return II
 }
-
-// flow.FlowSet is reserved for future visibility variants (e.g. WCD-based
-// AVB heuristic); referenced here so the import survives until then.
-var _ = flow.FlowSet{}

@@ -171,12 +171,10 @@ func GetGarph(topology *topology.Topology) *Graph {
 
 func (vertex *Vertex) AddEdge(connections []*topology.Link) {
 	for _, c := range connections {
-		edge := &Edge{
+		vertex.Edges = append(vertex.Edges, &Edge{
 			Strat: c.FromNodeID,
 			End:   c.ToNodeID,
-			Cost:  1,
-		}
-		vertex.Edges = append(vertex.Edges, edge)
+		})
 	}
 }
 

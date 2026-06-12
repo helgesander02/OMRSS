@@ -47,7 +47,7 @@ schedule:
     o4: 1
 
 experiment:
-  test_cases: 1
+  test_cases: 100
   random_seed: 1
   network_only: false    
 

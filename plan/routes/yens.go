@@ -106,7 +106,7 @@ func oneShortestPath(graph *Graph, src, dst int) []int {
 			if visited[edge.End] {
 				continue
 			}
-			alt := dist[minID] + edge.Cost
+			alt := dist[minID] + 1
 			if alt < dist[edge.End] {
 				dist[edge.End] = alt
 				prev[edge.End] = minID
@@ -159,12 +159,10 @@ func (graph *Graph) Clone() *Graph {
 
 		// Clone edges
 		for _, e := range v.Edges {
-			newEdge := &Edge{
+			newVertex.Edges = append(newVertex.Edges, &Edge{
 				Strat: e.Strat,
 				End:   e.End,
-				Cost:  e.Cost,
-			}
-			newVertex.Edges = append(newVertex.Edges, newEdge)
+			})
 		}
 
 		clone.Vertexs = append(clone.Vertexs, newVertex)
@@ -239,14 +237,12 @@ func BuildGraphFromTopology(topo *topology.Topology) *Graph {
 				Edges: make([]*Edge, 0),
 			}
 
-			// Add edges
+			// Add edges. Hop cost is implicit (1) — see routes.Edge doc.
 			for _, conn := range node.Links {
-				edge := &Edge{
+				vertex.Edges = append(vertex.Edges, &Edge{
 					Strat: conn.FromNodeID,
 					End:   conn.ToNodeID,
-					Cost:  1, // Use hop count as cost
-				}
-				vertex.Edges = append(vertex.Edges, edge)
+				})
 			}
 
 			graph.Vertexs = append(graph.Vertexs, vertex)

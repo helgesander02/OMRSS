@@ -103,5 +103,4 @@ type Vertex struct {
 type Edge struct {
 	Strat int
 	End   int
-	Cost  int
 }
