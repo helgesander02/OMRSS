@@ -25,6 +25,15 @@ var methodList = []string{
 	MethodWSTMAR,
 }
 
+// MethodList exposes the encap method ordering to other packages. Stays
+// in sync with what GenerateCAN2TTFlows produces, so OSRO's per-method
+// harness can iterate the same set the gateway actually emitted.
+func MethodList() []string {
+	out := make([]string, len(methodList))
+	copy(out, methodList)
+	return out
+}
+
 func GenerateCAN2TTFlows(can config.CANFlowConfig, hyperperiod int, CANnode []int, mode string) []*Method {
 	// step 1: generate CAN flows
 	importantCANFlows, unimportantCANFlows := GenerateCANFlows(can, hyperperiod, CANnode)

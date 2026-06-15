@@ -27,24 +27,29 @@ func (plan *OMACO) ShowPlan() {
 }
 
 func (plan *OSRO) ShowPlan() {
-	logger.Println()
-	logger.Println("--- The Shortest Path final selected routing---")
-	plan.SP.Routes.Show_RouteSet()
+	// SP routes are shared across methods (same Yen's K-path output);
+	// pick the first method to surface them.
+	first := plan.Methods[0]
 
 	logger.Println()
-	logger.Println("--- 5th K-Paths ---")
-	plan.OSACO.KRoutes.Show_KRouteSet()
+	logger.Println("--- The Shortest Path final selected routing (shared across methods) ---")
+	plan.SPByMethod[first].Routes.Show_RouteSet()
 
-	plan.OSACO.Timer[0].TimerExportData()
-	plan.OSACO.Timer[1].TimerExportData()
-	plan.OSACO.Timer[2].TimerExportData()
-	plan.OSACO.Timer[3].TimerExportData()
-	plan.OSACO.Timer[4].TimerExportData()
+	for _, m := range plan.Methods {
+		osaco := plan.OSACOByMethod[m]
+		logger.Println()
+		logger.Printf("--- 5th K-Paths — method: %s ---\n", m)
+		osaco.KRoutes.Show_KRouteSet()
 
-	logger.Println()
-	logger.Println("--- The OSACO (Path) final selected routing ---")
-	plan.OSACO.InputRoutes.Show_RouteSet()
-	plan.OSACO.BGRoutes.Show_RouteSet()
+		for i := 0; i < 5; i++ {
+			osaco.Timer[i].TimerExportData()
+		}
+
+		logger.Println()
+		logger.Printf("--- The OSACO (Path) final selected routing — method: %s ---\n", m)
+		osaco.InputRoutes.Show_RouteSet()
+		osaco.BGRoutes.Show_RouteSet()
+	}
 }
 
 //func (plan *Plan3) ShowPlan() {

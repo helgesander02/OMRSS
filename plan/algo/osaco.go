@@ -52,7 +52,7 @@ func (osaco *OSACO) OSACO_Initial_Settings(network *network.Network, cfg *config
 // Ching-Chih Chuang et al., "Online Stream-Aware Routing for TSN-Based
 // Industrial Control Systems".
 func (osaco *OSACO) OSACO_Run(network *network.Network, cfg *config.Config, timeoutIndex int) [4]float64 {
-	initialobj, initialcost := schedule.OBJ(network, cfg, osaco.KRoutes, osaco.InputRoutes, osaco.BGRoutes, false)
+	initialobj, initialcost := schedule.OBJ(network, cfg, osaco.KRoutes, osaco.InputRoutes, osaco.BGRoutes, osaco.MethodScope, false)
 	logger.Println()
 	logger.Printf("initial value: %d \n", initialcost)
 	logger.Printf("O1: %f O2: %f O3: pass O4: %f \n", initialobj[0], initialobj[1], initialobj[3])
@@ -66,8 +66,8 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, cfg *config.Config, time
 		II := epoch(network, cfg, osaco, timeoutIndex)
 		osaco.Timer[timeoutIndex].TimerStop()
 
-		_, cost1 := schedule.OBJ(network, cfg, osaco.KRoutes, II, osaco.BGRoutes, false)
-		_, cost2 := schedule.OBJ(network, cfg, osaco.KRoutes, osaco.InputRoutes, osaco.BGRoutes, false)
+		_, cost1 := schedule.OBJ(network, cfg, osaco.KRoutes, II, osaco.BGRoutes, osaco.MethodScope, false)
+		_, cost2 := schedule.OBJ(network, cfg, osaco.KRoutes, osaco.InputRoutes, osaco.BGRoutes, osaco.MethodScope, false)
 
 		if cost1 < cost2 {
 			osaco.InputRoutes = II
@@ -80,7 +80,7 @@ func (osaco *OSACO) OSACO_Run(network *network.Network, cfg *config.Config, time
 		}
 	}
 
-	resultobj, resultcost := schedule.OBJ(network, cfg, osaco.KRoutes, osaco.InputRoutes, osaco.BGRoutes, true)
+	resultobj, resultcost := schedule.OBJ(network, cfg, osaco.KRoutes, osaco.InputRoutes, osaco.BGRoutes, osaco.MethodScope, true)
 	logger.Println()
 	logger.Printf("result value: %d \n", resultcost)
 	logger.Printf("O1: %f O2: %f O3: pass O4: %f \n", resultobj[0], resultobj[1], resultobj[3])
@@ -288,7 +288,7 @@ func epoch(network *network.Network, cfg *config.Config, osaco *OSACO, timeoutIn
 	logger.Printf("Select input routing %v \n", inputLoc)
 	osaco.Timer[timeoutIndex].TimerStop()
 
-	obj, cost := schedule.OBJ(network, cfg, osaco.KRoutes, II, osaco.BGRoutes, false)
+	obj, cost := schedule.OBJ(network, cfg, osaco.KRoutes, II, osaco.BGRoutes, osaco.MethodScope, false)
 
 	osaco.Timer[timeoutIndex].TimerStart()
 	if obj[0] == 0 && obj[1] == 0 {

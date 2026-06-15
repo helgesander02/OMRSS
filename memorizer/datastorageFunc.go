@@ -44,16 +44,25 @@ func (OS *OsroMemorizer) MStoreData(fileName string, testcase int) {
 	createFolder(fileName)
 	switchWorkingPath(fileName)
 
-	// Write results to CSV file
-	logger.Printf("Storing Shortest Path data to CSV...\n")
-	StoreCSV("ShortestPath.csv", OS.average_obj_smt, testcase)
-	logger.Printf("Storing OSACO (Path) data to CSV...\n")
-	StoreCSV("OSACO_Path_timeout_X5.csv", OS.average_objs_osaco[4], testcase)
-	StoreCSV("OSACO_Path_timeout_X4.csv", OS.average_objs_osaco[3], testcase)
-	StoreCSV("OSACO_Path_timeout_X3.csv", OS.average_objs_osaco[2], testcase)
-	StoreCSV("OSACO_Path_timeout_X2.csv", OS.average_objs_osaco[1], testcase)
-	StoreCSV("OSACO_Path_timeout_X1.csv", OS.average_objs_osaco[0], testcase)
-	StoreComputeringTimeCSV_OSRO("computering_time.csv", OS.average_time_mdt, OS.average_time_osaco[4], testcase)
+	// One CSV per method per artefact: ShortestPath_<method>.csv,
+	// OSACO_Path_<method>_timeout_X{1..5}.csv, computering_time_<method>.csv.
+	// Keeping the method in the filename means averageDataToResult_OSRO
+	// can recover per-method aggregates by suffix-matching, without
+	// needing the method list at read time.
+	for _, method := range OS.methods {
+		logger.Printf("Storing OSRO data to CSV — method: %s\n", method)
+		StoreCSV(fmt.Sprintf("ShortestPath_%s.csv", method), *OS.average_obj_sp_by_method[method], testcase)
+		osacoObj := OS.average_objs_osaco_by_method[method]
+		for i := 1; i <= 5; i++ {
+			StoreCSV(fmt.Sprintf("OSACO_Path_%s_timeout_X%d.csv", method, i), osacoObj[i-1], testcase)
+		}
+		StoreComputeringTimeCSV_OSRO(
+			fmt.Sprintf("computering_time_%s.csv", method),
+			*OS.average_time_sp_by_method[method],
+			OS.average_time_osaco_by_method[method][4],
+			testcase,
+		)
+	}
 
 	switchWorkingPath("../..")
 }

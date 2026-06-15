@@ -113,6 +113,47 @@ func (rs *RouteSet) BGRouteSet(bgTSN, bgAVB int) *RouteSet {
 	return out
 }
 
+// FilterCAN2TTByMethod returns a shallow-cloned RouteSet whose
+// CAN2TTRoutes only contain routes whose Method field matches `name`.
+// Native TT / AVB route slices are aliased (read-only by convention)
+// because they are unaffected by method choice. Empty `name` returns
+// a clone with CAN2TT routes preserved (no filter) — caller uses this
+// for "no method scope, evaluate everything together".
+func (rs *RouteSet) FilterCAN2TTByMethod(name string) *RouteSet {
+	out := newRouteSet()
+	out.TSNRoutes = rs.TSNRoutes
+	out.AVBRoutes = rs.AVBRoutes
+	if name == "" {
+		out.CAN2TTRoutes = append(out.CAN2TTRoutes, rs.CAN2TTRoutes...)
+		return out
+	}
+	for _, r := range rs.CAN2TTRoutes {
+		if r != nil && r.Method == name {
+			out.CAN2TTRoutes = append(out.CAN2TTRoutes, r)
+		}
+	}
+	return out
+}
+
+// FilterCAN2TTByMethod is the KRouteSet variant. OSACO consumes
+// KRouteSet directly to score per-flow candidate sets, so scoping at
+// this level keeps the ant-colony probability walk method-isolated.
+func (krs *KRouteSet) FilterCAN2TTByMethod(name string) *KRouteSet {
+	out := newKRouteSet()
+	out.TSNRoutes = krs.TSNRoutes
+	out.AVBRoutes = krs.AVBRoutes
+	if name == "" {
+		out.CAN2TTRoutes = append(out.CAN2TTRoutes, krs.CAN2TTRoutes...)
+		return out
+	}
+	for _, kr := range krs.CAN2TTRoutes {
+		if kr != nil && kr.Method == name {
+			out.CAN2TTRoutes = append(out.CAN2TTRoutes, kr)
+		}
+	}
+	return out
+}
+
 func Get_KTree_Routing(network *network.Network, cfg *config.Config, SMT *RouteSet, K int, Method_Number int) *KRouteSet {
 	ktrees_set := newKRouteSet()
 

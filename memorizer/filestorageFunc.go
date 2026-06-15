@@ -6,8 +6,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"src/pkg/logger"
 	"strconv"
+	"strings"
 )
 
 func (OC *OmacoMemorizer) MStoreFile(fileName string) {
@@ -220,29 +222,64 @@ func getAverageData(fileName string) (map[string]float64, int) {
 	return data, testcaseNumbers
 }
 
+// averageDataToResult_OSRO walks the per-method CSV files written by
+// MStoreData and emits one block per method into the result.txt. Method
+// names are recovered by filename suffix-matching, so adding a new encap
+// method in network/flow/can only requires changes there — this code
+// picks it up automatically by reading whatever ShortestPath_<m>.csv
+// files exist in the directory.
 func averageDataToResult_OSRO(fileName string) string {
-	data, testcaseNumbers := getAverageData_OSRO(fileName)
+	dataByMethod, testcaseNumbers := getAverageData_OSRO(fileName)
+
+	// Render in lexicographic method order for stable diffs across runs.
+	methods := make([]string, 0, len(dataByMethod))
+	for m := range dataByMethod {
+		methods = append(methods, m)
+	}
+	sort.Strings(methods)
 
 	text := fmt.Sprintf("( testcase numbers: %d ) ", testcaseNumbers)
 	text += "--- The experimental results are as follows --- \n"
-	text += "The average objective result for the Shortest Path:\n"
-	text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", data["average_obj_sp_o1"], data["average_obj_sp_o2"], data["average_obj_sp_o4"])
-	text += fmt.Sprintf("Computering time: %v ms\n", data["average_time_sp"])
-	text += "The average objective result for OSACO (Path-based):\n"
-	text += fmt.Sprintf("timeout_X5: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_path_X5_O1"], data["average_objs_osaco_path_X5_O2"], data["average_objs_osaco_path_X5_O4"])
-	text += fmt.Sprintf("timeout_X4: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_path_X4_O1"], data["average_objs_osaco_path_X4_O2"], data["average_objs_osaco_path_X4_O4"])
-	text += fmt.Sprintf("timeout_X3: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_path_X3_O1"], data["average_objs_osaco_path_X3_O2"], data["average_objs_osaco_path_X3_O4"])
-	text += fmt.Sprintf("timeout_X2: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_path_X2_O1"], data["average_objs_osaco_path_X2_O2"], data["average_objs_osaco_path_X2_O4"])
-	text += fmt.Sprintf("timeout_X1: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_path_X1_O1"], data["average_objs_osaco_path_X1_O2"], data["average_objs_osaco_path_X1_O4"])
-	text += fmt.Sprintf("Computering time: %v ms\n", data["average_time_osaco_path"])
+	for _, method := range methods {
+		data := dataByMethod[method]
+		text += fmt.Sprintf("\n=== method: %s ===\n", method)
+		text += "The average objective result for the Shortest Path:\n"
+		text += fmt.Sprintf("O1: %f O2: %f O3: pass O4: %f \n", data["average_obj_sp_o1"], data["average_obj_sp_o2"], data["average_obj_sp_o4"])
+		text += fmt.Sprintf("Computering time: %v ms\n", data["average_time_sp"])
+		text += "The average objective result for OSACO (Path-based):\n"
+		text += fmt.Sprintf("timeout_X5: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_path_X5_O1"], data["average_objs_osaco_path_X5_O2"], data["average_objs_osaco_path_X5_O4"])
+		text += fmt.Sprintf("timeout_X4: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_path_X4_O1"], data["average_objs_osaco_path_X4_O2"], data["average_objs_osaco_path_X4_O4"])
+		text += fmt.Sprintf("timeout_X3: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_path_X3_O1"], data["average_objs_osaco_path_X3_O2"], data["average_objs_osaco_path_X3_O4"])
+		text += fmt.Sprintf("timeout_X2: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_path_X2_O1"], data["average_objs_osaco_path_X2_O2"], data["average_objs_osaco_path_X2_O4"])
+		text += fmt.Sprintf("timeout_X1: O1: %f O2: %f O3: pass O4: %f \n", data["average_objs_osaco_path_X1_O1"], data["average_objs_osaco_path_X1_O2"], data["average_objs_osaco_path_X1_O4"])
+		text += fmt.Sprintf("Computering time: %v ms\n", data["average_time_osaco_path"])
+	}
 
 	return text
 }
 
-func getAverageData_OSRO(fileName string) (map[string]float64, int) {
+// getAverageData_OSRO returns per-method aggregated data plus the
+// number of testcases. Methods are discovered by parsing filenames
+// like:
+//
+//	ShortestPath_<method>.csv
+//	OSACO_Path_<method>_timeout_X{1..5}.csv
+//	computering_time_<method>.csv
+//
+// We do *not* hard-code the method list; whatever filenames exist in
+// the directory become the methods rendered into the result.txt.
+func getAverageData_OSRO(fileName string) (map[string]map[string]float64, int) {
 	currentDir, _ := os.Getwd()
 	dir := filepath.Join(currentDir + "/data/" + fileName)
-	data := make(map[string]float64)
+	dataByMethod := make(map[string]map[string]float64)
+	getData := func(m string) map[string]float64 {
+		if d, ok := dataByMethod[m]; ok {
+			return d
+		}
+		d := make(map[string]float64)
+		dataByMethod[m] = d
+		return d
+	}
 
 	files, err := os.ReadDir(dir)
 	if err != nil {
@@ -267,7 +304,6 @@ func getAverageData_OSRO(fileName string) (map[string]float64, int) {
 		reader := csv.NewReader(csvFile)
 		columns := make([][]string, 0)
 
-		// Read columns instead of rows
 		for {
 			row, err := reader.Read()
 			if err == io.EOF {
@@ -297,45 +333,60 @@ func getAverageData_OSRO(fileName string) (map[string]float64, int) {
 			return sum / float64(len(row)), err
 		}
 
-		switch file.Name() {
-		case "computering_time.csv":
+		name := file.Name()
+		switch {
+		case strings.HasPrefix(name, "computering_time_") && strings.HasSuffix(name, ".csv"):
+			method := strings.TrimSuffix(strings.TrimPrefix(name, "computering_time_"), ".csv")
+			d := getData(method)
 			if val, err := convertToFloat(columns[0]); err == nil {
-				data["average_time_sp"] = val
+				d["average_time_sp"] = val
 			}
 			if val, err := convertToFloat(columns[1]); err == nil {
-				data["average_time_osaco_path"] = val
+				d["average_time_osaco_path"] = val
 			}
-			if val, err := convertToFloat(columns[2]); err == nil {
+			if val, err := convertToFloat(columns[2]); err == nil && val > 0 {
 				testcaseNumbers = int(val)
 			}
 
-		case "ShortestPath.csv":
+		case strings.HasPrefix(name, "ShortestPath_") && strings.HasSuffix(name, ".csv"):
+			method := strings.TrimSuffix(strings.TrimPrefix(name, "ShortestPath_"), ".csv")
+			d := getData(method)
 			if val, err := convertToFloat(columns[0]); err == nil {
-				data["average_obj_sp_o1"] = val
+				d["average_obj_sp_o1"] = val
 			}
 			if val, err := convertToFloat(columns[1]); err == nil {
-				data["average_obj_sp_o2"] = val
+				d["average_obj_sp_o2"] = val
 			}
 			if val, err := convertToFloat(columns[3]); err == nil {
-				data["average_obj_sp_o4"] = val
+				d["average_obj_sp_o4"] = val
 			}
-		}
 
-		// OSACO Path timeout cases
-		for i := 1; i <= 5; i++ {
-			if file.Name() == fmt.Sprintf("OSACO_Path_timeout_X%d.csv", i) {
-				if val, err := convertToFloat(columns[0]); err == nil {
-					data[fmt.Sprintf("average_objs_osaco_path_X%d_O1", i)] = val
-				}
-				if val, err := convertToFloat(columns[1]); err == nil {
-					data[fmt.Sprintf("average_objs_osaco_path_X%d_O2", i)] = val
-				}
-				if val, err := convertToFloat(columns[3]); err == nil {
-					data[fmt.Sprintf("average_objs_osaco_path_X%d_O4", i)] = val
-				}
+		case strings.HasPrefix(name, "OSACO_Path_") && strings.HasSuffix(name, ".csv"):
+			// OSACO_Path_<method>_timeout_X{i}.csv
+			trimmed := strings.TrimSuffix(strings.TrimPrefix(name, "OSACO_Path_"), ".csv")
+			// trimmed = "<method>_timeout_X{i}"
+			sep := strings.LastIndex(trimmed, "_timeout_X")
+			if sep < 0 {
+				continue
+			}
+			method := trimmed[:sep]
+			idxStr := trimmed[sep+len("_timeout_X"):]
+			i, err := strconv.Atoi(idxStr)
+			if err != nil || i < 1 || i > 5 {
+				continue
+			}
+			d := getData(method)
+			if val, err := convertToFloat(columns[0]); err == nil {
+				d[fmt.Sprintf("average_objs_osaco_path_X%d_O1", i)] = val
+			}
+			if val, err := convertToFloat(columns[1]); err == nil {
+				d[fmt.Sprintf("average_objs_osaco_path_X%d_O2", i)] = val
+			}
+			if val, err := convertToFloat(columns[3]); err == nil {
+				d[fmt.Sprintf("average_objs_osaco_path_X%d_O4", i)] = val
 			}
 		}
 	}
 
-	return data, testcaseNumbers
+	return dataByMethod, testcaseNumbers
 }

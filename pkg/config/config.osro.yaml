@@ -1,7 +1,7 @@
 network:
   topology: "typical_complex"
   hyperperiod: 60000
-  bandwidth: 1e9
+  bandwidth: 1e8
   flows:
     routing_mode: "path" 
     tsn:
@@ -47,7 +47,7 @@ schedule:
     o4: 1
 
 experiment:
-  test_cases: 1
+  test_cases: 100
   random_seed: 1
   network_only: false     
 

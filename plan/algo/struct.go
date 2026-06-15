@@ -33,6 +33,12 @@ type OSACO struct {
 	Objs_osaco    [5][4]float64        // 200ms{o1, o2, o3, o4} 400ms{o1, o2, o3, o4} 600ms{o1, o2, o3, o4}, 800ms{o1, o2, o3, o4}, 1000ms{o1, o2, o3, o4}
 	Timer         [5]*algo_timer.Timer // 200ms{time} 400ms{time} 600ms{time}, 800ms{time}, 1000ms{time}
 	Method_Number int                  // 0: TOP K minimum weight 1: Increasing Arithmetic Sequence 2: Average Arithmetic Sequence
+
+	// MethodScope is the OSRO encap method this OSACO instance is
+	// optimizing for ("" for OMACO, "fifo"/"mao"/etc. for OSRO). When
+	// non-empty it is threaded into every schedule.OBJ call so the
+	// scoring sees only this method's CAN2TT footprint on the timeline.
+	MethodScope string
 }
 
 type Visibility struct {
