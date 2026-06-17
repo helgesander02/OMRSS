@@ -5,13 +5,13 @@ network:
   flows:
     routing_mode: "tree"
     tsn:
-      input: 35
-      background: 35
+      input: 9
+      background: 8
       params:
         periods: [100, 500, 1000, 1500, 2000]
         datasizes: [30, 40, 50, 60, 70, 80, 90, 100]
     avb:
-      input: 15
+      input: 21
       background: 15
       params:
         period: 125
@@ -47,7 +47,7 @@ schedule:
     o4: 1
 
 experiment:
-  test_cases: 100
+  test_cases: 1
   random_seed: 1
   network_only: false    
 

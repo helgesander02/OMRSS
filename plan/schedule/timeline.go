@@ -306,7 +306,7 @@ func (nt *NetworkTimeline) LaursenInterference(from, to, twcUs int) int {
 
 	imax := 0
 	for i := range lt.Windows {
-		ic := walkLaursenFromAnchor(lt.Windows, i, lt.Windows[i].Start, twcUs)
+		ic := walkLaursenFromAnchor(lt.Windows, i, lt.Windows[i].Start, twcUs, nt.HyperPeriod)
 		if ic > imax {
 			imax = ic
 		}
@@ -318,35 +318,58 @@ func (nt *NetworkTimeline) LaursenInterference(from, to, twcUs int) int {
 // startIdx-th window forward, modelling AVB transmission starting at
 // `anchor` with `twcUs` of payload still to send. Returns total µs of
 // TT-induced stall (= Laursen's icurrent for this anchor).
-func walkLaursenFromAnchor(windows []Window, startIdx, anchor, twcUs int) int {
+//
+// GCL is periodic with hyperperiod H. When we run out of windows in
+// this period and still have remaining payload, we wrap around to the
+// first window shifted by H — Laursen 2016 Algorithm 1's gce.next is a
+// circular linked list, and the previous implementation's forward-only
+// walk was the long-standing FIXME mirroring the same bug in
+// oldsrc/schedule/evaluator.rs (workload=3 returns 3 instead of 4 on
+// the 3-window unit test).
+//
+// We iterate at most 2 × len(windows) times: one full cycle from
+// startIdx is enough to exhaust any reasonable twc under bounded
+// utilisation; the extra round provides a safety margin so a
+// straddling-anchor case never under-counts.
+func walkLaursenFromAnchor(windows []Window, startIdx, anchor, twcUs, hyperperiod int) int {
+	n := len(windows)
+	if n == 0 || twcUs <= 0 {
+		return 0
+	}
 	icurrent := 0
 	remaining := twcUs
 	pos := anchor
 
-	for i := startIdx; i < len(windows); i++ {
-		w := windows[i]
-		if w.End <= pos {
+	for k := 0; k < 2*n; k++ {
+		i := (startIdx + k) % n
+		cycleOff := ((startIdx + k) / n) * hyperperiod
+		wStart := windows[i].Start + cycleOff
+		wEnd := windows[i].End + cycleOff
+
+		if wEnd <= pos {
 			continue
 		}
 		// Free gap before this window: AVB transmits, consume remaining.
-		if w.Start > pos {
-			gap := w.Start - pos
+		if wStart > pos {
+			gap := wStart - pos
 			if gap >= remaining {
 				return icurrent
 			}
 			remaining -= gap
-			pos = w.Start
+			pos = wStart
 		}
 		// Inside the window: AVB stalled, gate closed.
 		stallStart := pos
-		if stallStart < w.Start {
-			stallStart = w.Start
+		if stallStart < wStart {
+			stallStart = wStart
 		}
-		icurrent += w.End - stallStart
-		pos = w.End
+		icurrent += wEnd - stallStart
+		pos = wEnd
 	}
-	// No more windows but still have remaining payload — that final
-	// stretch is free, no additional interference.
+	// We've cycled twice without exhausting remaining — the AVB is
+	// effectively starved on this link. Return whatever stall we've
+	// accumulated; downstream schedulability will mark the flow
+	// unschedulable.
 	return icurrent
 }
 

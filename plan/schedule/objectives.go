@@ -48,12 +48,14 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KRouteSet, II *
 	)
 	linkmap := map[string]float64{}
 
-	// Build the timeline once for this evaluation. Native TT (Rounds 1+2)
-	// and CAN2TT (Round 3 encap output) are both placed here, with EMSO
-	// disaggregation as the fallback for CAN2TT flows that can't fit
-	// directly. AVB WCD reads from this same timeline so the encap
-	// method's busy-window footprint propagates into AVB O2/O4.
+	// Build the timeline + AVB per-link load once for this evaluation.
+	// Native TT (Rounds 1+2) and CAN2TT (Round 3 encap output) are both
+	// placed on the timeline; selected AVB routes (BG + input) are
+	// tallied into avbLoad. WCDWithTimeline reads both so encap-method
+	// choices propagate into AVB O2/O4 *and* AVB-on-AVB interference is
+	// counted exactly once per actually-selected route.
 	timeline := BuildTimelineForRoutes(network, cfg, II, II_prime, methodScope)
+	avbLoad := ComputeAVBPerLinkLoad(II, II_prime, network.FlowSet)
 
 	// Round1: Schedule BG flow
 	// O1
@@ -64,7 +66,7 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KRouteSet, II *
 
 	// O2 and O4 — AVB WCD via Laursen
 	for nth, route := range II_prime.AVBRoutes {
-		wcd := WCDWithTimeline(route, X, S_prime.AVBFlows[nth], network.FlowSet, timeline)
+		wcd := WCDWithTimeline(route, X, S_prime.AVBFlows[nth], network.FlowSet, timeline, avbLoad)
 		avb_wcd_sum += wcd
 		schedulability := schedulability(wcd, S_prime.AVBFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		avb_failed_count += 1 - schedulability
@@ -80,7 +82,7 @@ func OBJ(network *network.Network, cfg *config.Config, X *routes.KRouteSet, II *
 
 	// O2 and O4 — AVB WCD via Laursen
 	for nth, route := range II.AVBRoutes {
-		wcd := WCDWithTimeline(route, X, S.AVBFlows[nth], network.FlowSet, timeline)
+		wcd := WCDWithTimeline(route, X, S.AVBFlows[nth], network.FlowSet, timeline, avbLoad)
 		avb_wcd_sum += wcd
 		schedulability := schedulability(wcd, S.AVBFlows[nth], route, linkmap, cfg.Network.Bandwidth, cfg.Network.Hyperperiod)
 		avb_failed_count += 1 - schedulability
@@ -215,63 +217,66 @@ func indexByte(s string, c byte) int {
 	return -1
 }
 
+// schedulability is the bandwidth-only schedulability check shared by
+// every flow class (native TT, AVB, CAN2TT). For AVB, `wcd` is the
+// Laursen 2016 worst-case end-to-end delay; for TT/CAN2TT, 0 is passed
+// because no WCD analysis is done — the deadline is enforced solely by
+// the per-link byte budget.
+//
+// Previously this routine mutated `linkmap` in place as it walked, and
+// only rolled back the LAST link's increment on failure. Upstream
+// hops' additions stayed in `linkmap`, polluting subsequent flows and
+// causing cascading false failures whenever a multi-hop flow ran out
+// of room downstream. The fix below collects every per-link byte
+// addition in a separate delta map and commits atomically only if the
+// whole walk plus the WCD constraint succeed.
 func schedulability(wcd time.Duration, flow *tt.Flow, route *routes.Route, linkmap map[string]float64, bandwidth float64, hyperPeriod int) int {
 	r := wcd <= time.Duration(flow.Deadline)*time.Microsecond
+	delta := make(map[string]float64)
 	node := route.GetNodeByID(flow.Source)
-	schedulable, _ := schedulable(node, -1, flow, route, linkmap, bandwidth, hyperPeriod)
-
-	if r && schedulable {
-		return 1
+	ok := schedulableDelta(node, -1, flow, route, linkmap, delta, bandwidth, hyperPeriod)
+	if !(r && ok) {
+		// Discard delta — leave linkmap exactly as we found it.
+		return 0
 	}
-	return 0
+	// Atomic commit.
+	for k, v := range delta {
+		linkmap[k] += v
+	}
+	return 1
 }
 
-func schedulable(node *routes.Node, parentID int, flow *tt.Flow, route *routes.Route, linkmap map[string]float64, bandwidth float64, hyperPeriod int) (bool, map[string]float64) {
+// schedulableDelta walks the route DFS-style and accumulates per-link
+// byte additions in `delta`. `linkmap` is read-only — we check
+// `linkmap[key] + delta[key]` against the per-link bandwidth budget so
+// the combined load (already-committed + this flow's pending) is what
+// is enforced. End-station-incident links are skipped, matching the
+// duplex assumption that talkers and listeners have dedicated cables.
+func schedulableDelta(node *routes.Node, parentID int, flow *tt.Flow, route *routes.Route, linkmap, delta map[string]float64, bandwidth float64, hyperPeriod int) bool {
+	if node == nil {
+		return true
+	}
 	for _, link := range node.Connections {
 		if link.ToNodeID == parentID {
 			continue
-
-		} else {
-			//// Duplex
-			if !(link.FromNodeID == flow.Source || loopcompare(link.ToNodeID, flow.Destinations)) {
-				key := fmt.Sprintf("%d>%d", link.FromNodeID, link.ToNodeID)
-				linkmap[key] += flow.DataSize * float64((hyperPeriod / flow.Period))
-				if linkmap[key] > bandwidth {
-					linkmap[key] -= flow.DataSize * float64((hyperPeriod / flow.Period))
-					return false, linkmap
-				}
+		}
+		if !(link.FromNodeID == flow.Source || loopcompare(link.ToNodeID, flow.Destinations)) {
+			key := fmt.Sprintf("%d>%d", link.FromNodeID, link.ToNodeID)
+			if flow.Period <= 0 {
+				return false
 			}
-
-			//// Simplex
-			//if !(link.FromNodeID == flow.Source || loopcompare(link.ToNodeID, flow.Destinations)) {
-			//	key := ""
-			//	key1 := fmt.Sprintf("%d>%d", link.FromNodeID, link.ToNodeID)
-			//	key2 := fmt.Sprintf("%d>%d", link.ToNodeID, link.FromNodeID)
-			//	if _, ok := linkmap[key1]; !ok {
-			//		if _, ok := linkmap[key2]; !ok {
-			//			key = key1
-			//		} else {
-			//			key = key2
-			//		}
-			//
-			//	} else {
-			//		key = key1
-			//	}
-			//
-			//	linkmap[key] += flow.DataSize * float64((hyperPeriod / flow.Period))
-			//	if linkmap[key] > bandwidth {
-			//		return false, linkmap
-			//	}
-			//}
-
-			nextnode := route.GetNodeByID(link.ToNodeID)
-			schedulable, updatedLinkmap := schedulable(nextnode, node.ID, flow, route, linkmap, bandwidth, hyperPeriod)
-			if !schedulable {
-				return false, updatedLinkmap
+			add := flow.DataSize * float64(hyperPeriod/flow.Period)
+			delta[key] += add
+			if linkmap[key]+delta[key] > bandwidth {
+				return false
 			}
 		}
+		nextnode := route.GetNodeByID(link.ToNodeID)
+		if !schedulableDelta(nextnode, node.ID, flow, route, linkmap, delta, bandwidth, hyperPeriod) {
+			return false
+		}
 	}
-	return true, linkmap
+	return true
 }
 
 func loopcompare(a int, b []int) bool {
